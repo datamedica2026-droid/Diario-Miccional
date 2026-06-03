@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Diario Miccional</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f4f8;--surface:#ffffff;--card:#ffffff;--border:#dde3ee;--border2:#c5cedf;
+  --text:#1a2236;--text2:#5a6a85;--text3:#9aaac0;
+  --accent:#1976d2;--accent2:#1565c0;--accent-light:#e3f2fd;
+  --green:#2e7d32;--green-light:#e8f5e9;
+  --amber:#e65100;--amber-light:#fff3e0;
+  --red:#c62828;--red-light:#ffebee;
+  --radius:14px;--radius-lg:20px;--radius-xl:28px;
+}
+[data-theme="dark"]{
+  --bg:#0d1117;--surface:#161b27;--card:#1c2235;--border:#252d45;--border2:#323d58;
+  --text:#e8eef8;--text2:#8896b3;--text3:#4a5675;
+  --accent:#4fc3f7;--accent2:#0288d1;--accent-light:#0d2137;
+  --green:#43d98c;--green-light:#0a2e1e;
+  --amber:#ffb74d;--amber-light:#2e1f00;
+  --red:#ef5350;--red-light:#2e0a0a;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;}
+
+/* ── TOP BAR ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1rem;height:56px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
+.topbar-logo{font-size:13px;font-weight:700;color:var(--accent2);letter-spacing:0.04em;flex:1;}
+.btn-lang{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);font-family:inherit;}
+.btn-theme{background:transparent;border:none;cursor:pointer;font-size:18px;line-height:1;}
+
+/* ── SCREENS ── */
+.screen{display:none;padding:1.5rem 1rem 6rem;}
+.screen.active{display:block;}
+
+/* ── WELCOME / ONBOARDING ── */
+.welcome-hero{text-align:center;padding:2rem 1rem 1.5rem;}
+.welcome-icon{font-size:4rem;margin-bottom:1rem;}
+.welcome-title{font-size:1.5rem;font-weight:700;margin-bottom:0.5rem;}
+.welcome-sub{font-size:14px;color:var(--text2);line-height:1.6;}
+.onboard-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;}
+.onboard-title{font-size:1rem;font-weight:700;margin-bottom:1.25rem;}
+.tab-row{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.25rem;}
+.tab-btn{flex:1;padding:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text2);border-bottom:2px solid transparent;font-family:inherit;transition:all .15s;}
+.tab-btn.active{color:var(--accent2);border-bottom-color:var(--accent2);}
+
+/* ── BUTTONS ── */
+.btn{padding:10px 20px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--card);color:var(--text);font-size:14px;cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s;}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--accent2);border-color:var(--accent2);color:#fff;}
+.btn-primary:active{background:var(--accent);}
+.btn-full{width:100%;padding:14px;font-size:15px;border-radius:var(--radius-lg);}
+.btn-xl{padding:18px;font-size:1rem;border-radius:var(--radius-xl);}
+.btn-outline{background:transparent;border:1.5px solid var(--accent2);color:var(--accent2);}
+.btn-danger-outline{background:var(--red-light);border:1px solid var(--red);color:var(--red);}
+
+/* ── FORMS ── */
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;letter-spacing:0.04em;text-transform:uppercase;}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--text);font-family:inherit;transition:border-color .15s;}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--accent2);}
+.form-group select option{background:var(--card);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0;cursor:pointer;transition:all .15s;}
+.nav-item.active .nav-icon{color:var(--accent2);}
+.nav-item.active .nav-label{color:var(--accent2);}
+.nav-icon{font-size:22px;margin-bottom:2px;}
+.nav-label{font-size:10px;font-weight:600;color:var(--text3);}
+
+/* ── ACTION BUTTONS (main screen) ── */
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem;}
+.action-btn{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;text-align:center;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.action-btn:active{transform:scale(0.96);}
+.action-btn-icon{font-size:2rem;}
+.action-btn-label{font-size:13px;font-weight:700;color:var(--text);}
+.action-btn-sub{font-size:11px;color:var(--text2);}
+.action-btn.primary-action{background:var(--accent-light);border-color:var(--accent2);}
+.action-btn.primary-action .action-btn-label{color:var(--accent2);}
+
+/* ── CHRONOMETER ── */
+.chrono-wrap{background:var(--accent-light);border:1.5px solid var(--accent2);border-radius:var(--radius-lg);padding:1.5rem;text-align:center;margin-bottom:1.25rem;}
+.chrono-time{font-family:'JetBrains Mono',monospace;font-size:3.2rem;font-weight:500;color:var(--accent2);letter-spacing:0.04em;}
+.chrono-label{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem;}
+.chrono-btns{display:flex;gap:10px;justify-content:center;margin-top:1rem;}
+.chrono-start{background:var(--accent2);color:#fff;border:none;padding:12px 30px;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.chrono-start:active{transform:scale(0.96);}
+.chrono-stop{background:var(--red);color:#fff;border:none;padding:12px 30px;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.chrono-reset{background:transparent;border:1px solid var(--border2);padding:12px 16px;border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:inherit;color:var(--text2);}
+
+/* ── AUDIO ── */
+.audio-section{margin-bottom:10px;}
+.audio-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.btn-mic{background:var(--bg);border:1.5px solid var(--border2);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text2);}
+.btn-mic.active{background:var(--red-light);border-color:var(--red);color:var(--red);}
+.audio-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;flex:1;}
+.audio-fill{height:100%;background:var(--accent2);border-radius:3px;transition:width .1s;width:0%;}
+.mic-status{font-size:11px;color:var(--text2);}
+
+/* ── URGENCY ── */
+.urgency-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.urgency-btn{padding:10px 4px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:11px;font-weight:600;text-align:center;font-family:inherit;transition:all .15s;color:var(--text2);}
+.urgency-btn.selected{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.urgency-btn .u-num{font-size:1.1rem;display:block;font-family:'JetBrains Mono',monospace;}
+
+/* ── POSITION ── */
+.pos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.pos-btn{padding:14px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--bg);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;}
+.pos-btn:active{transform:scale(0.97);}
+.pos-btn.selected{background:var(--green-light);border-color:var(--green);}
+.pos-icon{font-size:2rem;display:block;margin-bottom:4px;}
+.pos-label{font-size:13px;font-weight:700;color:var(--text2);}
+
+/* ── RECORDS ── */
+.record-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px;}
+.record-icon-wrap{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.record-body{flex:1;}
+.record-time{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.record-title{font-size:14px;font-weight:700;margin-top:2px;}
+.record-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.chip-blue{background:var(--accent-light);color:var(--accent2);}
+.chip-green{background:var(--green-light);color:var(--green);}
+.chip-amber{background:var(--amber-light);color:var(--amber);}
+.chip-red{background:var(--red-light);color:var(--red);}
+.chip-gray{background:var(--border);color:var(--text2);}
+.delete-btn{background:transparent;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:4px;border-radius:6px;}
+.delete-btn:active{background:var(--red-light);}
+
+/* ── DATE LABEL ── */
+.date-chip{font-size:11px;font-weight:600;color:var(--text3);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:4px 10px;display:inline-block;margin:10px 0 6px;}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:1.5rem;width:100%;max-width:430px;max-height:92vh;overflow-y:auto;padding-bottom:2rem;}
+.modal-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 1.25rem;}
+.modal-title{font-size:1.1rem;font-weight:700;margin-bottom:1.25rem;}
+.modal-footer{display:flex;gap:10px;margin-top:1.25rem;}
+.modal-footer .btn{flex:1;}
+
+/* ── CODE ENTRY ── */
+.code-input{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;text-align:center;letter-spacing:0.2em;text-transform:uppercase;border:2px solid var(--accent2);border-radius:var(--radius);padding:14px;}
+
+/* ── PROFILE VIEW ── */
+.profile-section{margin-bottom:1.25rem;}
+.profile-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
+.profile-value{font-size:15px;font-weight:500;}
+
+/* ── MSG ── */
+.msg-error{color:var(--red);font-size:12px;margin-top:8px;text-align:center;font-weight:600;}
+.msg-success{color:var(--green);font-size:12px;margin-top:8px;text-align:center;font-weight:600;}
+.empty-state{text-align:center;padding:2.5rem 1rem;color:var(--text3);}
+.empty-state .ei{font-size:2.5rem;margin-bottom:0.75rem;}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar" id="topbar" style="display:none">
+  <div class="topbar-logo">🏥 <span data-t="appTitle">Diario Miccional</span></div>
+  <button class="btn-lang" onclick="toggleLang()" id="langBtn">EN</button>
+  <button class="btn-theme" onclick="toggleTheme()">🌙</button>
+</div>
+
+<!-- ══ ONBOARDING SCREEN ══ -->
+<div class="screen active" id="screen-onboard">
+  <div class="welcome-hero">
+    <div class="welcome-icon">🚿</div>
+    <div class="welcome-title" data-t="welcomeTitle">Diario Miccional</div>
+    <div class="welcome-sub" data-t="welcomeSub">Registra y comparte tu diario con tu médico de forma segura.</div>
+  </div>
+  <div class="onboard-card">
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="onboardTab(this,'ob-code')" data-t="haveCode">Tengo un código</button>
+      <button class="tab-btn" onclick="onboardTab(this,'ob-register')" data-t="registerNew">Registrarme</button>
+    </div>
+    <!-- Tab código -->
+    <div id="ob-code">
+      <div style="font-size:14px;color:var(--text2);margin-bottom:1rem" data-t="codeInstructions">Tu médico te dio un código de 8 letras. Ingrésalo aquí:</div>
+      <div class="form-group">
+        <input class="code-input" type="text" id="accessCodeInput" maxlength="9" placeholder="XXXX-XXXX" oninput="formatCode(this)">
+      </div>
+      <div class="form-group">
+        <label data-t="yourName">Tu nombre (para confirmar)</label>
+        <input type="text" id="codePatientName" placeholder="Tu nombre completo">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="connectWithCode()" data-t="connect">Conectar</button>
+      <div id="codeError" class="msg-error"></div>
+    </div>
+    <!-- Tab registro -->
+    <div id="ob-register" style="display:none">
+      <div class="form-row">
+        <div class="form-group"><label data-t="name">Nombre *</label><input type="text" id="regNombre" placeholder="María López"></div>
+        <div class="form-group"><label data-t="birthdate">Fecha de nac.</label><input type="date" id="regNac"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label data-t="gender">Género</label>
+          <select id="regGenero">
+            <option value="">—</option>
+            <option value="f" data-t="female">Femenino</option>
+            <option value="m" data-t="male">Masculino</option>
+            <option value="o" data-t="other">Otro</option>
+          </select>
+        </div>
+        <div class="form-group"><label data-t="phone">Teléfono</label><input type="tel" id="regTel" placeholder="+57 300..."></div>
+      </div>
+      <div class="form-group"><label data-t="email">Email</label><input type="email" id="regEmail" placeholder="tu@email.com"></div>
+      <div class="form-group"><label data-t="diagnosis">Diagnóstico (si lo conoces)</label><input type="text" id="regDiag" placeholder="Opcional"></div>
+      <button class="btn btn-primary btn-full" onclick="selfRegister()" data-t="createProfile">Crear perfil</button>
+      <div id="regError" class="msg-error"></div>
+      <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px" data-t="pendingNote">Tu perfil quedará pendiente hasta que tu médico lo confirme.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN SCREEN ══ -->
+<div class="screen" id="screen-main">
+  <!-- Greeting -->
+  <div style="margin-bottom:1.25rem">
+    <div style="font-size:1.1rem;font-weight:700" id="greetingName">Hola 👋</div>
+    <div style="font-size:13px;color:var(--text2)" id="greetingDate"></div>
+  </div>
+
+  <!-- Sleep times -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1.25rem;display:flex;gap:10px;align-items:flex-end">
+    <div class="form-group" style="flex:1;margin:0">
+      <label data-t="wakeUp">🌅 Me levanté</label>
+      <input type="time" id="wakeTime">
+    </div>
+    <div class="form-group" style="flex:1;margin:0">
+      <label data-t="bedtime">🌙 Me acuesto</label>
+      <input type="time" id="sleepTime">
+    </div>
+    <button class="btn btn-primary" style="height:46px;padding:0 14px;border-radius:12px;font-size:13px" onclick="saveSleep()" data-t="save">Guardar</button>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="action-grid">
+    <div class="action-btn primary-action" onclick="openModal('miction')" style="grid-column:1/-1">
+      <div class="action-btn-icon">🚽</div>
+      <div class="action-btn-label" data-t="addMiction">+ Registrar micción</div>
+      <div class="action-btn-sub" data-t="mictionSub">Con cronómetro y micrófono</div>
+    </div>
+    <div class="action-btn" onclick="openModal('drink')">
+      <div class="action-btn-icon">💧</div>
+      <div class="action-btn-label" data-t="addDrink">+ Bebida</div>
+    </div>
+    <div class="action-btn" onclick="openModal('leak')">
+      <div class="action-btn-icon">⚠️</div>
+      <div class="action-btn-label" data-t="addLeak">+ Fuga</div>
+    </div>
+  </div>
+
+  <!-- Today's records -->
+  <div style="font-size:13px;font-weight:700;margin-bottom:10px" data-t="todayRecords">Registros de hoy</div>
+  <div id="recordsList"></div>
+</div>
+
+<!-- ══ PROFILE SCREEN ══ -->
+<div class="screen" id="screen-profile">
+  <div style="font-size:1.1rem;font-weight:700;margin-bottom:1.25rem" data-t="myProfile">Mi perfil</div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem" id="profileView"></div>
+  <button class="btn btn-danger-outline btn-full" onclick="logout()" data-t="logout">Cerrar sesión / Cambiar paciente</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav" id="bottomNav" style="display:none">
+  <div class="nav-item active" onclick="showScreen('main',this)">
+    <div class="nav-icon">📋</div>
+    <div class="nav-label" data-t="diary">Diario</div>
+  </div>
+  <div class="nav-item" onclick="showScreen('profile',this)">
+    <div class="nav-icon">👤</div>
+    <div class="nav-label" data-t="profile">Perfil</div>
+  </div>
+</div>
+
+<!-- ══ MODAL MICCIÓN ══ -->
+<div class="modal-overlay" id="modalMiction">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" data-t="recordMiction">🚽 Registrar micción</div>
+
+    <!-- Chrono -->
+    <div class="chrono-wrap" id="chronoWrap">
+      <div class="chrono-label" data-t="timer">Cronómetro</div>
+      <div class="chrono-time" id="chronoDisplay">00:00.0</div>
+      <div style="font-size:12px;color:var(--accent);margin-top:4px" id="chronoState" data-t="ready">Listo</div>
+      <div class="chrono-btns">
+        <button class="chrono-start" id="btnStart" onclick="chronoStart()" data-t="start">▶ Iniciar</button>
+        <button class="chrono-stop" id="btnStop" onclick="chronoStop()" style="display:none" data-t="stop">■ Detener</button>
+        <button class="chrono-reset" id="btnReset" onclick="chronoReset()" style="display:none" data-t="reset">↺</button>
+      </div>
+    </div>
+
+    <!-- Mic -->
+    <div class="audio-section">
+      <div class="audio-row">
+        <button class="btn-mic" id="btnMic" onclick="toggleMic()" data-t="useMic">🎙 Usar micrófono</button>
+        <div class="audio-bar"><div class="audio-fill" id="audioFill"></div></div>
+      </div>
+      <div class="mic-status" id="micStatus" data-t="micAuto">Detecta inicio y fin automáticamente</div>
+    </div>
+
+    <div class="form-row" style="margin-bottom:10px">
+      <div class="form-group" style="margin:0">
+        <label data-t="time">Hora</label>
+        <input type="time" id="micHora">
+      </div>
+      <div class="form-group" style="margin:0">
+        <label data-t="volume">Volumen (ml)</label>
+        <input type="number" id="micVol" placeholder="250" min="0" max="1000">
+      </div>
+    </div>
+    <div class="form-row" style="margin-bottom:14px">
+      <div class="form-group" style="margin:0">
+        <label data-t="duration">Duración (seg)</label>
+        <input type="number" id="micDur" placeholder="20">
+      </div>
+      <div class="form-group" style="margin:0">
+        <label data-t="gender">Género</label>
+        <select id="micGenero" onchange="togglePos()">
+          <option value="">—</option>
+          <option value="f" data-t="female">Femenino</option>
+          <option value="m" data-t="male">Masculino</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Position (men only) -->
+    <div id="posSection" style="display:none;margin-bottom:14px">
+      <label class="form-group" style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;letter-spacing:0.04em;text-transform:uppercase" data-t="position">Posición</label>
+      <div class="pos-grid">
+        <button class="pos-btn" id="posSentado" onclick="setPos('sentado')"><span class="pos-icon">🪑</span><span class="pos-label" data-t="seated">Sentado</span></button>
+        <button class="pos-btn" id="posParado" onclick="setPos('parado')"><span class="pos-icon">🧍</span><span class="pos-label" data-t="standing">De pie</span></button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;letter-spacing:0.04em;text-transform:uppercase" data-t="urgency">Urgencia</label>
+      <div class="urgency-grid">
+        <button class="urgency-btn" onclick="setUrg(0)"><span class="u-num">0</span><span data-t="u0">Nada</span></button>
+        <button class="urgency-btn" onclick="setUrg(1)"><span class="u-num">1</span><span data-t="u1">Leve</span></button>
+        <button class="urgency-btn" onclick="setUrg(2)"><span class="u-num">2</span><span data-t="u2">Mod.</span></button>
+        <button class="urgency-btn" onclick="setUrg(3)"><span class="u-num">3</span><span data-t="u3">Severa</span></button>
+        <button class="urgency-btn" onclick="setUrg(4)"><span class="u-num">4</span><span data-t="u4">Escape</span></button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label data-t="notes">Notas</label>
+      <input type="text" id="micNotes" data-t-placeholder="notesPlaceholder" placeholder="Observaciones...">
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn" onclick="closeM('Miction')" data-t="cancel">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMiction()" data-t="save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL BEBIDA ══ -->
+<div class="modal-overlay" id="modalDrink">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" data-t="recordDrink">💧 Registrar bebida</div>
+    <div class="form-row" style="margin-bottom:10px">
+      <div class="form-group" style="margin:0"><label data-t="time">Hora</label><input type="time" id="drkHora"></div>
+      <div class="form-group" style="margin:0"><label data-t="volume">Volumen (ml)</label><input type="number" id="drkVol" placeholder="250"></div>
+    </div>
+    <div class="form-group">
+      <label data-t="drinkType">Tipo de bebida</label>
+      <select id="drkTipo">
+        <option data-t="water">Agua</option>
+        <option data-t="coffee">Café</option>
+        <option data-t="decaf">Café descafeinado</option>
+        <option data-t="tea">Té</option>
+        <option data-t="herbal">Infusión sin cafeína</option>
+        <option data-t="milk">Leche</option>
+        <option data-t="juice">Jugo natural</option>
+        <option data-t="soda">Refresco / Gaseosa</option>
+        <option data-t="energy">Bebida energética</option>
+        <option data-t="beer">Alcohol (cerveza)</option>
+        <option data-t="wine">Alcohol (vino)</option>
+        <option data-t="spirit">Alcohol (licor)</option>
+        <option data-t="soup">Sopa / Caldo</option>
+        <option data-t="other">Otro</option>
+      </select>
+    </div>
+    <div class="form-group"><label data-t="notes">Notas</label><input type="text" id="drkNotes" placeholder="..."></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeM('Drink')" data-t="cancel">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveDrink()" data-t="save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL FUGA ══ -->
+<div class="modal-overlay" id="modalLeak">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" data-t="recordLeak">⚠️ Registrar fuga</div>
+    <div class="form-row" style="margin-bottom:10px">
+      <div class="form-group" style="margin:0"><label data-t="time">Hora</label><input type="time" id="leakHora"></div>
+      <div class="form-group" style="margin:0">
+        <label data-t="leakType">Tipo de escape</label>
+        <select id="leakTipo">
+          <option value="urgencia" data-t="urgency_leak">Por Urgencia</option>
+          <option value="esfuerzo" data-t="effort_leak">Por Esfuerzo</option>
+          <option value="mixta" data-t="mixed_leak">Mixta</option>
+          <option value="otra" data-t="other">Otra</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600;text-transform:none;letter-spacing:0">
+        <input type="checkbox" id="leakMuda" style="width:18px;height:18px"> <span data-t="clothingChange">Requirió cambio de ropa / protector</span>
+      </label>
+    </div>
+    <div class="form-group"><label data-t="notes">Notas</label><input type="text" id="leakNotes" placeholder="..."></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeM('Leak')" data-t="cancel">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveLeak()" data-t="save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyANR_4lIz4Z6At3FMykRIzRPyMCE2U4454",
+  authDomain: "diario-miccional-26954.firebaseapp.com",
+  projectId: "diario-miccional-26954",
+  storageBucket: "diario-miccional-26954.firebasestorage.app",
+  messagingSenderId: "403511441490",
+  appId: "1:403511441490:web:4b4ccc666036588a50078b"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ── i18n ──
+const lang = { current: localStorage.getItem('dm_lang') || 'es' };
+const translations = {
+  es: {
+    appTitle:'Diario Miccional',welcomeTitle:'Diario Miccional',welcomeSub:'Registra y comparte tu diario con tu médico de forma segura.',
+    haveCode:'Tengo un código',registerNew:'Registrarme',codeInstructions:'Tu médico te dio un código de 8 letras. Ingrésalo aquí:',
+    yourName:'Tu nombre (para confirmar)',connect:'Conectar',name:'Nombre *',birthdate:'Fecha de nac.',gender:'Género',
+    female:'Femenino',male:'Masculino',other:'Otro',phone:'Teléfono',email:'Email',diagnosis:'Diagnóstico (si lo conoces)',
+    createProfile:'Crear perfil',pendingNote:'Tu perfil quedará pendiente hasta que tu médico lo confirme.',
+    wakeUp:'🌅 Me levanté',bedtime:'🌙 Me acuesto',save:'Guardar',addMiction:'+ Registrar micción',
+    mictionSub:'Con cronómetro y micrófono',addDrink:'+ Bebida',addLeak:'+ Fuga',todayRecords:'Registros de hoy',
+    diary:'Diario',profile:'Perfil',myProfile:'Mi perfil',logout:'Cerrar sesión / Cambiar paciente',
+    recordMiction:'🚽 Registrar micción',timer:'Cronómetro',ready:'Listo',start:'▶ Iniciar',stop:'■ Detener',reset:'↺',
+    useMic:'🎙 Usar micrófono',micAuto:'Detecta inicio y fin automáticamente',time:'Hora',volume:'Volumen (ml)',
+    duration:'Duración (seg)',position:'Posición',seated:'Sentado',standing:'De pie',urgency:'Urgencia',
+    u0:'Nada',u1:'Leve',u2:'Mod.',u3:'Severa',u4:'Escape',notes:'Notas',notesPlaceholder:'Observaciones...',
+    cancel:'Cancelar',recordDrink:'💧 Registrar bebida',drinkType:'Tipo de bebida',water:'Agua',coffee:'Café',
+    decaf:'Café descafeinado',tea:'Té',herbal:'Infusión sin cafeína',milk:'Leche',juice:'Jugo natural',
+    soda:'Refresco / Gaseosa',energy:'Bebida energética',beer:'Alcohol (cerveza)',wine:'Alcohol (vino)',
+    spirit:'Alcohol (licor)',soup:'Sopa / Caldo',recordLeak:'⚠️ Registrar fuga',leakType:'Tipo de escape',
+    urgency_leak:'Por Urgencia',effort_leak:'Por Esfuerzo',mixed_leak:'Mixta',clothingChange:'Requirió cambio de ropa / protector',
+    miction:'Micción',drink:'Bebida',leak:'Fuga',noRecords:'Sin registros hoy. ¡Empieza registrando!',
+    micListening:'Escuchando sonido...',micDetected:'¡Sonido detectado!',micStopped:'Micrófono detenido'
+  },
+  en: {
+    appTitle:'Voiding Diary',welcomeTitle:'Voiding Diary',welcomeSub:'Record and securely share your diary with your doctor.',
+    haveCode:'I have a code',registerNew:'Register',codeInstructions:'Your doctor gave you an 8-character code. Enter it here:',
+    yourName:'Your name (to confirm)',connect:'Connect',name:'Name *',birthdate:'Date of birth',gender:'Gender',
+    female:'Female',male:'Male',other:'Other',phone:'Phone',email:'Email',diagnosis:'Diagnosis (if known)',
+    createProfile:'Create profile',pendingNote:'Your profile will be pending until your doctor confirms it.',
+    wakeUp:'🌅 Wake time',bedtime:'🌙 Bedtime',save:'Save',addMiction:'+ Record voiding',
+    mictionSub:'With timer and microphone',addDrink:'+ Drink',addLeak:'+ Leak',todayRecords:"Today's records",
+    diary:'Diary',profile:'Profile',myProfile:'My profile',logout:'Sign out / Switch patient',
+    recordMiction:'🚽 Record voiding',timer:'Timer',ready:'Ready',start:'▶ Start',stop:'■ Stop',reset:'↺',
+    useMic:'🎙 Use microphone',micAuto:'Automatically detects start and end',time:'Time',volume:'Volume (ml)',
+    duration:'Duration (sec)',position:'Position',seated:'Seated',standing:'Standing',urgency:'Urgency',
+    u0:'None',u1:'Mild',u2:'Mod.',u3:'Severe',u4:'Leak',notes:'Notes',notesPlaceholder:'Observations...',
+    cancel:'Cancel',recordDrink:'💧 Record drink',drinkType:'Drink type',water:'Water',coffee:'Coffee',
+    decaf:'Decaf coffee',tea:'Tea',herbal:'Herbal tea',milk:'Milk',juice:'Natural juice',
+    soda:'Soda / Cola',energy:'Energy drink',beer:'Alcohol (beer)',wine:'Alcohol (wine)',
+    spirit:'Alcohol (spirits)',soup:'Soup / Broth',recordLeak:'⚠️ Record leak',leakType:'Type of leak',
+    urgency_leak:'Urgency',effort_leak:'Effort (cough, laugh...)',mixed_leak:'Mixed',clothingChange:'Required clothing change / pad',
+    miction:'Voiding',drink:'Drink',leak:'Leak',noRecords:'No records today. Start recording!',
+    micListening:'Listening for sound...',micDetected:'Sound detected!',micStopped:'Microphone stopped'
+  }
+};
+
+function t(key) { return translations[lang.current][key] || key; }
+function applyLang() {
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const key = el.getAttribute('data-t');
+    if (el.tagName === 'OPTION') el.textContent = t(key);
+    else if (el.hasAttribute('placeholder')) el.placeholder = t(key);
+    else el.textContent = t(key);
+  });
+  document.querySelectorAll('[data-t-placeholder]').forEach(el => { el.placeholder = t(el.getAttribute('data-t-placeholder')); });
+  document.getElementById('langBtn').textContent = lang.current === 'es' ? 'EN' : 'ES';
+  document.documentElement.lang = lang.current;
+}
+window.toggleLang = () => {
+  lang.current = lang.current === 'es' ? 'en' : 'es';
+  localStorage.setItem('dm_lang', lang.current);
+  applyLang();
+  renderRecords();
+};
+
+// ── THEME ──
+let darkMode = localStorage.getItem('dm_theme') === 'dark';
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+  document.querySelector('.btn-theme').textContent = darkMode ? '☀️' : '🌙';
+}
+window.toggleTheme = () => { darkMode = !darkMode; localStorage.setItem('dm_theme', darkMode?'dark':'light'); applyTheme(); };
+applyTheme();
+
+// ── PATIENT STATE ──
+let patient = JSON.parse(localStorage.getItem('dm_patient') || 'null');
+let unsubscribeRecords = null;
+
+function todayKey() { return new Date().toISOString().slice(0,10); }
+function nowTime() { const d=new Date(); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+
+// ── INIT ──
+if (patient) {
+  enterApp();
+} else {
+  document.getElementById('screen-onboard').classList.add('active');
+  applyLang();
+}
+
+function enterApp() {
+  document.getElementById('screen-onboard').classList.remove('active');
+  document.getElementById('topbar').style.display = 'flex';
+  document.getElementById('bottomNav').style.display = 'flex';
+  showScreen('main', document.querySelector('.nav-item'));
+  renderGreeting();
+  renderProfile();
+  loadSleep();
+  subscribeRecords();
+  applyLang();
+}
+
+// ── ONBOARD ──
+window.onboardTab = (el, id) => {
+  el.closest('.tab-row').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  ['ob-code','ob-register'].forEach(i => { document.getElementById(i).style.display = i===id?'block':'none'; });
+};
+
+window.formatCode = (el) => {
+  let v = el.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if (v.length > 4) v = v.slice(0,4)+'-'+v.slice(4,8);
+  el.value = v;
+};
+
+window.connectWithCode = async () => {
+  const code = document.getElementById('accessCodeInput').value.trim().toUpperCase();
+  const name = document.getElementById('codePatientName').value.trim();
+  document.getElementById('codeError').textContent = '';
+  if (code.length < 9) { document.getElementById('codeError').textContent = lang.current==='es'?'Ingresa el código completo (XXXX-XXXX)':'Enter the full code (XXXX-XXXX)'; return; }
+  try {
+    const q = query(collection(db,'patients'), where('accessCode','==',code));
+    const snap = await getDocs(q);
+    if (snap.empty) { document.getElementById('codeError').textContent = lang.current==='es'?'Código no encontrado. Verifica con tu médico.':'Code not found. Check with your doctor.'; return; }
+    const patDoc = snap.docs[0];
+    patient = { id: patDoc.id, ...patDoc.data() };
+    localStorage.setItem('dm_patient', JSON.stringify(patient));
+    enterApp();
+  } catch(e) {
+    document.getElementById('codeError').textContent = e.message;
+  }
+};
+
+window.selfRegister = async () => {
+  const nombre = document.getElementById('regNombre').value.trim();
+  document.getElementById('regError').textContent = '';
+  if (!nombre) { document.getElementById('regError').textContent = lang.current==='es'?'El nombre es obligatorio':'Name is required'; return; }
+  try {
+    const data = {
+      nombre, fechaNac: document.getElementById('regNac').value,
+      genero: document.getElementById('regGenero').value,
+      telefono: document.getElementById('regTel').value.trim(),
+      email: document.getElementById('regEmail').value.trim(),
+      diagnostico: document.getElementById('regDiag').value.trim(),
+      status: 'pending', doctorId: null, accessCode: null,
+      notes: [], createdAt: serverTimestamp()
+    };
+    const ref = await addDoc(collection(db,'patients'), data);
+    patient = { id: ref.id, ...data };
+    localStorage.setItem('dm_patient', JSON.stringify(patient));
+    enterApp();
+  } catch(e) {
+    document.getElementById('regError').textContent = e.message;
+  }
+};
+
+window.logout = () => {
+  if (unsubscribeRecords) unsubscribeRecords();
+  localStorage.removeItem('dm_patient');
+  patient = null;
+  location.reload();
+};
+
+// ── NAVIGATION ──
+window.showScreen = (name, el) => {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  if (el) el.closest('.nav-item').classList.add('active');
+};
+
+// ── GREETING ──
+function renderGreeting() {
+  const hours = new Date().getHours();
+  const g = hours < 12 ? (lang.current==='es'?'Buenos días':'Good morning') : hours < 18 ? (lang.current==='es'?'Buenas tardes':'Good afternoon') : (lang.current==='es'?'Buenas noches':'Good evening');
+  document.getElementById('greetingName').textContent = g + ', ' + (patient?.nombre?.split(' ')[0] || '') + ' 👋';
+  document.getElementById('greetingDate').textContent = new Date().toLocaleDateString(lang.current==='es'?'es':'en', {weekday:'long',day:'numeric',month:'long'});
+}
+
+// ── SLEEP ──
+function loadSleep() {
+  const d = JSON.parse(localStorage.getItem('dm_sleep_'+patient?.id) || '{}');
+  const today = d[todayKey()] || {};
+  document.getElementById('wakeTime').value = today.wake || '';
+  document.getElementById('sleepTime').value = today.sleep || '';
+}
+window.saveSleep = () => {
+  const d = JSON.parse(localStorage.getItem('dm_sleep_'+patient?.id) || '{}');
+  d[todayKey()] = { wake: document.getElementById('wakeTime').value, sleep: document.getElementById('sleepTime').value };
+  localStorage.setItem('dm_sleep_'+patient?.id, JSON.stringify(d));
+};
+
+// ── RECORDS ──
+function subscribeRecords() {
+  if (!patient?.id) return;
+  const q = query(collection(db,'patients',patient.id,'records'), orderBy('timestamp','desc'));
+  unsubscribeRecords = onSnapshot(q, snap => {
+    const recs = snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.date===todayKey());
+    renderRecords(recs);
+  });
+}
+
+const urgencyColors = ['chip-gray','chip-green','chip-amber chip','chip-red','chip-red'];
+const urgencyLabels = { es:['Sin urgencia','Leve','Moderada','Severa','Escape'], en:['No urgency','Mild','Moderate','Severe','Leak'] };
+
+function renderRecords(recs) {
+  const list = document.getElementById('recordsList');
+  if (!list) return;
+  if (!recs || !recs.length) {
+    list.innerHTML = `<div class="empty-state"><div class="ei">📋</div><p>${t('noRecords')}</p></div>`;
+    return;
+  }
+  const sorted = [...recs].sort((a,b)=>a.hora.localeCompare(b.hora));
+  list.innerHTML = sorted.map(r => {
+    if (r.type==='miction') {
+      const chips = [];
+      if (r.vol) chips.push(`<span class="chip chip-blue">💧 ${r.vol}ml</span>`);
+      if (r.dur) chips.push(`<span class="chip chip-gray">⏱ ${r.dur}s</span>`);
+      if (r.flow) chips.push(`<span class="chip chip-green">⚡ ${r.flow}ml/s</span>`);
+      if (r.urgency!=null) chips.push(`<span class="chip ${urgencyColors[r.urgency]}">U${r.urgency}</span>`);
+      if (r.pos) chips.push(`<span class="chip chip-gray">${r.pos==='sentado'?'🪑':'🧍'}</span>`);
+      return `<div class="record-card"><div class="record-icon-wrap" style="background:var(--accent-light)">🚽</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-title">${t('miction')}</div><div class="record-chips">${chips.join('')}</div></div><button class="delete-btn" onclick="deleteRecord('${r.id}')">✕</button></div>`;
+    }
+    if (r.type==='drink') return `<div class="record-card"><div class="record-icon-wrap" style="background:var(--green-light)">💧</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-title">${r.tipo||t('drink')}</div><div class="record-chips"><span class="chip chip-green">${r.vol||0}ml</span></div></div><button class="delete-btn" onclick="deleteRecord('${r.id}')">✕</button></div>`;
+    if (r.type==='leak') return `<div class="record-card"><div class="record-icon-wrap" style="background:var(--amber-light)">⚠️</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-title">${t('leak')} — ${r.tipo}</div>${r.muda?`<div class="record-chips"><span class="chip chip-amber">👕</span></div>`:''}</div><button class="delete-btn" onclick="deleteRecord('${r.id}')">✕</button></div>`;
+    return '';
+  }).join('');
+}
+
+window.deleteRecord = async (id) => {
+  const { deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  await deleteDoc(doc(db,'patients',patient.id,'records',id));
+};
+
+// ── MODALS ──
+window.openModal = (type) => {
+  const now = nowTime();
+  if (type==='miction') {
+    document.getElementById('micHora').value = now;
+    document.getElementById('micVol').value = '';
+    document.getElementById('micDur').value = '';
+    document.getElementById('micNotes').value = '';
+    selectedUrg = null; selectedPos = null;
+    document.querySelectorAll('.urgency-btn').forEach(b=>b.classList.remove('selected'));
+    document.querySelectorAll('.pos-btn').forEach(b=>b.classList.remove('selected'));
+    chronoReset();
+    if (patient?.genero) { document.getElementById('micGenero').value = patient.genero; togglePos(); }
+    document.getElementById('modalMiction').classList.add('open');
+  } else if (type==='drink') {
+    document.getElementById('drkHora').value = now;
+    document.getElementById('drkVol').value = '';
+    document.getElementById('drkNotes').value = '';
+    document.getElementById('modalDrink').classList.add('open');
+  } else if (type==='leak') {
+    document.getElementById('leakHora').value = now;
+    document.getElementById('leakMuda').checked = false;
+    document.getElementById('leakNotes').value = '';
+    document.getElementById('modalLeak').classList.add('open');
+  }
+};
+window.closeM = (name) => { document.getElementById('modal'+name).classList.remove('open'); stopMic(); };
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m){ m.classList.remove('open'); stopMic(); } }));
+
+// ── URGENCY / POSITION ──
+let selectedUrg = null, selectedPos = null;
+window.setUrg = (n) => { selectedUrg=n; document.querySelectorAll('.urgency-btn').forEach((b,i)=>b.classList.toggle('selected',i===n)); };
+window.togglePos = () => { document.getElementById('posSection').style.display = document.getElementById('micGenero').value==='m'?'block':'none'; };
+window.setPos = (p) => { selectedPos=p; document.getElementById('posSentado').classList.toggle('selected',p==='sentado'); document.getElementById('posParado').classList.toggle('selected',p==='parado'); };
+
+// ── CHRONOMETER ──
+let cRunning=false, cStart=0, cElapsed=0, cInterval=null;
+window.chronoStart = () => {
+  cRunning=true; cStart=Date.now()-cElapsed*1000;
+  document.getElementById('btnStart').style.display='none';
+  document.getElementById('btnStop').style.display='';
+  document.getElementById('btnReset').style.display='';
+  document.getElementById('chronoState').textContent = lang.current==='es'?'Midiendo...':'Measuring...';
+  cInterval=setInterval(()=>{
+    cElapsed=(Date.now()-cStart)/1000;
+    const m=Math.floor(cElapsed/60).toString().padStart(2,'0');
+    const s=Math.floor(cElapsed%60).toString().padStart(2,'0');
+    const f=(cElapsed%1).toFixed(1).slice(1);
+    document.getElementById('chronoDisplay').textContent=m+':'+s+f;
+  },100);
+};
+window.chronoStop = () => {
+  clearInterval(cInterval); cRunning=false;
+  document.getElementById('btnStop').style.display='none';
+  document.getElementById('chronoState').textContent=(lang.current==='es'?'Listo — ':'Done — ')+Math.round(cElapsed)+'s';
+  document.getElementById('micDur').value=Math.round(cElapsed);
+};
+window.chronoReset = () => {
+  clearInterval(cInterval); cRunning=false; cElapsed=0;
+  document.getElementById('chronoDisplay').textContent='00:00.0';
+  document.getElementById('chronoState').textContent=t('ready');
+  document.getElementById('btnStart').style.display='';
+  document.getElementById('btnStop').style.display='none';
+  document.getElementById('btnReset').style.display='none';
+};
+
+// ── MICROPHONE ──
+let micOn=false, aCtx=null, analyser=null, stream=null, animFrame=null, silTimer=null, sndDetected=false;
+window.toggleMic = async () => { micOn ? stopMic() : startMic(); };
+async function startMic() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    aCtx = new (window.AudioContext||window.webkitAudioContext)();
+    analyser = aCtx.createAnalyser(); analyser.fftSize=256;
+    aCtx.createMediaStreamSource(stream).connect(analyser);
+    micOn=true; sndDetected=false;
+    document.getElementById('btnMic').classList.add('active');
+    document.getElementById('btnMic').textContent='🔴 '+(lang.current==='es'?'Detener mic':'Stop mic');
+    document.getElementById('micStatus').textContent=t('micListening');
+    monitorAudio();
+  } catch(e) { document.getElementById('micStatus').textContent=lang.current==='es'?'Micrófono no disponible':'Microphone unavailable'; }
+}
+function stopMic() {
+  if (!micOn) return;
+  if (stream) stream.getTracks().forEach(t=>t.stop());
+  if (aCtx) aCtx.close();
+  cancelAnimationFrame(animFrame); clearTimeout(silTimer);
+  micOn=false; sndDetected=false;
+  document.getElementById('btnMic').classList.remove('active');
+  document.getElementById('btnMic').textContent='🎙 '+(lang.current==='es'?'Usar micrófono':'Use microphone');
+  document.getElementById('micStatus').textContent=t('micStopped');
+  document.getElementById('audioFill').style.width='0%';
+  if (cRunning) chronoStop();
+}
+function monitorAudio() {
+  const data=new Uint8Array(analyser.frequencyBinCount);
+  function tick() {
+    analyser.getByteFrequencyData(data);
+    const avg=data.reduce((a,b)=>a+b,0)/data.length;
+    document.getElementById('audioFill').style.width=Math.min(100,avg*2)+'%';
+    if (avg>20) {
+      clearTimeout(silTimer); silTimer=null;
+      if (!sndDetected && !cRunning) { sndDetected=true; chronoStart(); document.getElementById('micStatus').textContent=t('micDetected'); }
+    } else if (sndDetected && cRunning && !silTimer) {
+      silTimer=setTimeout(()=>{ if(cRunning){chronoStop();stopMic();} },1500);
+    }
+    animFrame=requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+// ── SAVE RECORDS ──
+async function addRecord(data) {
+  if (!patient?.id) return;
+  await addDoc(collection(db,'patients',patient.id,'records'), { ...data, timestamp: serverTimestamp() });
+  await updateDoc(doc(db,'patients',patient.id), { lastRecord: Date.now() });
+}
+
+window.saveMiction = async () => {
+  const hora=document.getElementById('micHora').value;
+  const vol=parseFloat(document.getElementById('micVol').value)||null;
+  const dur=parseFloat(document.getElementById('micDur').value)||null;
+  if (!hora) return;
+  await addRecord({
+    type:'miction', date:todayKey(), hora, vol, dur,
+    genero:document.getElementById('micGenero').value,
+    urgency:selectedUrg, pos:selectedPos,
+    flow:(vol&&dur)?+(vol/dur).toFixed(2):null,
+    notas:document.getElementById('micNotes').value
+  });
+  closeM('Miction');
+};
+window.saveDrink = async () => {
+  const hora=document.getElementById('drkHora').value;
+  if (!hora) return;
+  await addRecord({ type:'drink', date:todayKey(), hora, vol:parseFloat(document.getElementById('drkVol').value)||null, tipo:document.getElementById('drkTipo').value, notas:document.getElementById('drkNotes').value });
+  closeM('Drink');
+};
+window.saveLeak = async () => {
+  const hora=document.getElementById('leakHora').value;
+  if (!hora) return;
+  await addRecord({ type:'leak', date:todayKey(), hora, tipo:document.getElementById('leakTipo').value, muda:document.getElementById('leakMuda').checked, notas:document.getElementById('leakNotes').value });
+  closeM('Leak');
+};
+
+// ── PROFILE ──
+function renderProfile() {
+  if (!patient) return;
+  const gLabel = patient.genero==='m'?(lang.current==='es'?'Masculino':'Male'):patient.genero==='f'?(lang.current==='es'?'Femenino':'Female'):'—';
+  document.getElementById('profileView').innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:1.25rem">
+      <div style="width:56px;height:56px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--accent2)">${(patient.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
+      <div>
+        <div style="font-size:1.1rem;font-weight:700">${patient.nombre||'—'}</div>
+        <div style="font-size:12px;color:var(--text2)">${patient.diagnostico||''}</div>
+        ${patient.accessCode ? `<div style="font-size:11px;color:var(--text3);margin-top:2px">Código: <span style="font-family:'JetBrains Mono';font-weight:700;color:var(--accent2)">${patient.accessCode}</span></div>` : (patient.status==='pending'?`<div style="font-size:11px;color:var(--amber)">⏳ ${lang.current==='es'?'Pendiente de validación':'Pending validation'}</div>`:'')}
+      </div>
+    </div>
+    ${[
+      [lang.current==='es'?'Fecha de nac.':'Date of birth', patient.fechaNac],
+      [lang.current==='es'?'Género':'Gender', gLabel],
+      [lang.current==='es'?'Teléfono':'Phone', patient.telefono],
+      ['Email', patient.email],
+      [lang.current==='es'?'Médico':'Doctor', patient.medicoTratante],
+      [lang.current==='es'?'Desde':'Since', patient.fechaInicio],
+    ].filter(([,v])=>v).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px"><span style="color:var(--text2)">${k}</span><span style="font-weight:600">${v}</span></div>`).join('')}
+  `;
+}
+</script>
+</body>
+</html>
