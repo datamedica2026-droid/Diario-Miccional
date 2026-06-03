@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>CURG Diario Miccional</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1565c0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CURG">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231565c0'/><text y='130' x='96' text-anchor='middle' font-size='120'>🏥</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -202,6 +208,46 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .threshold-table td{padding:6px 8px;border-top:1px solid var(--border);}
 .version-badge{font-size:11px;color:var(--text3);text-align:center;margin-top:1rem;padding-bottom:0.5rem;}
 
+/* ── STREAK ── */
+.streak-banner{background:linear-gradient(135deg,#ff6f00,#ffa000);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:12px;color:#fff;}
+.streak-fire{font-size:2rem;}
+.streak-text h3{font-size:1rem;font-weight:700;margin-bottom:2px;}
+.streak-text p{font-size:12px;opacity:0.85;}
+
+/* ── WELLBEING ── */
+.wb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;}
+.wb-btn{padding:10px 6px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:11px;font-weight:600;text-align:center;font-family:inherit;transition:all .15s;}
+.wb-btn.selected{border-color:var(--accent);background:var(--accent-light);}
+.wb-btn .wb-icon{font-size:1.4rem;display:block;margin-bottom:3px;}
+.pain-row{display:flex;gap:4px;margin-top:6px;}
+.pain-btn{flex:1;padding:7px 2px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:11px;font-weight:600;text-align:center;font-family:inherit;}
+.pain-btn.selected{background:var(--red-light);border-color:var(--red);color:var(--red);}
+
+/* ── INSTALL BANNER ── */
+.install-banner{background:linear-gradient(135deg,var(--accent),#42a5f5);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:12px;color:#fff;}
+.install-banner-text{flex:1;}
+.install-banner-text h3{font-size:13px;font-weight:700;margin-bottom:2px;}
+.install-banner-text p{font-size:11px;opacity:0.85;}
+.btn-install{background:#fff;color:var(--accent);border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.btn-dismiss{background:transparent;border:none;color:#fff;cursor:pointer;font-size:18px;padding:4px;}
+
+/* ── NOTIFICATIONS ── */
+.notif-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
+.notif-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.notif-row:last-child{border-bottom:none;}
+.notif-info{flex:1;}
+.notif-label{font-size:13px;font-weight:600;}
+.notif-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+.toggle{width:44px;height:24px;background:var(--border2);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;border:none;flex-shrink:0;}
+.toggle.on{background:var(--accent);}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s;}
+.toggle.on::after{left:23px;}
+
+/* ── NIGHT SECTION ── */
+.night-section{background:var(--purple-light);border:1px solid var(--purple);border-radius:var(--radius);padding:10px 12px;margin-bottom:1rem;}
+.night-section h4{font-size:12px;font-weight:700;color:var(--purple);margin-bottom:4px;}
+.night-section p{font-size:12px;color:var(--text2);}
+
 /* ── MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;display:none;align-items:flex-end;justify-content:center;}
 .modal-overlay.open{display:flex;}
@@ -327,9 +373,45 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 
 <!-- ══ DIARIO ══ -->
 <div class="screen" id="screen-main">
-  <div style="margin-bottom:1.25rem">
-    <div style="font-size:1.1rem;font-weight:700" id="greetingName">Hola 👋</div>
-    <div style="font-size:13px;color:var(--text2)" id="greetingDate"></div>
+  <!-- Install Banner -->
+  <div class="install-banner" id="installBanner" style="display:none">
+    <div style="font-size:2rem">📲</div>
+    <div class="install-banner-text">
+      <h3>Instalar como app</h3>
+      <p>Accede más rápido desde tu pantalla de inicio</p>
+    </div>
+    <button class="btn-install" id="btnInstall" onclick="installPWA()">Instalar</button>
+    <button class="btn-dismiss" onclick="dismissInstall()">✕</button>
+  </div>
+
+  <div style="margin-bottom:1.25rem;display:flex;align-items:flex-start;justify-content:space-between">
+    <div>
+      <div style="font-size:1.1rem;font-weight:700" id="greetingName">Hola 👋</div>
+      <div style="font-size:13px;color:var(--text2)" id="greetingDate"></div>
+    </div>
+    <div id="streakBadge" style="display:none;background:linear-gradient(135deg,#ff6f00,#ffa000);color:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px">
+      🔥 <span id="streakDays">0</span> días
+    </div>
+  </div>
+
+  <!-- Wellbeing daily check -->
+  <div id="wellbeingSection" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1.25rem">
+    <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">¿Cómo te sientes hoy?</div>
+    <div class="wb-grid">
+      <button class="wb-btn" onclick="setWellbeing('great')"><span class="wb-icon">😊</span>Muy bien</button>
+      <button class="wb-btn" onclick="setWellbeing('ok')"><span class="wb-icon">😐</span>Regular</button>
+      <button class="wb-btn" onclick="setWellbeing('bad')"><span class="wb-icon">😔</span>Mal</button>
+    </div>
+    <div style="font-size:11px;font-weight:600;color:var(--text2);margin:8px 0 4px;text-transform:uppercase;letter-spacing:0.04em">Dolor / malestar pélvico</div>
+    <div class="pain-row">
+      <button class="pain-btn" onclick="setPain(0)">0<br><span style="font-size:9px">Nada</span></button>
+      <button class="pain-btn" onclick="setPain(1)">1</button>
+      <button class="pain-btn" onclick="setPain(2)">2</button>
+      <button class="pain-btn" onclick="setPain(3)">3</button>
+      <button class="pain-btn" onclick="setPain(4)">4</button>
+      <button class="pain-btn" onclick="setPain(5)">5<br><span style="font-size:9px">Mucho</span></button>
+    </div>
+    <div id="wellbeingStatus" style="font-size:11px;color:var(--text3);margin-top:8px;text-align:right"></div>
   </div>
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1.25rem;display:flex;gap:10px;align-items:flex-end">
     <div class="form-group" style="flex:1;margin:0"><label>🌅 Me levanté</label><input type="time" id="wakeTime"></div>
@@ -504,6 +586,27 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <div class="screen" id="screen-profile">
   <div style="font-size:1.1rem;font-weight:700;margin-bottom:1.25rem">👤 Mi perfil</div>
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem" id="profileView"></div>
+  <!-- Notifications -->
+  <div style="font-size:13px;font-weight:700;margin:1.25rem 0 0.75rem">🔔 Recordatorios</div>
+  <div class="notif-card">
+    <div class="notif-row">
+      <div class="notif-info"><div class="notif-label">🌅 Hora de despertar</div><div class="notif-sub">Recuerda registrar tu hora de levantada (5:00 AM)</div></div>
+      <button class="toggle" id="togWake" onclick="toggleNotif('wake')"></button>
+    </div>
+    <div class="notif-row">
+      <div class="notif-info"><div class="notif-label">💧 Recordatorio de agua</div><div class="notif-sub">Cada 2 horas entre 8am y 6pm</div></div>
+      <button class="toggle" id="togWater" onclick="toggleNotif('water')"></button>
+    </div>
+    <div class="notif-row">
+      <div class="notif-info"><div class="notif-label">🚽 Recordatorio micción</div><div class="notif-sub">Cada 3 horas (9am, 12pm, 3pm, 6pm)</div></div>
+      <button class="toggle" id="togMiction" onclick="toggleNotif('miction')"></button>
+    </div>
+    <div class="notif-row">
+      <div class="notif-info"><div class="notif-label">🌙 Hora de acostarse</div><div class="notif-sub">Recuerda registrar tu hora de dormir (6:00 PM)</div></div>
+      <button class="toggle" id="togSleep" onclick="toggleNotif('sleep')"></button>
+    </div>
+  </div>
+  <div id="notifStatus" style="font-size:11px;color:var(--text2);text-align:center;margin-bottom:1rem"></div>
   <button class="btn btn-danger-outline btn-full" style="margin-bottom:10px" onclick="revokeConsent()">🗑️ Revocar consentimiento y eliminar datos</button>
   <button class="btn btn-danger-outline btn-full" onclick="logout()">Cerrar sesión / Cambiar paciente</button>
 </div>
@@ -513,7 +616,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
   <div class="nav-item active" onclick="showScreen('main',this)"><div class="nav-icon">📋</div><div class="nav-label">Diario</div></div>
   <div class="nav-item" onclick="showScreen('analysis',this)"><div class="nav-icon">📊</div><div class="nav-label">Análisis</div></div>
   <div class="nav-item" onclick="showScreen('instructions',this)"><div class="nav-icon">ℹ️</div><div class="nav-label">Guía</div></div>
-  <div class="nav-item" onclick="showScreen('about',this)"><div class="nav-icon">🔬</div><div class="nav-label">Acerca de</div></div>
+  <div class="nav-item" onclick="showScreen('about',this)"><div class="nav-icon">🔬</div><div class="nav-label">Ciencia</div></div>
   <div class="nav-item" onclick="showScreen('profile',this)"><div class="nav-icon">👤</div><div class="nav-label">Perfil</div></div>
 </div>
 
@@ -690,6 +793,10 @@ function enterApp() {
   document.getElementById('bottomNav').style.display='flex';
   showScreen('main', document.querySelector('.nav-item'));
   renderGreeting(); renderProfile(); loadSleep(); subscribeRecords();
+  updateStreak();
+  loadWellbeing();
+  renderNotifToggles();
+  scheduleNotifications();
 }
 
 // ── ONBOARD ──
@@ -731,6 +838,7 @@ window.showScreen=(name,el)=>{
   document.getElementById('screen-'+name).classList.add('active');
   if(el) el.closest('.nav-item').classList.add('active');
   if(name==='analysis') renderAnalysis();
+  if(name==='profile') { renderNotifToggles(); }
 };
 
 // ── GREETING ──
@@ -1210,6 +1318,283 @@ window.saveLeak=async()=>{
   await addRecord({type:'leak',date:todayKey(),hora,tipo:document.getElementById('leakTipo').value,muda:document.getElementById('leakMuda').checked,notas:document.getElementById('leakNotes').value});
   closeM('Leak');
 };
+
+// ── PWA INSTALL ──
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredPrompt = e;
+  if (!localStorage.getItem('curg_install_dismissed')) {
+    document.getElementById('installBanner').style.display = 'flex';
+  }
+});
+window.installPWA = async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('installBanner').style.display = 'none';
+};
+window.dismissInstall = () => {
+  localStorage.setItem('curg_install_dismissed','1');
+  document.getElementById('installBanner').style.display = 'none';
+};
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    console.log('SW registered');
+  }).catch(e => console.log('SW error:', e));
+}
+
+// ── STREAK ──
+function updateStreak() {
+  if (!patient?.id) return;
+  const key = 'curg_streak_' + patient.id;
+  const data = JSON.parse(localStorage.getItem(key) || '{"days":0,"last":""}');
+  const today = todayKey();
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+  const yKey = yesterday.toISOString().slice(0,10);
+  if (data.last === today) {
+    // Already counted today
+  } else if (data.last === yKey) {
+    data.days++; data.last = today;
+  } else if (data.last !== today) {
+    data.days = 1; data.last = today;
+  }
+  localStorage.setItem(key, JSON.stringify(data));
+  const badge = document.getElementById('streakBadge');
+  const days = document.getElementById('streakDays');
+  if (badge && days) {
+    days.textContent = data.days;
+    badge.style.display = data.days >= 2 ? 'flex' : 'none';
+  }
+}
+
+// ── WELLBEING ──
+let selectedWellbeing = null, selectedPain = null;
+
+window.setWellbeing = (val) => {
+  selectedWellbeing = val;
+  document.querySelectorAll('.wb-btn').forEach(b => b.classList.remove('selected'));
+  const map = {'great':0,'ok':1,'bad':2};
+  document.querySelectorAll('.wb-btn')[map[val]]?.classList.add('selected');
+  saveWellbeing();
+};
+window.setPain = (val) => {
+  selectedPain = val;
+  document.querySelectorAll('.pain-btn').forEach((b,i) => b.classList.toggle('selected', i===val));
+  saveWellbeing();
+};
+
+async function saveWellbeing() {
+  if (!patient?.id || selectedWellbeing === null) return;
+  const data = { date: todayKey(), wellbeing: selectedWellbeing, pain: selectedPain, timestamp: serverTimestamp() };
+  try {
+    await setDoc(doc(db,'patients',patient.id,'wellbeing',todayKey()), data, {merge:true});
+    document.getElementById('wellbeingStatus').textContent = '✓ Guardado';
+    setTimeout(() => { const el = document.getElementById('wellbeingStatus'); if(el) el.textContent=''; }, 2000);
+  } catch(e) { console.log('Wellbeing save error:', e); }
+}
+
+async function loadWellbeing() {
+  if (!patient?.id) return;
+  try {
+    const snap = await getDoc(doc(db,'patients',patient.id,'wellbeing',todayKey()));
+    if (snap.exists()) {
+      const d = snap.data();
+      if (d.wellbeing) { selectedWellbeing = d.wellbeing; const map={'great':0,'ok':1,'bad':2}; document.querySelectorAll('.wb-btn')[map[d.wellbeing]]?.classList.add('selected'); }
+      if (d.pain !== null && d.pain !== undefined) { selectedPain = d.pain; document.querySelectorAll('.pain-btn').forEach((b,i)=>b.classList.toggle('selected',i===d.pain)); }
+    }
+  } catch(e) {}
+}
+
+// ── NOTIFICATIONS ──
+const NOTIF_SCHEDULES = {
+  wake:    { label:'Hora de despertar', times:['05:00'], msg:'🌅 Buenos días — no olvides registrar tu hora de levantada' },
+  water:   { label:'Toma de agua', times:['08:00','10:00','12:00','14:00','16:00','18:00'], msg:'💧 Recuerda registrar lo que bebes' },
+  miction: { label:'Micción', times:['09:00','12:00','15:00','18:00'], msg:'🚽 Momento de registrar tu micción' },
+  sleep:   { label:'Hora de acostarse', times:['18:00'], msg:'🌙 Recuerda registrar tu hora de dormir antes de acostarte' }
+};
+
+let notifSettings = JSON.parse(localStorage.getItem('curg_notifs') || '{"wake":false,"water":false,"miction":false,"sleep":false}');
+
+function renderNotifToggles() {
+  Object.keys(notifSettings).forEach(k => {
+    const el = document.getElementById('tog' + k.charAt(0).toUpperCase() + k.slice(1));
+    if (el) el.classList.toggle('on', notifSettings[k]);
+  });
+}
+
+window.toggleNotif = async (key) => {
+  if (!('Notification' in window)) {
+    document.getElementById('notifStatus').textContent = 'Tu navegador no soporta notificaciones';
+    return;
+  }
+  if (notifSettings[key]) {
+    notifSettings[key] = false;
+    localStorage.setItem('curg_notifs', JSON.stringify(notifSettings));
+    renderNotifToggles();
+    document.getElementById('notifStatus').textContent = '🔕 Recordatorio desactivado';
+    return;
+  }
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') {
+    document.getElementById('notifStatus').textContent = '⚠️ Debes permitir notificaciones en tu navegador';
+    return;
+  }
+  notifSettings[key] = true;
+  localStorage.setItem('curg_notifs', JSON.stringify(notifSettings));
+  renderNotifToggles();
+  document.getElementById('notifStatus').textContent = '✓ Recordatorio activado — mantén la app instalada';
+  scheduleNotifications();
+};
+
+function scheduleNotifications() {
+  // Use setInterval to check time every minute
+  if (window._notifInterval) clearInterval(window._notifInterval);
+  window._notifInterval = setInterval(checkNotifTime, 60000);
+  checkNotifTime(); // check immediately
+}
+
+function checkNotifTime() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const now = new Date();
+  const hm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  const fired = JSON.parse(sessionStorage.getItem('curg_fired') || '{}');
+  Object.entries(NOTIF_SCHEDULES).forEach(([key, sched]) => {
+    if (!notifSettings[key]) return;
+    sched.times.forEach(t => {
+      const fkey = key + '_' + t + '_' + todayKey();
+      if (hm === t && !fired[fkey]) {
+        new Notification('CURG Diario Miccional', { body: sched.msg, icon: '/manifest.json', tag: fkey });
+        fired[fkey] = true;
+        sessionStorage.setItem('curg_fired', JSON.stringify(fired));
+      }
+    });
+  });
+}
+
+// ── SLEEP IN ANALYSIS — with day/night split ──
+async function getSleepData(dateKey) {
+  // Try Firebase first, fallback to local
+  try {
+    const snap = await getDoc(doc(db,'patients',patient.id,'sleep',dateKey));
+    if (snap.exists()) return snap.data();
+  } catch(e) {}
+  const local = JSON.parse(localStorage.getItem('dm_sleep_'+patient?.id)||'{}');
+  return local[dateKey] || null;
+}
+
+function isNocturnal(hora, wake, sleep) {
+  if (!wake || !sleep) return false;
+  // Nocturnal = after sleep time OR before wake time
+  const toMin = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
+  const recMin = toMin(hora);
+  const wakeMin = toMin(wake);
+  const sleepMin = toMin(sleep);
+  if (sleepMin > wakeMin) {
+    return recMin >= sleepMin || recMin < wakeMin;
+  }
+  return recMin >= sleepMin && recMin < wakeMin;
+}
+
+// ── UPDATED renderAnalysis with sleep + nicturia ──
+async function renderAnalysisWithSleep(recs, sleepData) {
+  const mics = recs.filter(r=>r.type==='miction');
+  const drks = recs.filter(r=>r.type==='drink');
+  const leaks = recs.filter(r=>r.type==='leak');
+
+  // Day/night split
+  const wake = sleepData?.wake || null;
+  const sleep = sleepData?.sleep || null;
+  const nightMics = wake && sleep ? mics.filter(r => isNocturnal(r.hora, wake, sleep)) : [];
+  const dayMics = mics.filter(r => !nightMics.includes(r));
+
+  const totalVol = mics.reduce((a,r)=>a+(r.vol||0),0);
+  const avgVol = mics.length ? Math.round(totalVol/mics.length) : 0;
+  const days = [...new Set(mics.map(r=>r.date))].length||1;
+  const micPerDay = +(mics.length/days).toFixed(1);
+  const totalDrink = drks.reduce((a,r)=>a+(r.vol||0),0);
+  const nicturia = nightMics.length;
+
+  const semFreq = micPerDay<=7&&micPerDay>=4?'green':micPerDay>8?'red':'amber';
+  const semVol = avgVol>=250&&avgVol<=400?'green':avgVol>400?'amber':'red';
+  const semLeaks = leaks.length===0?'green':leaks.length<=2?'amber':'red';
+  const semNic = nicturia===0?'green':nicturia===1?'amber':'red';
+  const sem = (icon,label,val,cls) => `<div class="sem-item sem-${cls}"><div class="sem-icon">${icon}</div><div class="sem-label">${label}</div><div class="sem-val">${val}</div></div>`;
+
+  let sleepHTML = '';
+  if (wake && sleep) {
+    sleepHTML = `<div class="night-section">
+      <h4>🌙 Período nocturno</h4>
+      <p>Dormiste de <strong>${sleep}</strong> a <strong>${wake}</strong> · Micciones nocturnas (nicturia): <strong style="color:${nicturia>1?'var(--red)':nicturia===1?'var(--amber)':'var(--green)'}">${nicturia}</strong> · Normal: 0–1</p>
+      ${nicturia > 1 ? '<p style="color:var(--red);font-weight:600;margin-top:4px">⚠️ Nicturia elevada — comenta con tu médico</p>' : ''}
+    </div>`;
+  } else {
+    sleepHTML = `<div class="night-section"><h4>🌙 Sin horario de sueño</h4><p>Registra tu hora de despertar y acostarse para ver el análisis de nicturia.</p></div>`;
+  }
+
+  document.getElementById('analysisContent').innerHTML = `
+    ${sleepHTML}
+    <div class="semaphore">
+      ${sem('🚽','Frec/día',micPerDay+'/día',semFreq)}
+      ${sem('📏','Vol. prom',avgVol+'ml',semVol)}
+      ${sem('⚠️','Fugas',leaks.length,semLeaks)}
+      ${sem('🌙','Nicturia',nicturia,semNic)}
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Micciones diurnas</div><div class="stat-val">${dayMics.length}</div><div class="stat-ref">Normal: 4–7/día</div></div>
+      <div class="stat-card"><div class="stat-label">Micciones nocturnas</div><div class="stat-val" style="color:${nicturia>1?'var(--red)':'var(--text)'}">${nicturia}</div><div class="stat-ref">Normal: 0–1/noche</div></div>
+      <div class="stat-card"><div class="stat-label">Vol. total orina</div><div class="stat-val">${totalVol}<span class="stat-unit">ml</span></div><div class="stat-ref">Normal: 800–2000ml</div></div>
+      <div class="stat-card"><div class="stat-label">Líquido ingerido</div><div class="stat-val">${totalDrink}<span class="stat-unit">ml</span></div><div class="stat-ref">Recomendado: 1.5–2L</div></div>
+    </div>
+    <div class="chart-section">
+      <div class="chart-title">Micciones por hora (🌞 diurna / 🌙 nocturna)</div>
+      <div class="chart-wrap"><canvas id="chartHours"></canvas></div>
+      <div class="normal-range">ℹ️ Patrón normal: actividad entre 8h–22h, sin nicturia frecuente</div>
+    </div>
+    <div class="chart-section">
+      <div class="chart-title">Volumen por micción (ml)</div>
+      <div class="chart-wrap"><canvas id="chartVols"></canvas></div>
+      <div class="normal-range">ℹ️ Rango normal: 250–400 ml por micción (ICS 2019)</div>
+    </div>
+  `;
+
+  setTimeout(() => {
+    const hourDay = Array(24).fill(0);
+    const hourNight = Array(24).fill(0);
+    dayMics.forEach(r => { const h=parseInt((r.hora||'0').split(':')[0]); hourDay[h]++; });
+    nightMics.forEach(r => { const h=parseInt((r.hora||'0').split(':')[0]); hourNight[h]++; });
+    const ctx1 = document.getElementById('chartHours');
+    if (ctx1) {
+      new Chart(ctx1, { type:'bar', data:{ labels:Array.from({length:24},(_,i)=>i+'h'), datasets:[
+        { label:'Diurna', data:hourDay, backgroundColor:'#1976d299', borderRadius:4 },
+        { label:'Nocturna', data:hourNight, backgroundColor:'#6a1b9a99', borderRadius:4 }
+      ]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{x:{stacked:true},y:{stacked:true,ticks:{stepSize:1}}}}});
+    }
+    const ctx2 = document.getElementById('chartVols');
+    if (ctx2) {
+      const volData = mics.filter(r=>r.vol).map(r=>({x:r.hora,y:r.vol}));
+      new Chart(ctx2, { type:'scatter', data:{ datasets:[
+        {label:'ml', data:volData, backgroundColor:'#2e7d3299', pointRadius:7},
+        {data:[{x:'00:00',y:250},{x:'23:59',y:250}],type:'line',borderColor:'#2e7d3244',borderDash:[4,4],pointRadius:0},
+        {data:[{x:'00:00',y:400},{x:'23:59',y:400}],type:'line',borderColor:'#e6510044',borderDash:[4,4],pointRadius:0}
+      ]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{type:'category'},y:{min:0,title:{display:true,text:'ml'}}}}});
+    }
+  }, 100);
+}
+
+// ── OVERRIDE renderAnalysis to include sleep ──
+async function renderAnalysis() {
+  if (!patient?.id) return;
+  const snap = await getDocs(query(collection(db,'patients',patient.id,'records'),orderBy('timestamp','desc')));
+  const allRecs = snap.docs.map(d=>({id:d.id,...d.data()}));
+  const from = analysisPeriod==='today' ? todayKey() : (()=>{ const d=new Date(); d.setDate(d.getDate()-6); return d.toISOString().slice(0,10); })();
+  const recs = allRecs.filter(r=>r.date>=from);
+  // Get sleep data for today (or last available)
+  const sleepData = await getSleepData(todayKey());
+  await renderAnalysisWithSleep(recs, sleepData);
+}
 
 // ── PROFILE ──
 function renderProfile(){
