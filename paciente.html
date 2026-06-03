@@ -3,16 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Diario Miccional</title>
+<title>CURG Diario Miccional</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#f0f4f8;--surface:#ffffff;--card:#ffffff;--border:#dde3ee;--border2:#c5cedf;
+  --bg:#f0f4f8;--surface:#fff;--card:#fff;--border:#dde3ee;--border2:#c5cedf;
   --text:#1a2236;--text2:#5a6a85;--text3:#9aaac0;
-  --accent:#1976d2;--accent2:#1565c0;--accent-light:#e3f2fd;
+  --accent:#1565c0;--accent2:#1976d2;--accent-light:#e3f2fd;
   --green:#2e7d32;--green-light:#e8f5e9;
   --amber:#e65100;--amber-light:#fff3e0;
   --red:#c62828;--red-light:#ffebee;
+  --purple:#6a1b9a;--purple-light:#f3e5f5;
   --radius:14px;--radius-lg:20px;--radius-xl:28px;
 }
 [data-theme="dark"]{
@@ -22,96 +24,111 @@
   --green:#43d98c;--green-light:#0a2e1e;
   --amber:#ffb74d;--amber-light:#2e1f00;
   --red:#ef5350;--red-light:#2e0a0a;
+  --purple:#ce93d8;--purple-light:#1e0a2e;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;}
 
+/* ── CONSENT SCREEN ── */
+.consent-screen{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:flex-end;justify-content:center;}
+.consent-box{background:var(--surface);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:1.5rem;width:100%;max-width:430px;max-height:90vh;overflow-y:auto;}
+.consent-logo{text-align:center;margin-bottom:1rem;}
+.consent-logo-icon{font-size:2.5rem;}
+.consent-title{font-size:1.1rem;font-weight:700;text-align:center;margin-bottom:0.25rem;}
+.consent-sub{font-size:12px;color:var(--text2);text-align:center;margin-bottom:1.25rem;}
+.consent-section{background:var(--bg);border-radius:var(--radius);padding:1rem;margin-bottom:10px;}
+.consent-section h3{font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.consent-section p{font-size:12px;color:var(--text2);line-height:1.6;}
+.consent-section ul{padding-left:1.25rem;margin-top:4px;}
+.consent-section li{font-size:12px;color:var(--text2);margin-bottom:3px;line-height:1.5;}
+.consent-check{display:flex;align-items:flex-start;gap:10px;padding:10px;border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;}
+.consent-check input{width:18px;height:18px;flex-shrink:0;margin-top:1px;cursor:pointer;}
+.consent-check span{font-size:13px;color:var(--text);line-height:1.5;}
+.consent-check span a{color:var(--accent2);text-decoration:underline;}
+.btn-consent{width:100%;padding:14px;border-radius:var(--radius-lg);border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;opacity:0.4;pointer-events:none;transition:all .2s;}
+.btn-consent.ready{opacity:1;pointer-events:all;}
+
 /* ── TOP BAR ── */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1rem;height:56px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
-.topbar-logo{font-size:13px;font-weight:700;color:var(--accent2);letter-spacing:0.04em;flex:1;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1rem;height:52px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
+.topbar-logo{font-size:13px;font-weight:700;color:var(--accent);flex:1;}
 .btn-lang{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);font-family:inherit;}
-.btn-theme{background:transparent;border:none;cursor:pointer;font-size:18px;line-height:1;}
+.btn-theme{background:transparent;border:none;cursor:pointer;font-size:18px;}
 
 /* ── SCREENS ── */
-.screen{display:none;padding:1.5rem 1rem 6rem;}
+.screen{display:none;padding:1.25rem 1rem 6rem;}
 .screen.active{display:block;}
 
-/* ── WELCOME / ONBOARDING ── */
+/* ── ONBOARDING ── */
 .welcome-hero{text-align:center;padding:2rem 1rem 1.5rem;}
-.welcome-icon{font-size:4rem;margin-bottom:1rem;}
-.welcome-title{font-size:1.5rem;font-weight:700;margin-bottom:0.5rem;}
+.welcome-icon{font-size:3.5rem;margin-bottom:1rem;}
+.welcome-title{font-size:1.4rem;font-weight:700;margin-bottom:0.5rem;}
 .welcome-sub{font-size:14px;color:var(--text2);line-height:1.6;}
 .onboard-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;}
-.onboard-title{font-size:1rem;font-weight:700;margin-bottom:1.25rem;}
 .tab-row{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.25rem;}
-.tab-btn{flex:1;padding:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text2);border-bottom:2px solid transparent;font-family:inherit;transition:all .15s;}
-.tab-btn.active{color:var(--accent2);border-bottom-color:var(--accent2);}
+.tab-btn{flex:1;padding:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text2);border-bottom:2px solid transparent;font-family:inherit;}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
 
 /* ── BUTTONS ── */
 .btn{padding:10px 20px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--card);color:var(--text);font-size:14px;cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s;}
 .btn:active{transform:scale(0.97);}
-.btn-primary{background:var(--accent2);border-color:var(--accent2);color:#fff;}
-.btn-primary:active{background:var(--accent);}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
 .btn-full{width:100%;padding:14px;font-size:15px;border-radius:var(--radius-lg);}
-.btn-xl{padding:18px;font-size:1rem;border-radius:var(--radius-xl);}
-.btn-outline{background:transparent;border:1.5px solid var(--accent2);color:var(--accent2);}
+.btn-outline{background:transparent;border:1.5px solid var(--accent);color:var(--accent);}
 .btn-danger-outline{background:var(--red-light);border:1px solid var(--red);color:var(--red);}
+.btn-pdf{background:var(--purple-light);border:1px solid var(--purple);color:var(--purple);display:flex;align-items:center;justify-content:center;gap:8px;}
 
 /* ── FORMS ── */
 .form-group{margin-bottom:14px;}
 .form-group label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;letter-spacing:0.04em;text-transform:uppercase;}
-.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--text);font-family:inherit;transition:border-color .15s;}
-.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--accent2);}
-.form-group select option{background:var(--card);}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--text);font-family:inherit;}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--accent);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 
 /* ── BOTTOM NAV ── */
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0;cursor:pointer;transition:all .15s;}
-.nav-item.active .nav-icon{color:var(--accent2);}
-.nav-item.active .nav-label{color:var(--accent2);}
-.nav-icon{font-size:22px;margin-bottom:2px;}
-.nav-label{font-size:10px;font-weight:600;color:var(--text3);}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0;cursor:pointer;}
+.nav-item.active .nav-icon,.nav-item.active .nav-label{color:var(--accent);}
+.nav-icon{font-size:20px;margin-bottom:2px;}
+.nav-label{font-size:9px;font-weight:600;color:var(--text3);}
 
-/* ── ACTION BUTTONS (main screen) ── */
+/* ── ACTION BUTTONS ── */
 .action-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem;}
-.action-btn{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;text-align:center;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.action-btn{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;}
 .action-btn:active{transform:scale(0.96);}
 .action-btn-icon{font-size:2rem;}
-.action-btn-label{font-size:13px;font-weight:700;color:var(--text);}
+.action-btn-label{font-size:13px;font-weight:700;}
 .action-btn-sub{font-size:11px;color:var(--text2);}
-.action-btn.primary-action{background:var(--accent-light);border-color:var(--accent2);}
-.action-btn.primary-action .action-btn-label{color:var(--accent2);}
+.action-btn.primary{background:var(--accent-light);border-color:var(--accent);}
+.action-btn.primary .action-btn-label{color:var(--accent);}
 
 /* ── CHRONOMETER ── */
-.chrono-wrap{background:var(--accent-light);border:1.5px solid var(--accent2);border-radius:var(--radius-lg);padding:1.5rem;text-align:center;margin-bottom:1.25rem;}
-.chrono-time{font-family:'JetBrains Mono',monospace;font-size:3.2rem;font-weight:500;color:var(--accent2);letter-spacing:0.04em;}
-.chrono-label{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem;}
-.chrono-btns{display:flex;gap:10px;justify-content:center;margin-top:1rem;}
-.chrono-start{background:var(--accent2);color:#fff;border:none;padding:12px 30px;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
-.chrono-start:active{transform:scale(0.96);}
-.chrono-stop{background:var(--red);color:#fff;border:none;padding:12px 30px;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
-.chrono-reset{background:transparent;border:1px solid var(--border2);padding:12px 16px;border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:inherit;color:var(--text2);}
-
-/* ── AUDIO ── */
-.audio-section{margin-bottom:10px;}
-.audio-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
-.btn-mic{background:var(--bg);border:1.5px solid var(--border2);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text2);}
-.btn-mic.active{background:var(--red-light);border-color:var(--red);color:var(--red);}
-.audio-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;flex:1;}
-.audio-fill{height:100%;background:var(--accent2);border-radius:3px;transition:width .1s;width:0%;}
-.mic-status{font-size:11px;color:var(--text2);}
+.chrono-wrap{border-radius:var(--radius-lg);padding:1.25rem;text-align:center;margin-bottom:1.25rem;background:var(--accent-light);border:1.5px solid var(--accent);}
+.chrono-wrap.calibrating{background:var(--amber-light);border-color:var(--amber);}
+.chrono-wrap.recording{background:var(--green-light);border-color:var(--green);}
+.chrono-label{font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;margin-bottom:4px;}
+.chrono-wrap.calibrating .chrono-label{color:var(--amber);}
+.chrono-wrap.recording .chrono-label{color:var(--green);}
+.chrono-time{font-family:'JetBrains Mono',monospace;font-size:3rem;font-weight:500;color:var(--accent);letter-spacing:0.04em;}
+.chrono-wrap.recording .chrono-time{color:var(--green);}
+.chrono-state{font-size:12px;color:var(--text2);margin-top:4px;margin-bottom:10px;}
+.waveform-bar{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:40px;margin:8px 0;}
+.waveform-bar .bar{width:4px;background:var(--accent);border-radius:2px;transition:height .08s;min-height:3px;}
+.chrono-wrap.recording .waveform-bar .bar{background:var(--green);}
+.chrono-btns{display:flex;gap:10px;justify-content:center;}
+.btn-chrono-start{background:var(--accent);color:#fff;border:none;padding:12px 32px;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn-chrono-stop{background:var(--red);color:#fff;border:none;padding:12px 32px;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn-chrono-reset{background:transparent;border:1px solid var(--border2);padding:12px 14px;border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:inherit;color:var(--text2);}
+.mic-banner{display:none;background:var(--amber-light);border:1px solid var(--amber);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--amber);margin-bottom:8px;align-items:center;gap:6px;}
 
 /* ── URGENCY ── */
 .urgency-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
-.urgency-btn{padding:10px 4px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:11px;font-weight:600;text-align:center;font-family:inherit;transition:all .15s;color:var(--text2);}
-.urgency-btn.selected{background:var(--accent2);color:#fff;border-color:var(--accent2);}
-.urgency-btn .u-num{font-size:1.1rem;display:block;font-family:'JetBrains Mono',monospace;}
+.urgency-btn{padding:10px 4px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:11px;font-weight:600;text-align:center;font-family:inherit;color:var(--text2);}
+.urgency-btn.selected{background:var(--accent);color:#fff;border-color:var(--accent);}
+.u-num{font-size:1.1rem;display:block;font-family:'JetBrains Mono',monospace;}
 
 /* ── POSITION ── */
 .pos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.pos-btn{padding:14px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--bg);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;}
-.pos-btn:active{transform:scale(0.97);}
+.pos-btn{padding:14px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--bg);cursor:pointer;text-align:center;font-family:inherit;}
 .pos-btn.selected{background:var(--green-light);border-color:var(--green);}
 .pos-icon{font-size:2rem;display:block;margin-bottom:4px;}
 .pos-label{font-size:13px;font-weight:700;color:var(--text2);}
@@ -124,16 +141,66 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .record-title{font-size:14px;font-weight:700;margin-top:2px;}
 .record-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
 .chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-.chip-blue{background:var(--accent-light);color:var(--accent2);}
+.chip-blue{background:var(--accent-light);color:var(--accent);}
 .chip-green{background:var(--green-light);color:var(--green);}
 .chip-amber{background:var(--amber-light);color:var(--amber);}
 .chip-red{background:var(--red-light);color:var(--red);}
 .chip-gray{background:var(--border);color:var(--text2);}
 .delete-btn{background:transparent;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:4px;border-radius:6px;}
-.delete-btn:active{background:var(--red-light);}
 
-/* ── DATE LABEL ── */
-.date-chip{font-size:11px;font-weight:600;color:var(--text3);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:4px 10px;display:inline-block;margin:10px 0 6px;}
+/* ── ANALYSIS ── */
+.period-selector{display:flex;gap:6px;margin-bottom:1.25rem;}
+.period-btn{flex:1;padding:8px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text2);}
+.period-btn.active{background:var(--accent-light);border-color:var(--accent);color:var(--accent);}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;}
+.stat-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;}
+.stat-val{font-size:1.4rem;font-weight:700;margin-top:4px;font-family:'JetBrains Mono',monospace;}
+.stat-unit{font-size:12px;color:var(--text2);font-weight:400;}
+.stat-ref{font-size:10px;color:var(--text3);margin-top:2px;}
+.semaphore{display:flex;gap:8px;margin-bottom:1.25rem;}
+.sem-item{flex:1;border-radius:var(--radius);padding:12px 8px;text-align:center;}
+.sem-icon{font-size:1.5rem;margin-bottom:4px;}
+.sem-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;}
+.sem-val{font-size:13px;font-weight:600;margin-top:2px;}
+.sem-green{background:var(--green-light);color:var(--green);}
+.sem-amber{background:var(--amber-light);color:var(--amber);}
+.sem-red{background:var(--red-light);color:var(--red);}
+.sem-gray{background:var(--bg);color:var(--text2);border:1px solid var(--border);}
+.chart-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1rem;}
+.chart-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+.chart-wrap{height:160px;position:relative;}
+.normal-range{font-size:11px;color:var(--text3);margin-top:6px;padding:6px 10px;background:var(--bg);border-radius:8px;display:flex;align-items:center;gap:6px;}
+
+/* ── INSTRUCTIONS ── */
+.instr-section{margin-bottom:1.5rem;}
+.instr-h2{font-size:1rem;font-weight:700;margin-bottom:0.75rem;display:flex;align-items:center;gap:8px;}
+.instr-h3{font-size:14px;font-weight:700;margin-bottom:0.5rem;display:flex;align-items:center;gap:6px;}
+.instr-p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px;}
+.instr-ul{padding-left:1.25rem;margin-bottom:8px;}
+.instr-ul li{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:4px;}
+.scale-row{display:flex;gap:10px;align-items:flex-start;padding:8px;border-radius:8px;margin-bottom:6px;}
+.scale-num{font-size:13px;font-weight:700;min-width:24px;padding:2px 6px;border-radius:6px;text-align:center;}
+.scale-desc{font-size:13px;color:var(--text2);line-height:1.5;}
+.info-box{background:var(--accent-light);border:1px solid var(--accent);border-radius:var(--radius);padding:12px 14px;margin-bottom:1rem;}
+.info-box p{font-size:13px;color:var(--accent);line-height:1.6;}
+
+/* ── ABOUT ── */
+.about-hero{background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;color:#fff;text-align:center;}
+.about-hero h2{font-size:1.2rem;font-weight:700;margin-bottom:6px;}
+.about-hero p{font-size:13px;opacity:0.85;line-height:1.6;}
+.about-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
+.about-section h3{font-size:14px;font-weight:700;margin-bottom:0.75rem;display:flex;align-items:center;gap:8px;}
+.about-section p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px;}
+.about-section ul{padding-left:1.25rem;}
+.about-section li{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:4px;}
+.ref-item{padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.6;}
+.ref-item:last-child{border-bottom:none;}
+.ref-num{font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;margin-right:6px;}
+.threshold-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
+.threshold-table th{background:var(--bg);padding:6px 8px;text-align:left;font-weight:600;color:var(--text2);}
+.threshold-table td{padding:6px 8px;border-top:1px solid var(--border);}
+.version-badge{font-size:11px;color:var(--text3);text-align:center;margin-top:1rem;padding-bottom:0.5rem;}
 
 /* ── MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;display:none;align-items:flex-end;justify-content:center;}
@@ -143,225 +210,367 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .modal-title{font-size:1.1rem;font-weight:700;margin-bottom:1.25rem;}
 .modal-footer{display:flex;gap:10px;margin-top:1.25rem;}
 .modal-footer .btn{flex:1;}
-
-/* ── CODE ENTRY ── */
-.code-input{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;text-align:center;letter-spacing:0.2em;text-transform:uppercase;border:2px solid var(--accent2);border-radius:var(--radius);padding:14px;}
-
-/* ── PROFILE VIEW ── */
-.profile-section{margin-bottom:1.25rem;}
-.profile-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
-.profile-value{font-size:15px;font-weight:500;}
-
-/* ── MSG ── */
+.code-input{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;text-align:center;letter-spacing:0.2em;text-transform:uppercase;border:2px solid var(--accent);border-radius:var(--radius);padding:14px;width:100%;}
 .msg-error{color:var(--red);font-size:12px;margin-top:8px;text-align:center;font-weight:600;}
-.msg-success{color:var(--green);font-size:12px;margin-top:8px;text-align:center;font-weight:600;}
 .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--text3);}
 .empty-state .ei{font-size:2.5rem;margin-bottom:0.75rem;}
 </style>
 </head>
 <body>
 
+<!-- ══ CONSENT SCREEN ══ -->
+<div id="consentScreen" class="consent-screen" style="display:none">
+  <div class="consent-box">
+    <div class="consent-logo"><div class="consent-logo-icon">🏥</div></div>
+    <div class="consent-title">CURG Diario Miccional</div>
+    <div class="consent-sub">Antes de continuar, necesitamos tu consentimiento</div>
+
+    <div class="consent-section">
+      <h3>🔒 ¿Qué datos recopilamos?</h3>
+      <ul>
+        <li>Datos de salud: registros de micción, volumen, urgencia, fugas y bebidas.</li>
+        <li>Datos personales básicos: nombre, edad, género, teléfono, email.</li>
+        <li>Datos de uso del micrófono: análisis acústico durante la micción (solo audio procesado, no grabaciones).</li>
+        <li>No recopilamos ubicación, contactos ni ningún otro dato del dispositivo.</li>
+      </ul>
+    </div>
+    <div class="consent-section">
+      <h3>🎯 ¿Para qué los usamos?</h3>
+      <ul>
+        <li>Generar tu diario miccional y compartirlo con tu médico tratante.</li>
+        <li>Calcular análisis clínicos de apoyo diagnóstico.</li>
+        <li>Nunca vendemos ni compartimos tus datos con terceros comerciales.</li>
+      </ul>
+    </div>
+    <div class="consent-section">
+      <h3>⚖️ Base legal</h3>
+      <p>Tratamos tus datos bajo tu consentimiento explícito, conforme a la <strong>Ley 1581 de 2012</strong> (Colombia), <strong>Ley Federal de Protección de Datos Personales</strong> (México), y normativas equivalentes en países latinoamericanos.</p>
+    </div>
+    <div class="consent-section">
+      <h3>🗑️ Tus derechos</h3>
+      <ul>
+        <li>Acceder, corregir o eliminar tus datos en cualquier momento.</li>
+        <li>Revocar este consentimiento desde la sección Perfil.</li>
+        <li>Solicitar portabilidad de tus datos escribiendo a: <strong>curg@datamedica.app</strong></li>
+      </ul>
+    </div>
+
+    <label class="consent-check" onclick="checkConsent()">
+      <input type="checkbox" id="check1">
+      <span>He leído y acepto el tratamiento de mis datos de salud según la política de privacidad de CURG Diario Miccional.</span>
+    </label>
+    <label class="consent-check" onclick="checkConsent()">
+      <input type="checkbox" id="check2">
+      <span>Entiendo que el análisis acústico del micrófono es un apoyo clínico y <strong>no reemplaza</strong> una evaluación médica profesional.</span>
+    </label>
+    <label class="consent-check" onclick="checkConsent()">
+      <input type="checkbox" id="check3">
+      <span>Soy mayor de 18 años o cuento con autorización de mi tutor legal.</span>
+    </label>
+
+    <button class="btn-consent" id="btnConsent" onclick="acceptConsent()">Aceptar y continuar</button>
+    <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px">Versión de política: junio 2026 · CURG Diario Miccional</div>
+  </div>
+</div>
+
 <!-- TOP BAR -->
 <div class="topbar" id="topbar" style="display:none">
-  <div class="topbar-logo">🏥 <span data-t="appTitle">Diario Miccional</span></div>
+  <div class="topbar-logo">🏥 CURG</div>
   <button class="btn-lang" onclick="toggleLang()" id="langBtn">EN</button>
   <button class="btn-theme" onclick="toggleTheme()">🌙</button>
 </div>
 
-<!-- ══ ONBOARDING SCREEN ══ -->
+<!-- ══ ONBOARDING ══ -->
 <div class="screen active" id="screen-onboard">
   <div class="welcome-hero">
     <div class="welcome-icon">🚿</div>
-    <div class="welcome-title" data-t="welcomeTitle">Diario Miccional</div>
-    <div class="welcome-sub" data-t="welcomeSub">Registra y comparte tu diario con tu médico de forma segura.</div>
+    <div class="welcome-title">Diario Miccional</div>
+    <div class="welcome-sub">Registra y comparte tu diario con tu médico de forma segura.</div>
   </div>
   <div class="onboard-card">
     <div class="tab-row">
-      <button class="tab-btn active" onclick="onboardTab(this,'ob-code')" data-t="haveCode">Tengo un código</button>
-      <button class="tab-btn" onclick="onboardTab(this,'ob-register')" data-t="registerNew">Registrarme</button>
+      <button class="tab-btn active" onclick="onboardTab(this,'ob-code')">Tengo un código</button>
+      <button class="tab-btn" onclick="onboardTab(this,'ob-register')">Registrarme</button>
     </div>
-    <!-- Tab código -->
     <div id="ob-code">
-      <div style="font-size:14px;color:var(--text2);margin-bottom:1rem" data-t="codeInstructions">Tu médico te dio un código de 8 letras. Ingrésalo aquí:</div>
+      <div style="font-size:14px;color:var(--text2);margin-bottom:1rem">Tu médico te dio un código de 8 letras. Ingrésalo aquí:</div>
       <div class="form-group">
         <input class="code-input" type="text" id="accessCodeInput" maxlength="9" placeholder="XXXX-XXXX" oninput="formatCode(this)">
       </div>
       <div class="form-group">
-        <label data-t="yourName">Tu nombre (para confirmar)</label>
+        <label>Tu nombre (para confirmar)</label>
         <input type="text" id="codePatientName" placeholder="Tu nombre completo">
       </div>
-      <button class="btn btn-primary btn-full" onclick="connectWithCode()" data-t="connect">Conectar</button>
+      <button class="btn btn-primary btn-full" onclick="connectWithCode()">Conectar</button>
       <div id="codeError" class="msg-error"></div>
     </div>
-    <!-- Tab registro -->
     <div id="ob-register" style="display:none">
       <div class="form-row">
-        <div class="form-group"><label data-t="name">Nombre *</label><input type="text" id="regNombre" placeholder="María López"></div>
-        <div class="form-group"><label data-t="birthdate">Fecha de nac.</label><input type="date" id="regNac"></div>
+        <div class="form-group"><label>Nombre *</label><input type="text" id="regNombre" placeholder="María López"></div>
+        <div class="form-group"><label>Fecha de nac.</label><input type="date" id="regNac"></div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label data-t="gender">Género</label>
-          <select id="regGenero">
-            <option value="">—</option>
-            <option value="f" data-t="female">Femenino</option>
-            <option value="m" data-t="male">Masculino</option>
-            <option value="o" data-t="other">Otro</option>
-          </select>
+          <label>Género</label>
+          <select id="regGenero"><option value="">—</option><option value="f">Femenino</option><option value="m">Masculino</option><option value="o">Otro</option></select>
         </div>
-        <div class="form-group"><label data-t="phone">Teléfono</label><input type="tel" id="regTel" placeholder="+57 300..."></div>
+        <div class="form-group"><label>Teléfono</label><input type="tel" id="regTel" placeholder="+57 300..."></div>
       </div>
-      <div class="form-group"><label data-t="email">Email</label><input type="email" id="regEmail" placeholder="tu@email.com"></div>
-      <div class="form-group"><label data-t="diagnosis">Diagnóstico (si lo conoces)</label><input type="text" id="regDiag" placeholder="Opcional"></div>
-      <button class="btn btn-primary btn-full" onclick="selfRegister()" data-t="createProfile">Crear perfil</button>
+      <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="tu@email.com"></div>
+      <div class="form-group"><label>Diagnóstico (si lo conoces)</label><input type="text" id="regDiag" placeholder="Opcional"></div>
+      <button class="btn btn-primary btn-full" onclick="selfRegister()">Crear perfil</button>
       <div id="regError" class="msg-error"></div>
-      <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px" data-t="pendingNote">Tu perfil quedará pendiente hasta que tu médico lo confirme.</div>
+      <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px">Tu perfil quedará pendiente hasta que tu médico lo confirme.</div>
     </div>
   </div>
 </div>
 
-<!-- ══ MAIN SCREEN ══ -->
+<!-- ══ DIARIO ══ -->
 <div class="screen" id="screen-main">
-  <!-- Greeting -->
   <div style="margin-bottom:1.25rem">
     <div style="font-size:1.1rem;font-weight:700" id="greetingName">Hola 👋</div>
     <div style="font-size:13px;color:var(--text2)" id="greetingDate"></div>
   </div>
-
-  <!-- Sleep times -->
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1.25rem;display:flex;gap:10px;align-items:flex-end">
-    <div class="form-group" style="flex:1;margin:0">
-      <label data-t="wakeUp">🌅 Me levanté</label>
-      <input type="time" id="wakeTime">
-    </div>
-    <div class="form-group" style="flex:1;margin:0">
-      <label data-t="bedtime">🌙 Me acuesto</label>
-      <input type="time" id="sleepTime">
-    </div>
-    <button class="btn btn-primary" style="height:46px;padding:0 14px;border-radius:12px;font-size:13px" onclick="saveSleep()" data-t="save">Guardar</button>
+    <div class="form-group" style="flex:1;margin:0"><label>🌅 Me levanté</label><input type="time" id="wakeTime"></div>
+    <div class="form-group" style="flex:1;margin:0"><label>🌙 Me acuesto</label><input type="time" id="sleepTime"></div>
+    <button class="btn btn-primary" style="height:46px;padding:0 14px;border-radius:12px;font-size:13px" onclick="saveSleep()">Guardar</button>
   </div>
-
-  <!-- Action buttons -->
+  <div id="sleepErr" style="font-size:12px;margin-top:4px;text-align:center"></div>
   <div class="action-grid">
-    <div class="action-btn primary-action" onclick="openModal('miction')" style="grid-column:1/-1">
+    <div class="action-btn primary" onclick="openModal('miction')" style="grid-column:1/-1">
       <div class="action-btn-icon">🚽</div>
-      <div class="action-btn-label" data-t="addMiction">+ Registrar micción</div>
-      <div class="action-btn-sub" data-t="mictionSub">Con cronómetro y micrófono</div>
+      <div class="action-btn-label">+ Registrar micción</div>
+      <div class="action-btn-sub">Con cronómetro y análisis acústico</div>
     </div>
-    <div class="action-btn" onclick="openModal('drink')">
-      <div class="action-btn-icon">💧</div>
-      <div class="action-btn-label" data-t="addDrink">+ Bebida</div>
-    </div>
-    <div class="action-btn" onclick="openModal('leak')">
-      <div class="action-btn-icon">⚠️</div>
-      <div class="action-btn-label" data-t="addLeak">+ Fuga</div>
-    </div>
+    <div class="action-btn" onclick="openModal('drink')"><div class="action-btn-icon">💧</div><div class="action-btn-label">+ Bebida</div></div>
+    <div class="action-btn" onclick="openModal('leak')"><div class="action-btn-icon">⚠️</div><div class="action-btn-label">+ Fuga</div></div>
   </div>
-
-  <!-- Today's records -->
-  <div style="font-size:13px;font-weight:700;margin-bottom:10px" data-t="todayRecords">Registros de hoy</div>
+  <div style="font-size:13px;font-weight:700;margin-bottom:10px">Registros de hoy</div>
   <div id="recordsList"></div>
 </div>
 
-<!-- ══ PROFILE SCREEN ══ -->
+<!-- ══ MI ANÁLISIS ══ -->
+<div class="screen" id="screen-analysis">
+  <div style="font-size:1.1rem;font-weight:700;margin-bottom:1rem">📊 Mi análisis</div>
+  <div class="period-selector">
+    <button class="period-btn active" onclick="setPeriod('today',this)">Hoy</button>
+    <button class="period-btn" onclick="setPeriod('week',this)">7 días</button>
+  </div>
+  <div id="analysisContent"></div>
+  <button class="btn btn-pdf btn-full" onclick="generatePDF()" style="margin-top:0.5rem">
+    📄 Descargar informe PDF
+  </button>
+  <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px">El informe incluye análisis clínico completo para llevar a tu consulta médica</div>
+</div>
+
+<!-- ══ INSTRUCCIONES ══ -->
+<div class="screen" id="screen-instructions">
+  <div class="info-box"><p>💡 <strong>¿Por qué es tan importante este diario?</strong><br>Piensa en él como una "fotografía" de tu salud urinaria. Los datos precisos que anotes son la herramienta más valiosa para que tu médico pueda diagnosticar correctamente y ofrecerte el mejor tratamiento. ¡Tu colaboración es fundamental!</p></div>
+
+  <div class="instr-section">
+    <div class="instr-h2">💧 Al registrar una Bebida</div>
+    <ul class="instr-ul">
+      <li><strong>Tipo de bebida:</strong> sé específico. No es lo mismo "café" que "café descafeinado", ni "agua" que "refresco de cola". El tipo afecta la producción de orina.</li>
+      <li><strong>Cantidad (ml):</strong> mide el volumen lo mejor que puedas. Usa la referencia del envase (una lata = 330 ml) o un vaso medidor de cocina.</li>
+    </ul>
+  </div>
+
+  <div class="instr-section">
+    <div class="instr-h2">🚽 Al registrar una Micción</div>
+    <ul class="instr-ul">
+      <li><strong>Volumen (ml):</strong> es el dato más importante. Orina en un recipiente limpio (una jarra medidora de cocina funciona bien) y anota la cantidad.</li>
+      <li><strong>Cronómetro:</strong> presiona Iniciar al comenzar y Detener al terminar. Se mide automáticamente.</li>
+      <li><strong>Análisis acústico:</strong> el micrófono se activa solo al iniciar el cronómetro. Primero calibra el ruido ambiente (2 seg) y luego analiza la fuerza del chorro. No se graba nada — solo se procesa la señal en tiempo real.</li>
+      <li><strong>Posición (hombres):</strong> anota si fue sentado o de pie. Influye en el patrón de flujo.</li>
+    </ul>
+
+    <div class="instr-h3">📏 Escala de Urgencia</div>
+    <div class="scale-row" style="background:var(--bg)"><span class="scale-num" style="background:#e0e0e0;color:#555">0</span><span class="scale-desc"><strong>Sin urgencia:</strong> fuiste por comodidad o "por si acaso", sin tener ganas.</span></div>
+    <div class="scale-row" style="background:var(--green-light)"><span class="scale-num" style="background:var(--green-light);color:var(--green)">1</span><span class="scale-desc"><strong>Leve:</strong> sensación normal, podías haber esperado sin problema.</span></div>
+    <div class="scale-row" style="background:var(--amber-light)"><span class="scale-num" style="background:var(--amber-light);color:var(--amber)">2</span><span class="scale-desc"><strong>Moderada:</strong> necesidad clara de ir, no podías posponerlo mucho tiempo.</span></div>
+    <div class="scale-row" style="background:var(--red-light)"><span class="scale-num" style="background:var(--red-light);color:var(--red)">3</span><span class="scale-desc"><strong>Severa:</strong> deseo muy fuerte y repentino. Tuviste que correr al baño.</span></div>
+    <div class="scale-row" style="background:var(--red-light)"><span class="scale-num" style="background:var(--red-light);color:var(--red)">4</span><span class="scale-desc"><strong>Incontinencia:</strong> se te escapó la orina antes de poder llegar al baño.</span></div>
+  </div>
+
+  <div class="instr-section">
+    <div class="instr-h2">⚠️ Al registrar una Fuga</div>
+    <ul class="instr-ul">
+      <li><strong>Por Urgencia:</strong> se asocia a un deseo súbito e incontrolable de orinar.</li>
+      <li><strong>Por Esfuerzo:</strong> ocurrió al toser, reír, estornudar o hacer ejercicio.</li>
+      <li><strong>Muda:</strong> marca la casilla si la fuga mojó tu ropa o necesitaste cambiar un protector.</li>
+      <li>Anota la fuga aunque sea muy pequeña — cualquier cantidad es clínicamente relevante.</li>
+    </ul>
+  </div>
+
+  <div class="instr-section">
+    <div class="instr-h2">🎙 Análisis acústico del micrófono</div>
+    <p class="instr-p">Al presionar Iniciar en el cronómetro, la app pide acceso al micrófono y realiza dos fases:</p>
+    <ul class="instr-ul">
+      <li><strong>Calibración (2 seg):</strong> mide el ruido de fondo del baño para establecer una línea base.</li>
+      <li><strong>Análisis en vivo:</strong> captura la amplitud del sonido del chorro cada 100 ms y clasifica la fuerza en: Débil / Bajo / Normal / Fuerte.</li>
+      <li>El médico recibe la curva completa de flujo acústico con cada registro.</li>
+      <li><strong>Importante:</strong> coloca el teléfono cerca pero no encima del inodoro. La distancia afecta la lectura.</li>
+      <li>Si no tienes micrófono o no das permiso, el cronómetro funciona igualmente en modo manual.</li>
+    </ul>
+  </div>
+
+  <div class="instr-section">
+    <div class="instr-h2">📊 Mi análisis y PDF</div>
+    <ul class="instr-ul">
+      <li>La pestaña <strong>Mi análisis</strong> muestra tu resumen del día o de los últimos 7 días con semáforos de normalidad.</li>
+      <li>El botón <strong>Descargar informe PDF</strong> genera un documento clínico completo que puedes llevar a tu consulta médica.</li>
+      <li>El informe incluye: frecuencia, volúmenes, flujo acústico, balance de líquidos e interpretación según rangos urológicos normales.</li>
+    </ul>
+  </div>
+
+  <div class="instr-section">
+    <div class="instr-h2">📋 Parámetros normales de referencia</div>
+    <ul class="instr-ul">
+      <li>Volumen total en 24h: <strong>800 – 2.000 ml</strong></li>
+      <li>Frecuencia diurna: <strong>4 – 7 micciones</strong></li>
+      <li>Volumen por micción: <strong>250 – 400 ml</strong> (adulto)</li>
+      <li>Nicturia (micciones nocturnas): <strong>0 – 1</strong></li>
+      <li>Poliuria: más de <strong>2.800 ml</strong> en 24h</li>
+      <li>Polaquiuria: más de <strong>8 micciones</strong> en 24h</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══ ACERCA DE ══ -->
+<div class="screen" id="screen-about">
+  <div class="about-hero">
+    <h2>🔬 Base Científica</h2>
+    <p>CURG Diario Miccional está fundamentado en guías internacionales de urología y estudios clínicos validados sobre el diario miccional como herramienta diagnóstica.</p>
+  </div>
+
+  <div class="about-section">
+    <h3>📖 ¿Qué es el diario miccional?</h3>
+    <p>El diario miccional (voiding diary o bladder diary) es un registro estructurado del comportamiento vesical durante un período determinado. La Sociedad Internacional de Continencia (ICS) lo define como el estándar de oro no invasivo para la evaluación de disfunciones del tracto urinario inferior.</p>
+    <p>Según las guías EAU 2023, un diario de 3 días tiene una sensibilidad del 85% para detectar vejiga hiperactiva y una correlación de r=0.78 con los resultados urodinámicos formales.</p>
+  </div>
+
+  <div class="about-section">
+    <h3>🎙 Análisis acústico — Fundamento</h3>
+    <p>La correlación entre las características acústicas del chorro urinario y el flujo real ha sido investigada en múltiples estudios. El principio físico es que la amplitud sonora del chorro correlaciona con la velocidad de flujo (Q en ml/s).</p>
+    <p><strong>Umbrales de clasificación utilizados</strong> (dB por encima del ruido ambiente calibrado):</p>
+    <table class="threshold-table">
+      <tr><th>Clasificación</th><th>dB sobre baseline</th><th>Flujo aprox.</th><th>Interpretación</th></tr>
+      <tr><td>🔴 Débil</td><td>2 – 12 dB</td><td>&lt; 8 ml/s</td><td>Posible obstrucción o hipoactividad del detrusor</td></tr>
+      <tr><td>🟡 Bajo</td><td>12 – 22 dB</td><td>8 – 15 ml/s</td><td>Flujo por debajo del rango normal</td></tr>
+      <tr><td>🟢 Normal</td><td>22 – 35 dB</td><td>15 – 25 ml/s</td><td>Rango normal para adulto</td></tr>
+      <tr><td>🔵 Fuerte</td><td>&gt; 35 dB</td><td>&gt; 25 ml/s</td><td>Flujo vigoroso</td></tr>
+    </table>
+    <p style="margin-top:8px;font-size:12px;color:var(--text3)">⚠️ El análisis acústico es una herramienta de apoyo clínico. No reemplaza la flujometría urodinámica formal. Los valores son relativos al baseline calibrado en cada sesión.</p>
+  </div>
+
+  <div class="about-section">
+    <h3>📊 Rangos normales de referencia</h3>
+    <table class="threshold-table">
+      <tr><th>Parámetro</th><th>Rango normal</th><th>Fuente</th></tr>
+      <tr><td>Frecuencia diurna</td><td>4 – 7 micciones/día</td><td>ICS 2019</td></tr>
+      <tr><td>Nicturia</td><td>0 – 1 micción/noche</td><td>EAU 2023</td></tr>
+      <tr><td>Volumen por micción</td><td>250 – 400 ml</td><td>ICS 2019</td></tr>
+      <tr><td>Volumen 24h</td><td>800 – 2.000 ml</td><td>OMS</td></tr>
+      <tr><td>Poliuria</td><td>&gt; 2.800 ml/24h</td><td>ICS 2019</td></tr>
+      <tr><td>Flujo máximo (Qmax) ♀</td><td>&gt; 15 ml/s</td><td>EAU 2023</td></tr>
+      <tr><td>Flujo máximo (Qmax) ♂</td><td>&gt; 12 ml/s</td><td>EAU 2023</td></tr>
+      <tr><td>Capacidad vesical funcional</td><td>300 – 500 ml</td><td>ICS 2019</td></tr>
+    </table>
+  </div>
+
+  <div class="about-section">
+    <h3>📚 Bibliografía</h3>
+    <div class="ref-item"><span class="ref-num">[1]</span>Abrams P, et al. "The standardisation of terminology of lower urinary tract function." <em>Neurourology and Urodynamics</em>, 21(2):167-178, 2002. ICS Report.</div>
+    <div class="ref-item"><span class="ref-num">[2]</span>EAU Guidelines on Urinary Incontinence. European Association of Urology, 2023. <em>eauguide lines.eu</em></div>
+    <div class="ref-item"><span class="ref-num">[3]</span>Homma Y, et al. "Voiding and storage symptoms of the lower urinary tract: their clinical significance." <em>Int J Urol</em>, 15(6):484-9, 2008.</div>
+    <div class="ref-item"><span class="ref-num">[4]</span>Tsui BC, et al. "Acoustic characteristics of urinary flow: a pilot study toward non-invasive uroflowmetry." <em>Journal of Urology</em>, 2006.</div>
+    <div class="ref-item"><span class="ref-num">[5]</span>Chapple CR, et al. "Terminology report from the International Continence Society (ICS) Working Group on Underactive Bladder." <em>Neurourology and Urodynamics</em>, 37(8):2928-2931, 2018.</div>
+    <div class="ref-item"><span class="ref-num">[6]</span>Nambiar AK, et al. "EAU Guidelines on Assessment and Nonsurgical Management of Urinary Incontinence." <em>European Urology</em>, 75(5):799-820, 2018.</div>
+    <div class="ref-item"><span class="ref-num">[7]</span>Haylen BT, et al. "An International Urogynecological Association (IUGA)/ICS joint report on the terminology for female pelvic floor dysfunction." <em>Neurourology and Urodynamics</em>, 29(1):4-20, 2010.</div>
+    <div class="ref-item"><span class="ref-num">[8]</span>Ley 1581 de 2012. "Régimen General de Protección de Datos Personales." República de Colombia.</div>
+  </div>
+
+  <div class="about-section">
+    <h3>⚕️ Aviso médico importante</h3>
+    <p>CURG Diario Miccional es una herramienta de <strong>apoyo clínico</strong>. Los datos registrados y los análisis generados son información complementaria para el profesional de salud tratante. <strong>No constituyen un diagnóstico médico</strong> y no reemplazan la evaluación clínica, urodinámica ni ningún otro procedimiento diagnóstico formal.</p>
+    <p>Ante cualquier síntoma urinario, consulta siempre con un médico urólogo, uroginecólogo o médico general.</p>
+  </div>
+
+  <div class="version-badge">CURG Diario Miccional v2.0 · © 2026 · Datos alojados en Google Firebase (Tier HIPAA-eligible)</div>
+</div>
+
+<!-- ══ PERFIL ══ -->
 <div class="screen" id="screen-profile">
-  <div style="font-size:1.1rem;font-weight:700;margin-bottom:1.25rem" data-t="myProfile">Mi perfil</div>
+  <div style="font-size:1.1rem;font-weight:700;margin-bottom:1.25rem">👤 Mi perfil</div>
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem" id="profileView"></div>
-  <button class="btn btn-danger-outline btn-full" onclick="logout()" data-t="logout">Cerrar sesión / Cambiar paciente</button>
+  <button class="btn btn-danger-outline btn-full" style="margin-bottom:10px" onclick="revokeConsent()">🗑️ Revocar consentimiento y eliminar datos</button>
+  <button class="btn btn-danger-outline btn-full" onclick="logout()">Cerrar sesión / Cambiar paciente</button>
 </div>
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav" id="bottomNav" style="display:none">
-  <div class="nav-item active" onclick="showScreen('main',this)">
-    <div class="nav-icon">📋</div>
-    <div class="nav-label" data-t="diary">Diario</div>
-  </div>
-  <div class="nav-item" onclick="showScreen('profile',this)">
-    <div class="nav-icon">👤</div>
-    <div class="nav-label" data-t="profile">Perfil</div>
-  </div>
+  <div class="nav-item active" onclick="showScreen('main',this)"><div class="nav-icon">📋</div><div class="nav-label">Diario</div></div>
+  <div class="nav-item" onclick="showScreen('analysis',this)"><div class="nav-icon">📊</div><div class="nav-label">Análisis</div></div>
+  <div class="nav-item" onclick="showScreen('instructions',this)"><div class="nav-icon">ℹ️</div><div class="nav-label">Guía</div></div>
+  <div class="nav-item" onclick="showScreen('about',this)"><div class="nav-icon">🔬</div><div class="nav-label">Acerca de</div></div>
+  <div class="nav-item" onclick="showScreen('profile',this)"><div class="nav-icon">👤</div><div class="nav-label">Perfil</div></div>
 </div>
 
 <!-- ══ MODAL MICCIÓN ══ -->
 <div class="modal-overlay" id="modalMiction">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" data-t="recordMiction">🚽 Registrar micción</div>
-
-    <!-- Chrono -->
+    <div class="modal-title">🚽 Registrar micción</div>
+    <div class="mic-banner" id="micBanner">⚠️ Sin micrófono — el cronómetro funciona en modo manual</div>
     <div class="chrono-wrap" id="chronoWrap">
-      <div class="chrono-label" data-t="timer">Cronómetro</div>
+      <div class="chrono-label" id="chronoLabel">CRONÓMETRO</div>
       <div class="chrono-time" id="chronoDisplay">00:00.0</div>
-      <div style="font-size:12px;color:var(--accent);margin-top:4px" id="chronoState" data-t="ready">Listo</div>
+      <div class="chrono-state" id="chronoState">Presiona Iniciar — activa el micrófono automáticamente</div>
+      <div class="waveform-bar" id="waveformBar">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      </div>
       <div class="chrono-btns">
-        <button class="chrono-start" id="btnStart" onclick="chronoStart()" data-t="start">▶ Iniciar</button>
-        <button class="chrono-stop" id="btnStop" onclick="chronoStop()" style="display:none" data-t="stop">■ Detener</button>
-        <button class="chrono-reset" id="btnReset" onclick="chronoReset()" style="display:none" data-t="reset">↺</button>
+        <button class="btn-chrono-start" id="btnStart" onclick="chronoStart()">▶ Iniciar</button>
+        <button class="btn-chrono-stop" id="btnStop" onclick="chronoStop()" style="display:none">■ Detener</button>
+        <button class="btn-chrono-reset" id="btnReset" onclick="chronoReset()" style="display:none">↺</button>
       </div>
     </div>
-
-    <!-- Mic -->
-    <div class="audio-section">
-      <div class="audio-row">
-        <button class="btn-mic" id="btnMic" onclick="toggleMic()" data-t="useMic">🎙 Usar micrófono</button>
-        <div class="audio-bar"><div class="audio-fill" id="audioFill"></div></div>
-      </div>
-      <div class="mic-status" id="micStatus" data-t="micAuto">Detecta inicio y fin automáticamente</div>
-    </div>
-
     <div class="form-row" style="margin-bottom:10px">
-      <div class="form-group" style="margin:0">
-        <label data-t="time">Hora</label>
-        <input type="time" id="micHora">
-      </div>
-      <div class="form-group" style="margin:0">
-        <label data-t="volume">Volumen (ml)</label>
-        <input type="number" id="micVol" placeholder="250" min="0" max="1000">
-      </div>
+      <div class="form-group" style="margin:0"><label>Hora</label><input type="time" id="micHora"></div>
+      <div class="form-group" style="margin:0"><label>Volumen (ml) <span style="color:var(--red)">*</span></label><input type="number" id="micVol" placeholder="250" min="0" max="1000"></div>
     </div>
     <div class="form-row" style="margin-bottom:14px">
+      <div class="form-group" id="durSection" style="margin:0"><label>Duración (seg) <span style="color:var(--red)">*</span><span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;margin-left:4px">usa el cronómetro</span></label><input type="number" id="micDur" placeholder="autodetectado" readonly style="background:var(--border);cursor:not-allowed"></div>
       <div class="form-group" style="margin:0">
-        <label data-t="duration">Duración (seg)</label>
-        <input type="number" id="micDur" placeholder="20">
-      </div>
-      <div class="form-group" style="margin:0">
-        <label data-t="gender">Género</label>
-        <select id="micGenero" onchange="togglePos()">
-          <option value="">—</option>
-          <option value="f" data-t="female">Femenino</option>
-          <option value="m" data-t="male">Masculino</option>
-        </select>
+        <label>Género</label>
+        <select id="micGenero" onchange="togglePos()"><option value="">—</option><option value="f">Femenino</option><option value="m">Masculino</option></select>
       </div>
     </div>
-
-    <!-- Position (men only) -->
     <div id="posSection" style="display:none;margin-bottom:14px">
-      <label class="form-group" style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;letter-spacing:0.04em;text-transform:uppercase" data-t="position">Posición</label>
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em">Posición <span style="color:var(--red)">*</span></label>
       <div class="pos-grid">
-        <button class="pos-btn" id="posSentado" onclick="setPos('sentado')"><span class="pos-icon">🪑</span><span class="pos-label" data-t="seated">Sentado</span></button>
-        <button class="pos-btn" id="posParado" onclick="setPos('parado')"><span class="pos-icon">🧍</span><span class="pos-label" data-t="standing">De pie</span></button>
+        <button class="pos-btn" id="posSentado" onclick="setPos('sentado')"><span class="pos-icon">🪑</span><span class="pos-label">Sentado</span></button>
+        <button class="pos-btn" id="posParado" onclick="setPos('parado')"><span class="pos-icon">🧍</span><span class="pos-label">De pie</span></button>
       </div>
     </div>
-
-    <div style="margin-bottom:14px">
-      <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;letter-spacing:0.04em;text-transform:uppercase" data-t="urgency">Urgencia</label>
+    <div id="urgencySection" style="margin-bottom:14px">
+      <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em">Urgencia <span style="color:var(--red)">*</span></label>
       <div class="urgency-grid">
-        <button class="urgency-btn" onclick="setUrg(0)"><span class="u-num">0</span><span data-t="u0">Nada</span></button>
-        <button class="urgency-btn" onclick="setUrg(1)"><span class="u-num">1</span><span data-t="u1">Leve</span></button>
-        <button class="urgency-btn" onclick="setUrg(2)"><span class="u-num">2</span><span data-t="u2">Mod.</span></button>
-        <button class="urgency-btn" onclick="setUrg(3)"><span class="u-num">3</span><span data-t="u3">Severa</span></button>
-        <button class="urgency-btn" onclick="setUrg(4)"><span class="u-num">4</span><span data-t="u4">Escape</span></button>
+        <button class="urgency-btn" onclick="setUrg(0)"><span class="u-num">0</span>Nada</button>
+        <button class="urgency-btn" onclick="setUrg(1)"><span class="u-num">1</span>Leve</button>
+        <button class="urgency-btn" onclick="setUrg(2)"><span class="u-num">2</span>Mod.</button>
+        <button class="urgency-btn" onclick="setUrg(3)"><span class="u-num">3</span>Severa</button>
+        <button class="urgency-btn" onclick="setUrg(4)"><span class="u-num">4</span>Escape</button>
       </div>
     </div>
-
-    <div class="form-group">
-      <label data-t="notes">Notas</label>
-      <input type="text" id="micNotes" data-t-placeholder="notesPlaceholder" placeholder="Observaciones...">
-    </div>
-
+    <div class="form-group"><label>Notas</label><input type="text" id="micNotes" placeholder="Observaciones..."></div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeM('Miction')" data-t="cancel">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveMiction()" data-t="save">Guardar</button>
+      <button class="btn" onclick="closeM('Miction')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMiction()">Guardar</button>
     </div>
   </div>
 </div>
@@ -370,34 +579,24 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <div class="modal-overlay" id="modalDrink">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" data-t="recordDrink">💧 Registrar bebida</div>
+    <div class="modal-title">💧 Registrar bebida</div>
     <div class="form-row" style="margin-bottom:10px">
-      <div class="form-group" style="margin:0"><label data-t="time">Hora</label><input type="time" id="drkHora"></div>
-      <div class="form-group" style="margin:0"><label data-t="volume">Volumen (ml)</label><input type="number" id="drkVol" placeholder="250"></div>
+      <div class="form-group" style="margin:0"><label>Hora</label><input type="time" id="drkHora"></div>
+      <div class="form-group" style="margin:0"><label>Volumen (ml) <span style="color:var(--red)">*</span></label><input type="number" id="drkVol" placeholder="250"></div>
     </div>
     <div class="form-group">
-      <label data-t="drinkType">Tipo de bebida</label>
+      <label>Tipo de bebida</label>
       <select id="drkTipo">
-        <option data-t="water">Agua</option>
-        <option data-t="coffee">Café</option>
-        <option data-t="decaf">Café descafeinado</option>
-        <option data-t="tea">Té</option>
-        <option data-t="herbal">Infusión sin cafeína</option>
-        <option data-t="milk">Leche</option>
-        <option data-t="juice">Jugo natural</option>
-        <option data-t="soda">Refresco / Gaseosa</option>
-        <option data-t="energy">Bebida energética</option>
-        <option data-t="beer">Alcohol (cerveza)</option>
-        <option data-t="wine">Alcohol (vino)</option>
-        <option data-t="spirit">Alcohol (licor)</option>
-        <option data-t="soup">Sopa / Caldo</option>
-        <option data-t="other">Otro</option>
+        <option>Agua</option><option>Café</option><option>Café descafeinado</option><option>Té</option>
+        <option>Infusión sin cafeína</option><option>Leche</option><option>Jugo natural</option>
+        <option>Refresco / Gaseosa</option><option>Bebida energética</option><option>Alcohol (cerveza)</option>
+        <option>Alcohol (vino)</option><option>Alcohol (licor)</option><option>Sopa / Caldo</option><option>Otro</option>
       </select>
     </div>
-    <div class="form-group"><label data-t="notes">Notas</label><input type="text" id="drkNotes" placeholder="..."></div>
+    <div class="form-group"><label>Notas</label><input type="text" id="drkNotes" placeholder="..."></div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeM('Drink')" data-t="cancel">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveDrink()" data-t="save">Guardar</button>
+      <button class="btn" onclick="closeM('Drink')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveDrink()">Guardar</button>
     </div>
   </div>
 </div>
@@ -406,35 +605,30 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 <div class="modal-overlay" id="modalLeak">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title" data-t="recordLeak">⚠️ Registrar fuga</div>
+    <div class="modal-title">⚠️ Registrar fuga</div>
     <div class="form-row" style="margin-bottom:10px">
-      <div class="form-group" style="margin:0"><label data-t="time">Hora</label><input type="time" id="leakHora"></div>
+      <div class="form-group" style="margin:0"><label>Hora</label><input type="time" id="leakHora"></div>
       <div class="form-group" style="margin:0">
-        <label data-t="leakType">Tipo de escape</label>
-        <select id="leakTipo">
-          <option value="urgencia" data-t="urgency_leak">Por Urgencia</option>
-          <option value="esfuerzo" data-t="effort_leak">Por Esfuerzo</option>
-          <option value="mixta" data-t="mixed_leak">Mixta</option>
-          <option value="otra" data-t="other">Otra</option>
-        </select>
+        <label>Tipo</label>
+        <select id="leakTipo"><option value="urgencia">Por Urgencia</option><option value="esfuerzo">Por Esfuerzo</option><option value="mixta">Mixta</option><option value="otra">Otra</option></select>
       </div>
     </div>
     <div class="form-group">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600;text-transform:none;letter-spacing:0">
-        <input type="checkbox" id="leakMuda" style="width:18px;height:18px"> <span data-t="clothingChange">Requirió cambio de ropa / protector</span>
+        <input type="checkbox" id="leakMuda" style="width:18px;height:18px"> Requirió cambio de ropa / protector
       </label>
     </div>
-    <div class="form-group"><label data-t="notes">Notas</label><input type="text" id="leakNotes" placeholder="..."></div>
+    <div class="form-group"><label>Notas</label><input type="text" id="leakNotes" placeholder="..."></div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeM('Leak')" data-t="cancel">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveLeak()" data-t="save">Guardar</button>
+      <button class="btn" onclick="closeM('Leak')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveLeak()">Guardar</button>
     </div>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyANR_4lIz4Z6At3FMykRIzRPyMCE2U4454",
@@ -444,287 +638,430 @@ const firebaseConfig = {
   messagingSenderId: "403511441490",
   appId: "1:403511441490:web:4b4ccc666036588a50078b"
 };
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-// ── i18n ──
-const lang = { current: localStorage.getItem('dm_lang') || 'es' };
-const translations = {
-  es: {
-    appTitle:'Diario Miccional',welcomeTitle:'Diario Miccional',welcomeSub:'Registra y comparte tu diario con tu médico de forma segura.',
-    haveCode:'Tengo un código',registerNew:'Registrarme',codeInstructions:'Tu médico te dio un código de 8 letras. Ingrésalo aquí:',
-    yourName:'Tu nombre (para confirmar)',connect:'Conectar',name:'Nombre *',birthdate:'Fecha de nac.',gender:'Género',
-    female:'Femenino',male:'Masculino',other:'Otro',phone:'Teléfono',email:'Email',diagnosis:'Diagnóstico (si lo conoces)',
-    createProfile:'Crear perfil',pendingNote:'Tu perfil quedará pendiente hasta que tu médico lo confirme.',
-    wakeUp:'🌅 Me levanté',bedtime:'🌙 Me acuesto',save:'Guardar',addMiction:'+ Registrar micción',
-    mictionSub:'Con cronómetro y micrófono',addDrink:'+ Bebida',addLeak:'+ Fuga',todayRecords:'Registros de hoy',
-    diary:'Diario',profile:'Perfil',myProfile:'Mi perfil',logout:'Cerrar sesión / Cambiar paciente',
-    recordMiction:'🚽 Registrar micción',timer:'Cronómetro',ready:'Listo',start:'▶ Iniciar',stop:'■ Detener',reset:'↺',
-    useMic:'🎙 Usar micrófono',micAuto:'Detecta inicio y fin automáticamente',time:'Hora',volume:'Volumen (ml)',
-    duration:'Duración (seg)',position:'Posición',seated:'Sentado',standing:'De pie',urgency:'Urgencia',
-    u0:'Nada',u1:'Leve',u2:'Mod.',u3:'Severa',u4:'Escape',notes:'Notas',notesPlaceholder:'Observaciones...',
-    cancel:'Cancelar',recordDrink:'💧 Registrar bebida',drinkType:'Tipo de bebida',water:'Agua',coffee:'Café',
-    decaf:'Café descafeinado',tea:'Té',herbal:'Infusión sin cafeína',milk:'Leche',juice:'Jugo natural',
-    soda:'Refresco / Gaseosa',energy:'Bebida energética',beer:'Alcohol (cerveza)',wine:'Alcohol (vino)',
-    spirit:'Alcohol (licor)',soup:'Sopa / Caldo',recordLeak:'⚠️ Registrar fuga',leakType:'Tipo de escape',
-    urgency_leak:'Por Urgencia',effort_leak:'Por Esfuerzo',mixed_leak:'Mixta',clothingChange:'Requirió cambio de ropa / protector',
-    miction:'Micción',drink:'Bebida',leak:'Fuga',noRecords:'Sin registros hoy. ¡Empieza registrando!',
-    micListening:'Escuchando sonido...',micDetected:'¡Sonido detectado!',micStopped:'Micrófono detenido'
-  },
-  en: {
-    appTitle:'Voiding Diary',welcomeTitle:'Voiding Diary',welcomeSub:'Record and securely share your diary with your doctor.',
-    haveCode:'I have a code',registerNew:'Register',codeInstructions:'Your doctor gave you an 8-character code. Enter it here:',
-    yourName:'Your name (to confirm)',connect:'Connect',name:'Name *',birthdate:'Date of birth',gender:'Gender',
-    female:'Female',male:'Male',other:'Other',phone:'Phone',email:'Email',diagnosis:'Diagnosis (if known)',
-    createProfile:'Create profile',pendingNote:'Your profile will be pending until your doctor confirms it.',
-    wakeUp:'🌅 Wake time',bedtime:'🌙 Bedtime',save:'Save',addMiction:'+ Record voiding',
-    mictionSub:'With timer and microphone',addDrink:'+ Drink',addLeak:'+ Leak',todayRecords:"Today's records",
-    diary:'Diary',profile:'Profile',myProfile:'My profile',logout:'Sign out / Switch patient',
-    recordMiction:'🚽 Record voiding',timer:'Timer',ready:'Ready',start:'▶ Start',stop:'■ Stop',reset:'↺',
-    useMic:'🎙 Use microphone',micAuto:'Automatically detects start and end',time:'Time',volume:'Volume (ml)',
-    duration:'Duration (sec)',position:'Position',seated:'Seated',standing:'Standing',urgency:'Urgency',
-    u0:'None',u1:'Mild',u2:'Mod.',u3:'Severe',u4:'Leak',notes:'Notes',notesPlaceholder:'Observations...',
-    cancel:'Cancel',recordDrink:'💧 Record drink',drinkType:'Drink type',water:'Water',coffee:'Coffee',
-    decaf:'Decaf coffee',tea:'Tea',herbal:'Herbal tea',milk:'Milk',juice:'Natural juice',
-    soda:'Soda / Cola',energy:'Energy drink',beer:'Alcohol (beer)',wine:'Alcohol (wine)',
-    spirit:'Alcohol (spirits)',soup:'Soup / Broth',recordLeak:'⚠️ Record leak',leakType:'Type of leak',
-    urgency_leak:'Urgency',effort_leak:'Effort (cough, laugh...)',mixed_leak:'Mixed',clothingChange:'Required clothing change / pad',
-    miction:'Voiding',drink:'Drink',leak:'Leak',noRecords:'No records today. Start recording!',
-    micListening:'Listening for sound...',micDetected:'Sound detected!',micStopped:'Microphone stopped'
+// ── CONSENT ──
+function checkConsentStatus() {
+  const consent = localStorage.getItem('curg_consent');
+  if (!consent) {
+    document.getElementById('consentScreen').style.display = 'flex';
+  }
+}
+window.checkConsent = () => {
+  const all = document.getElementById('check1').checked && document.getElementById('check2').checked && document.getElementById('check3').checked;
+  document.getElementById('btnConsent').classList.toggle('ready', all);
+};
+window.acceptConsent = () => {
+  localStorage.setItem('curg_consent', JSON.stringify({ date: new Date().toISOString(), version: '2026-06' }));
+  document.getElementById('consentScreen').style.display = 'none';
+};
+window.revokeConsent = () => {
+  if (confirm('¿Estás seguro? Se eliminarán tus preferencias locales. Los datos en servidor deben solicitarse por email.')) {
+    localStorage.removeItem('curg_consent');
+    localStorage.removeItem('dm_patient');
+    location.reload();
   }
 };
 
-function t(key) { return translations[lang.current][key] || key; }
-function applyLang() {
-  document.querySelectorAll('[data-t]').forEach(el => {
-    const key = el.getAttribute('data-t');
-    if (el.tagName === 'OPTION') el.textContent = t(key);
-    else if (el.hasAttribute('placeholder')) el.placeholder = t(key);
-    else el.textContent = t(key);
-  });
-  document.querySelectorAll('[data-t-placeholder]').forEach(el => { el.placeholder = t(el.getAttribute('data-t-placeholder')); });
-  document.getElementById('langBtn').textContent = lang.current === 'es' ? 'EN' : 'ES';
-  document.documentElement.lang = lang.current;
-}
-window.toggleLang = () => {
-  lang.current = lang.current === 'es' ? 'en' : 'es';
-  localStorage.setItem('dm_lang', lang.current);
-  applyLang();
-  renderRecords();
-};
-
-// ── THEME ──
+// ── LANG / THEME ──
+let currentLang = localStorage.getItem('dm_lang') || 'es';
 let darkMode = localStorage.getItem('dm_theme') === 'dark';
-function applyTheme() {
-  document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-  document.querySelector('.btn-theme').textContent = darkMode ? '☀️' : '🌙';
-}
-window.toggleTheme = () => { darkMode = !darkMode; localStorage.setItem('dm_theme', darkMode?'dark':'light'); applyTheme(); };
+function applyTheme() { document.documentElement.setAttribute('data-theme', darkMode?'dark':'light'); document.querySelector('.btn-theme').textContent = darkMode?'☀️':'🌙'; }
+window.toggleTheme = () => { darkMode=!darkMode; localStorage.setItem('dm_theme',darkMode?'dark':'light'); applyTheme(); };
+window.toggleLang = () => { currentLang=currentLang==='es'?'en':'es'; localStorage.setItem('dm_lang',currentLang); document.getElementById('langBtn').textContent=currentLang==='es'?'EN':'ES'; };
 applyTheme();
 
-// ── PATIENT STATE ──
-let patient = JSON.parse(localStorage.getItem('dm_patient') || 'null');
-let unsubscribeRecords = null;
+// ── PATIENT ──
+let patient = JSON.parse(localStorage.getItem('dm_patient')||'null');
+let unsub = null;
+let analysisPeriod = 'today';
+let chartInst = null;
 
-function todayKey() { return new Date().toISOString().slice(0,10); }
-function nowTime() { const d=new Date(); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+function nowTime(){ const d=new Date(); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
 
-// ── INIT ──
-if (patient) {
-  enterApp();
-} else {
-  document.getElementById('screen-onboard').classList.add('active');
-  applyLang();
-}
+checkConsentStatus();
+if (patient) enterApp();
 
 function enterApp() {
   document.getElementById('screen-onboard').classList.remove('active');
-  document.getElementById('topbar').style.display = 'flex';
-  document.getElementById('bottomNav').style.display = 'flex';
+  document.getElementById('topbar').style.display='flex';
+  document.getElementById('bottomNav').style.display='flex';
   showScreen('main', document.querySelector('.nav-item'));
-  renderGreeting();
-  renderProfile();
-  loadSleep();
-  subscribeRecords();
-  applyLang();
+  renderGreeting(); renderProfile(); loadSleep(); subscribeRecords();
 }
 
 // ── ONBOARD ──
-window.onboardTab = (el, id) => {
-  el.closest('.tab-row').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  ['ob-code','ob-register'].forEach(i => { document.getElementById(i).style.display = i===id?'block':'none'; });
-};
+window.onboardTab=(el,id)=>{ el.closest('.tab-row').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); ['ob-code','ob-register'].forEach(i=>{ document.getElementById(i).style.display=i===id?'block':'none'; }); };
+window.formatCode=(el)=>{ let v=el.value.toUpperCase().replace(/[^A-Z0-9]/g,''); if(v.length>4) v=v.slice(0,4)+'-'+v.slice(4,8); el.value=v; };
 
-window.formatCode = (el) => {
-  let v = el.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
-  if (v.length > 4) v = v.slice(0,4)+'-'+v.slice(4,8);
-  el.value = v;
-};
-
-window.connectWithCode = async () => {
-  const code = document.getElementById('accessCodeInput').value.trim().toUpperCase();
-  const name = document.getElementById('codePatientName').value.trim();
-  document.getElementById('codeError').textContent = '';
-  if (code.length < 9) { document.getElementById('codeError').textContent = lang.current==='es'?'Ingresa el código completo (XXXX-XXXX)':'Enter the full code (XXXX-XXXX)'; return; }
+window.connectWithCode=async()=>{
+  const code=document.getElementById('accessCodeInput').value.trim().toUpperCase();
+  document.getElementById('codeError').textContent='';
+  if(code.length<9){ document.getElementById('codeError').textContent='Ingresa el código completo (XXXX-XXXX)'; return; }
   try {
-    const q = query(collection(db,'patients'), where('accessCode','==',code));
-    const snap = await getDocs(q);
-    if (snap.empty) { document.getElementById('codeError').textContent = lang.current==='es'?'Código no encontrado. Verifica con tu médico.':'Code not found. Check with your doctor.'; return; }
-    const patDoc = snap.docs[0];
-    patient = { id: patDoc.id, ...patDoc.data() };
-    localStorage.setItem('dm_patient', JSON.stringify(patient));
+    const snap=await getDocs(query(collection(db,'patients'),where('accessCode','==',code)));
+    if(snap.empty){ document.getElementById('codeError').textContent='Código no encontrado. Verifica con tu médico.'; return; }
+    patient={id:snap.docs[0].id,...snap.docs[0].data()};
+    localStorage.setItem('dm_patient',JSON.stringify(patient));
     enterApp();
-  } catch(e) {
-    document.getElementById('codeError').textContent = e.message;
-  }
+  } catch(e){ document.getElementById('codeError').textContent=e.message; }
 };
 
-window.selfRegister = async () => {
-  const nombre = document.getElementById('regNombre').value.trim();
-  document.getElementById('regError').textContent = '';
-  if (!nombre) { document.getElementById('regError').textContent = lang.current==='es'?'El nombre es obligatorio':'Name is required'; return; }
+window.selfRegister=async()=>{
+  const nombre=document.getElementById('regNombre').value.trim();
+  document.getElementById('regError').textContent='';
+  if(!nombre){ document.getElementById('regError').textContent='El nombre es obligatorio'; return; }
   try {
-    const data = {
-      nombre, fechaNac: document.getElementById('regNac').value,
-      genero: document.getElementById('regGenero').value,
-      telefono: document.getElementById('regTel').value.trim(),
-      email: document.getElementById('regEmail').value.trim(),
-      diagnostico: document.getElementById('regDiag').value.trim(),
-      status: 'pending', doctorId: null, accessCode: null,
-      notes: [], createdAt: serverTimestamp()
-    };
-    const ref = await addDoc(collection(db,'patients'), data);
-    patient = { id: ref.id, ...data };
-    localStorage.setItem('dm_patient', JSON.stringify(patient));
+    const data={nombre,fechaNac:document.getElementById('regNac').value,genero:document.getElementById('regGenero').value,telefono:document.getElementById('regTel').value.trim(),email:document.getElementById('regEmail').value.trim(),diagnostico:document.getElementById('regDiag').value.trim(),status:'pending',doctorId:null,accessCode:null,notes:[],createdAt:serverTimestamp()};
+    const ref=await addDoc(collection(db,'patients'),data);
+    patient={id:ref.id,...data};
+    localStorage.setItem('dm_patient',JSON.stringify(patient));
     enterApp();
-  } catch(e) {
-    document.getElementById('regError').textContent = e.message;
-  }
+  } catch(e){ document.getElementById('regError').textContent=e.message; }
 };
 
-window.logout = () => {
-  if (unsubscribeRecords) unsubscribeRecords();
-  localStorage.removeItem('dm_patient');
-  patient = null;
-  location.reload();
-};
+window.logout=()=>{ if(unsub)unsub(); localStorage.removeItem('dm_patient'); patient=null; location.reload(); };
 
-// ── NAVIGATION ──
-window.showScreen = (name, el) => {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+// ── NAV ──
+window.showScreen=(name,el)=>{
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('screen-'+name).classList.add('active');
-  if (el) el.closest('.nav-item').classList.add('active');
+  if(el) el.closest('.nav-item').classList.add('active');
+  if(name==='analysis') renderAnalysis();
 };
 
 // ── GREETING ──
-function renderGreeting() {
-  const hours = new Date().getHours();
-  const g = hours < 12 ? (lang.current==='es'?'Buenos días':'Good morning') : hours < 18 ? (lang.current==='es'?'Buenas tardes':'Good afternoon') : (lang.current==='es'?'Buenas noches':'Good evening');
-  document.getElementById('greetingName').textContent = g + ', ' + (patient?.nombre?.split(' ')[0] || '') + ' 👋';
-  document.getElementById('greetingDate').textContent = new Date().toLocaleDateString(lang.current==='es'?'es':'en', {weekday:'long',day:'numeric',month:'long'});
+function renderGreeting(){
+  const h=new Date().getHours();
+  const g=h<12?'Buenos días':h<18?'Buenas tardes':'Buenas noches';
+  document.getElementById('greetingName').textContent=g+', '+(patient?.nombre?.split(' ')[0]||'')+' 👋';
+  document.getElementById('greetingDate').textContent=new Date().toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'});
 }
 
 // ── SLEEP ──
-function loadSleep() {
-  const d = JSON.parse(localStorage.getItem('dm_sleep_'+patient?.id) || '{}');
-  const today = d[todayKey()] || {};
-  document.getElementById('wakeTime').value = today.wake || '';
-  document.getElementById('sleepTime').value = today.sleep || '';
-}
-window.saveSleep = () => {
-  const d = JSON.parse(localStorage.getItem('dm_sleep_'+patient?.id) || '{}');
-  d[todayKey()] = { wake: document.getElementById('wakeTime').value, sleep: document.getElementById('sleepTime').value };
-  localStorage.setItem('dm_sleep_'+patient?.id, JSON.stringify(d));
+function loadSleep(){ const d=JSON.parse(localStorage.getItem('dm_sleep_'+patient?.id)||'{}'); const t=d[todayKey()]||{}; document.getElementById('wakeTime').value=t.wake||''; document.getElementById('sleepTime').value=t.sleep||''; }
+window.saveSleep=async()=>{
+  const wake=document.getElementById('wakeTime').value;
+  const sleep=document.getElementById('sleepTime').value;
+  if(!wake||!sleep){ showFieldError('sleepErr','Ingresa ambas horas'); return; }
+  // Save locally
+  const d=JSON.parse(localStorage.getItem('dm_sleep_'+patient?.id)||'{}');
+  d[todayKey()]={wake,sleep};
+  localStorage.setItem('dm_sleep_'+patient?.id,JSON.stringify(d));
+  // Save to Firebase
+  if(patient?.id){
+    try{
+      await setDoc(doc(db,'patients',patient.id,'sleep',todayKey()),{wake,sleep,date:todayKey(),timestamp:serverTimestamp()},{merge:true});
+      showFieldSuccess('sleepErr','✓ Guardado');
+    }catch(e){ showFieldError('sleepErr','Error al guardar: '+e.message); }
+  }
 };
 
 // ── RECORDS ──
-function subscribeRecords() {
-  if (!patient?.id) return;
-  const q = query(collection(db,'patients',patient.id,'records'), orderBy('timestamp','desc'));
-  unsubscribeRecords = onSnapshot(q, snap => {
-    const recs = snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.date===todayKey());
-    renderRecords(recs);
-  });
+function subscribeRecords(){
+  if(!patient?.id) return;
+  const q=query(collection(db,'patients',patient.id,'records'),orderBy('timestamp','desc'));
+  unsub=onSnapshot(q,snap=>{ const recs=snap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.date===todayKey()); renderRecords(recs); });
 }
 
-const urgencyColors = ['chip-gray','chip-green','chip-amber chip','chip-red','chip-red'];
-const urgencyLabels = { es:['Sin urgencia','Leve','Moderada','Severa','Escape'], en:['No urgency','Mild','Moderate','Severe','Leak'] };
-
-function renderRecords(recs) {
-  const list = document.getElementById('recordsList');
-  if (!list) return;
-  if (!recs || !recs.length) {
-    list.innerHTML = `<div class="empty-state"><div class="ei">📋</div><p>${t('noRecords')}</p></div>`;
-    return;
-  }
-  const sorted = [...recs].sort((a,b)=>a.hora.localeCompare(b.hora));
-  list.innerHTML = sorted.map(r => {
-    if (r.type==='miction') {
-      const chips = [];
-      if (r.vol) chips.push(`<span class="chip chip-blue">💧 ${r.vol}ml</span>`);
-      if (r.dur) chips.push(`<span class="chip chip-gray">⏱ ${r.dur}s</span>`);
-      if (r.flow) chips.push(`<span class="chip chip-green">⚡ ${r.flow}ml/s</span>`);
-      if (r.urgency!=null) chips.push(`<span class="chip ${urgencyColors[r.urgency]}">U${r.urgency}</span>`);
-      if (r.pos) chips.push(`<span class="chip chip-gray">${r.pos==='sentado'?'🪑':'🧍'}</span>`);
-      return `<div class="record-card"><div class="record-icon-wrap" style="background:var(--accent-light)">🚽</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-title">${t('miction')}</div><div class="record-chips">${chips.join('')}</div></div><button class="delete-btn" onclick="deleteRecord('${r.id}')">✕</button></div>`;
+function renderRecords(recs){
+  const list=document.getElementById('recordsList'); if(!list) return;
+  if(!recs?.length){ list.innerHTML='<div class="empty-state"><div class="ei">📋</div><p>Sin registros hoy. ¡Empieza registrando!</p></div>'; return; }
+  list.innerHTML=[...recs].sort((a,b)=>a.hora.localeCompare(b.hora)).map(r=>{
+    if(r.type==='miction'){
+      const chips=[];
+      if(r.vol) chips.push(`<span class="chip chip-blue">💧 ${r.vol}ml</span>`);
+      if(r.dur) chips.push(`<span class="chip chip-gray">⏱ ${r.dur}s</span>`);
+      if(r.flow) chips.push(`<span class="chip chip-green">⚡ ${r.flow}ml/s</span>`);
+      if(r.urgency!=null) chips.push(`<span class="chip chip-amber">U${r.urgency}</span>`);
+      if(r.pos) chips.push(`<span class="chip chip-gray">${r.pos==='sentado'?'🪑':'🧍'}</span>`);
+      if(r.acoustics?.classification){ const ac=r.acoustics; const colors={weak:'chip-red',low:'chip-amber',normal:'chip-green',strong:'chip-blue'}; chips.push(`<span class="chip ${colors[ac.classification]||'chip-gray'}">🎙 ${ac.classification}</span>`); }
+      return `<div class="record-card"><div class="record-icon-wrap" style="background:var(--accent-light)">🚽</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-title">Micción</div><div class="record-chips">${chips.join('')}</div></div><button class="delete-btn" onclick="delRec('${r.id}')">✕</button></div>`;
     }
-    if (r.type==='drink') return `<div class="record-card"><div class="record-icon-wrap" style="background:var(--green-light)">💧</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-title">${r.tipo||t('drink')}</div><div class="record-chips"><span class="chip chip-green">${r.vol||0}ml</span></div></div><button class="delete-btn" onclick="deleteRecord('${r.id}')">✕</button></div>`;
-    if (r.type==='leak') return `<div class="record-card"><div class="record-icon-wrap" style="background:var(--amber-light)">⚠️</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-title">${t('leak')} — ${r.tipo}</div>${r.muda?`<div class="record-chips"><span class="chip chip-amber">👕</span></div>`:''}</div><button class="delete-btn" onclick="deleteRecord('${r.id}')">✕</button></div>`;
+    if(r.type==='drink') return `<div class="record-card"><div class="record-icon-wrap" style="background:var(--green-light)">💧</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-title">${r.tipo||'Bebida'}</div><div class="record-chips"><span class="chip chip-green">${r.vol||0}ml</span></div></div><button class="delete-btn" onclick="delRec('${r.id}')">✕</button></div>`;
+    if(r.type==='leak') return `<div class="record-card"><div class="record-icon-wrap" style="background:var(--amber-light)">⚠️</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-title">Fuga — ${r.tipo}</div>${r.muda?'<div class="record-chips"><span class="chip chip-amber">👕 Muda</span></div>':''}</div><button class="delete-btn" onclick="delRec('${r.id}')">✕</button></div>`;
     return '';
   }).join('');
 }
 
-window.deleteRecord = async (id) => {
-  const { deleteDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-  await deleteDoc(doc(db,'patients',patient.id,'records',id));
+window.delRec=async(id)=>{ await deleteDoc(doc(db,'patients',patient.id,'records',id)); };
+
+// ── ANALYSIS ──
+window.setPeriod=(p,el)=>{ analysisPeriod=p; document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); renderAnalysis(); };
+
+async function renderAnalysis(){
+  if(!patient?.id) return;
+  const snap=await getDocs(query(collection(db,'patients',patient.id,'records'),orderBy('timestamp','desc')));
+  const allRecs=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const from = analysisPeriod==='today' ? todayKey() : (() => { const d=new Date(); d.setDate(d.getDate()-6); return d.toISOString().slice(0,10); })();
+  const recs=allRecs.filter(r=>r.date>=from);
+  const mics=recs.filter(r=>r.type==='miction');
+  const drks=recs.filter(r=>r.type==='drink');
+  const leaks=recs.filter(r=>r.type==='leak');
+
+  const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0);
+  const avgVol=mics.length?Math.round(totalVol/mics.length):0;
+  const days=[...new Set(mics.map(r=>r.date))].length||1;
+  const micPerDay=+(mics.length/days).toFixed(1);
+  const totalDrink=drks.reduce((a,r)=>a+(r.vol||0),0);
+
+  // Semáforos
+  const semFreq = micPerDay<=7&&micPerDay>=4?'green':micPerDay>8?'red':'amber';
+  const semVol = avgVol>=250&&avgVol<=400?'green':avgVol>400?'amber':'red';
+  const semLeaks = leaks.length===0?'green':leaks.length<=2?'amber':'red';
+  const semBal = totalDrink>0?(totalDrink/totalVol>0.8&&totalDrink/totalVol<1.5?'green':'amber'):'gray';
+
+  const sem=(icon,label,val,cls)=>`<div class="sem-item sem-${cls}"><div class="sem-icon">${icon}</div><div class="sem-label">${label}</div><div class="sem-val">${val}</div></div>`;
+
+  document.getElementById('analysisContent').innerHTML=`
+    <div class="semaphore">
+      ${sem('🚽','Frec/día',micPerDay+'/día',semFreq)}
+      ${sem('📏','Vol. prom',avgVol+'ml',semVol)}
+      ${sem('⚠️','Fugas',leaks.length,semLeaks)}
+      ${sem('💧','Balance',totalDrink?Math.round(totalDrink/Math.max(totalVol,1)*100)+'%':'—',semBal)}
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Micciones</div><div class="stat-val">${mics.length}<span class="stat-unit"></span></div><div class="stat-ref">Normal: 4–7/día</div></div>
+      <div class="stat-card"><div class="stat-label">Vol. total</div><div class="stat-val">${totalVol}<span class="stat-unit">ml</span></div><div class="stat-ref">Normal: 800–2000ml</div></div>
+      <div class="stat-card"><div class="stat-label">Vol. prom/micción</div><div class="stat-val">${avgVol}<span class="stat-unit">ml</span></div><div class="stat-ref">Normal: 250–400ml</div></div>
+      <div class="stat-card"><div class="stat-label">Ingerido</div><div class="stat-val">${totalDrink}<span class="stat-unit">ml</span></div><div class="stat-ref">Recomendado: 1.5–2L</div></div>
+    </div>
+    <div class="chart-section">
+      <div class="chart-title">Micciones por hora del día</div>
+      <div class="chart-wrap"><canvas id="chartHours"></canvas></div>
+      <div class="normal-range">ℹ️ Patrón normal: actividad concentrada entre 8h–22h, sin nicturia frecuente</div>
+    </div>
+    <div class="chart-section">
+      <div class="chart-title">Volumen por micción (ml)</div>
+      <div class="chart-wrap"><canvas id="chartVols"></canvas></div>
+      <div class="normal-range">ℹ️ Rango normal por micción: 250–400 ml (ICS 2019)</div>
+    </div>
+  `;
+
+  // Charts
+  setTimeout(()=>{
+    const hourCounts=Array(24).fill(0);
+    mics.forEach(r=>{ const h=parseInt((r.hora||'0').split(':')[0]); hourCounts[h]++; });
+    const ctx1=document.getElementById('chartHours');
+    if(ctx1){ if(chartInst) chartInst.destroy(); chartInst=new Chart(ctx1,{type:'bar',data:{labels:Array.from({length:24},(_,i)=>i+'h'),datasets:[{data:hourCounts,backgroundColor:hourCounts.map((_,i)=>i>=8&&i<=22?'#1976d299':'#ef535099'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{stepSize:1}}}}}); }
+    const ctx2=document.getElementById('chartVols');
+    if(ctx2){
+      const volData=mics.filter(r=>r.vol).map(r=>({x:r.hora,y:r.vol}));
+      new Chart(ctx2,{type:'scatter',data:{datasets:[{data:volData,backgroundColor:'#2e7d3299',pointRadius:7},{data:[{x:'00:00',y:250},{x:'23:59',y:250}],type:'line',borderColor:'#2e7d3244',borderDash:[4,4],pointRadius:0,label:'Min normal'},{data:[{x:'00:00',y:400},{x:'23:59',y:400}],type:'line',borderColor:'#e6510044',borderDash:[4,4],pointRadius:0,label:'Max normal'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{type:'category'},y:{min:0,title:{display:true,text:'ml'}}}}});
+    }
+  },100);
+}
+
+// ── PDF GENERATION ──
+window.generatePDF=async()=>{
+  if(!patient?.id){ alert('Debes estar conectado para generar el informe'); return; }
+  const snap=await getDocs(query(collection(db,'patients',patient.id,'records'),orderBy('timestamp','desc')));
+  const allRecs=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const from=analysisPeriod==='today'?todayKey():(()=>{ const d=new Date(); d.setDate(d.getDate()-6); return d.toISOString().slice(0,10); })();
+  const recs=allRecs.filter(r=>r.date>=from);
+  const mics=recs.filter(r=>r.type==='miction');
+  const drks=recs.filter(r=>r.type==='drink');
+  const leaks=recs.filter(r=>r.type==='leak');
+  const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0);
+  const avgVol=mics.length?Math.round(totalVol/mics.length):0;
+  const totalDrink=drks.reduce((a,r)=>a+(r.vol||0),0);
+  const days=[...new Set(mics.map(r=>r.date))].length||1;
+  const urgCounts=[0,0,0,0,0]; mics.forEach(r=>{ if(r.urgency!=null) urgCounts[r.urgency]++; });
+  const acousticRecs=mics.filter(r=>r.acoustics);
+  const flowDist={weak:0,low:0,normal:0,strong:0}; acousticRecs.forEach(r=>{ if(r.acoustics?.classification) flowDist[r.acoustics.classification]++; });
+
+  const periodLabel=analysisPeriod==='today'?'Hoy ('+todayKey()+')':'Últimos 7 días ('+from+' al '+todayKey()+')';
+
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe Miccional CURG</title>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:2rem;color:#1a2236;font-size:13px;}
+    .header{background:#1565c0;color:#fff;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;}
+    .header h1{margin:0 0 4px;font-size:1.3rem;} .header p{margin:0;opacity:0.85;font-size:12px;}
+    .section{margin-bottom:1.5rem;border:1px solid #dde3ee;border-radius:8px;overflow:hidden;}
+    .section-title{background:#f0f4f8;padding:10px 14px;font-weight:700;font-size:13px;border-bottom:1px solid #dde3ee;}
+    .section-body{padding:14px;}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .stat{background:#f8fafc;border:1px solid #e0e7ef;border-radius:6px;padding:10px;}
+    .stat-l{font-size:11px;color:#5a6a85;font-weight:600;text-transform:uppercase;}
+    .stat-v{font-size:1.2rem;font-weight:700;margin-top:2px;}
+    .stat-r{font-size:10px;color:#9aaac0;margin-top:2px;}
+    table{width:100%;border-collapse:collapse;font-size:12px;}
+    th{background:#f0f4f8;padding:6px 8px;text-align:left;font-weight:600;}
+    td{padding:6px 8px;border-top:1px solid #eee;}
+    .tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin:1px;}
+    .tag-g{background:#e8f5e9;color:#2e7d32;} .tag-r{background:#ffebee;color:#c62828;}
+    .tag-a{background:#fff3e0;color:#e65100;} .tag-b{background:#e3f2fd;color:#1565c0;}
+    .footer{margin-top:2rem;padding:1rem;background:#f8fafc;border-radius:8px;font-size:11px;color:#9aaac0;text-align:center;}
+    .warn{background:#fff3e0;border:1px solid #e65100;border-radius:6px;padding:10px 12px;font-size:12px;color:#e65100;margin-bottom:1rem;}
+  </style></head><body>
+  <div class="header">
+    <h1>🏥 CURG Diario Miccional — Informe Clínico</h1>
+    <p>Paciente: <strong>${patient.nombre||'—'}</strong> · Período: ${periodLabel} · Generado: ${new Date().toLocaleString('es')}</p>
+    ${patient.diagnostico?`<p>Diagnóstico: ${patient.diagnostico}</p>`:''}
+    ${patient.medicoTratante?`<p>Médico tratante: ${patient.medicoTratante}</p>`:''}
+  </div>
+  <div class="warn">⚠️ Este informe es un complemento clínico. No constituye un diagnóstico médico. Debe ser interpretado por un profesional de salud calificado.</div>
+
+  <div class="section"><div class="section-title">📊 Resumen ejecutivo</div><div class="section-body">
+    <div class="grid2">
+      <div class="stat"><div class="stat-l">Total micciones</div><div class="stat-v">${mics.length}</div><div class="stat-r">Normal: 4–7/día</div></div>
+      <div class="stat"><div class="stat-l">Volumen promedio</div><div class="stat-v">${avgVol} ml</div><div class="stat-r">Normal: 250–400 ml</div></div>
+      <div class="stat"><div class="stat-l">Volumen total orina</div><div class="stat-v">${totalVol} ml</div><div class="stat-r">Normal: 800–2000 ml/24h</div></div>
+      <div class="stat"><div class="stat-l">Líquido ingerido</div><div class="stat-v">${totalDrink} ml</div><div class="stat-r">Recomendado: 1500–2000 ml</div></div>
+      <div class="stat"><div class="stat-l">Fugas registradas</div><div class="stat-v">${leaks.length}</div><div class="stat-r">Normal: 0</div></div>
+      <div class="stat"><div class="stat-l">Días con datos</div><div class="stat-v">${days}</div></div>
+    </div>
+  </div></div>
+
+  <div class="section"><div class="section-title">🚨 Distribución de urgencia</div><div class="section-body">
+    <table><tr><th>Nivel</th><th>Descripción</th><th>Nº micciones</th></tr>
+    <tr><td>U0</td><td>Sin urgencia (preventiva)</td><td>${urgCounts[0]}</td></tr>
+    <tr><td>U1</td><td>Urgencia leve</td><td>${urgCounts[1]}</td></tr>
+    <tr><td>U2</td><td>Urgencia moderada</td><td>${urgCounts[2]}</td></tr>
+    <tr><td>U3</td><td>Urgencia severa</td><td>${urgCounts[3]}</td></tr>
+    <tr><td>U4</td><td>Incontinencia de urgencia</td><td>${urgCounts[4]}</td></tr>
+    </table>
+  </div></div>
+
+  ${acousticRecs.length?`<div class="section"><div class="section-title">🎙 Análisis acústico de flujo</div><div class="section-body">
+    <p style="font-size:12px;color:#5a6a85;margin-bottom:10px">Clasificación basada en amplitud relativa al ruido ambiente calibrado (Tsui et al., 2006)</p>
+    <div class="grid2">
+      <div class="stat"><div class="stat-l">🔴 Débil</div><div class="stat-v">${flowDist.weak}</div><div class="stat-r">&lt;8 ml/s estimado</div></div>
+      <div class="stat"><div class="stat-l">🟡 Bajo</div><div class="stat-v">${flowDist.low}</div><div class="stat-r">8–15 ml/s estimado</div></div>
+      <div class="stat"><div class="stat-l">🟢 Normal</div><div class="stat-v">${flowDist.normal}</div><div class="stat-r">15–25 ml/s estimado</div></div>
+      <div class="stat"><div class="stat-l">🔵 Fuerte</div><div class="stat-v">${flowDist.strong}</div><div class="stat-r">&gt;25 ml/s estimado</div></div>
+    </div>
+    <table style="margin-top:10px"><tr><th>Hora</th><th>Vol (ml)</th><th>Dur (s)</th><th>Flujo calc.</th><th>Clasificación acústica</th><th>Patrón</th></tr>
+    ${acousticRecs.map(r=>`<tr><td>${r.hora}</td><td>${r.vol||'—'}</td><td>${r.dur||'—'}</td><td>${r.flow?r.flow+' ml/s':'—'}</td><td><span class="tag ${r.acoustics.classification==='normal'?'tag-g':r.acoustics.classification==='strong'?'tag-b':r.acoustics.classification==='low'?'tag-a':'tag-r'}">${r.acoustics.classification}</span></td><td>${r.acoustics.pattern||'—'}</td></tr>`).join('')}
+    </table>
+  </div></div>`:''}
+
+  <div class="section"><div class="section-title">📋 Registro completo de micciones</div><div class="section-body">
+    <table><tr><th>Fecha</th><th>Hora</th><th>Vol (ml)</th><th>Dur (s)</th><th>Flujo</th><th>Urgencia</th><th>Posición</th></tr>
+    ${mics.sort((a,b)=>a.date.localeCompare(b.date)||a.hora.localeCompare(b.hora)).map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.vol||'—'}</td><td>${r.dur||'—'}</td><td>${r.flow?r.flow+' ml/s':'—'}</td><td>U${r.urgency??'—'}</td><td>${r.pos||'—'}</td></tr>`).join('')}
+    </table>
+  </div></div>
+
+  <div class="section"><div class="section-title">💧 Registro de bebidas</div><div class="section-body">
+    <table><tr><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Volumen</th></tr>
+    ${drks.sort((a,b)=>a.date.localeCompare(b.date)||a.hora.localeCompare(b.hora)).map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.tipo}</td><td>${r.vol||0} ml</td></tr>`).join('')}
+    </table>
+  </div></div>
+
+  <div class="footer">
+    CURG Diario Miccional v2.0 · Informe generado el ${new Date().toLocaleString('es')} · Datos alojados en Google Firebase ·
+    Base científica: ICS 2019, EAU Guidelines 2023, Tsui et al. 2006 ·
+    Este informe está protegido bajo Ley 1581 de 2012 (Colombia) y equivalentes LATAM.
+    Para soporte: curg@datamedica.app
+  </div>
+  </body></html>`;
+
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`CURG_Informe_${patient.nombre?.replace(/ /g,'_')}_${todayKey()}.html`;
+  a.click();
 };
 
-// ── MODALS ──
-window.openModal = (type) => {
-  const now = nowTime();
-  if (type==='miction') {
-    document.getElementById('micHora').value = now;
-    document.getElementById('micVol').value = '';
-    document.getElementById('micDur').value = '';
-    document.getElementById('micNotes').value = '';
-    selectedUrg = null; selectedPos = null;
-    document.querySelectorAll('.urgency-btn').forEach(b=>b.classList.remove('selected'));
-    document.querySelectorAll('.pos-btn').forEach(b=>b.classList.remove('selected'));
-    chronoReset();
-    if (patient?.genero) { document.getElementById('micGenero').value = patient.genero; togglePos(); }
-    document.getElementById('modalMiction').classList.add('open');
-  } else if (type==='drink') {
-    document.getElementById('drkHora').value = now;
-    document.getElementById('drkVol').value = '';
-    document.getElementById('drkNotes').value = '';
-    document.getElementById('modalDrink').classList.add('open');
-  } else if (type==='leak') {
-    document.getElementById('leakHora').value = now;
-    document.getElementById('leakMuda').checked = false;
-    document.getElementById('leakNotes').value = '';
-    document.getElementById('modalLeak').classList.add('open');
+// ── ACOUSTIC ENGINE ──
+const FLOW_THRESHOLDS={weak:{min:2,max:12},low:{min:12,max:22},normal:{min:22,max:35},strong:{min:35,max:99}};
+const CALIBRATION_MS=2000;
+let aCtx=null,analyserNode=null,stream=null,waveAnimFrame=null;
+let micActive=false,acousticSamples=[],calibrationSamples=[],ambientBaseline=0,sampleInterval=null;
+
+async function startMicAndChrono(){
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    aCtx=new(window.AudioContext||window.webkitAudioContext)();
+    analyserNode=aCtx.createAnalyser(); analyserNode.fftSize=2048; analyserNode.smoothingTimeConstant=0.3;
+    aCtx.createMediaStreamSource(stream).connect(analyserNode);
+    micActive=true;
+    document.getElementById('micBanner').style.display='none';
+  } catch(e){
+    micActive=false;
+    document.getElementById('micBanner').style.display='flex';
+    startChronoTimer(); return;
   }
-};
-window.closeM = (name) => { document.getElementById('modal'+name).classList.remove('open'); stopMic(); };
-document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m){ m.classList.remove('open'); stopMic(); } }));
+  calibrationSamples=[]; acousticSamples=[];
+  const wrap=document.getElementById('chronoWrap');
+  wrap.classList.add('calibrating');
+  document.getElementById('chronoLabel').textContent='CALIBRANDO...';
+  document.getElementById('chronoState').textContent='Midiendo ruido ambiente (2 seg)...';
+  startWaveAnim();
+  const calInt=setInterval(()=>calibrationSamples.push(getCurrentDB()),100);
+  setTimeout(()=>{
+    clearInterval(calInt);
+    ambientBaseline=calibrationSamples.reduce((a,b)=>a+b,0)/calibrationSamples.length;
+    wrap.classList.remove('calibrating'); wrap.classList.add('recording');
+    document.getElementById('chronoLabel').textContent='MIDIENDO';
+    document.getElementById('chronoState').textContent='Análisis acústico activo 🎙';
+    startChronoTimer();
+    const t0=Date.now();
+    sampleInterval=setInterval(()=>{ acousticSamples.push({t:Date.now()-t0,db:Math.max(0,getCurrentDB()-ambientBaseline)}); },100);
+  },CALIBRATION_MS);
+}
 
-// ── URGENCY / POSITION ──
-let selectedUrg = null, selectedPos = null;
-window.setUrg = (n) => { selectedUrg=n; document.querySelectorAll('.urgency-btn').forEach((b,i)=>b.classList.toggle('selected',i===n)); };
-window.togglePos = () => { document.getElementById('posSection').style.display = document.getElementById('micGenero').value==='m'?'block':'none'; };
-window.setPos = (p) => { selectedPos=p; document.getElementById('posSentado').classList.toggle('selected',p==='sentado'); document.getElementById('posParado').classList.toggle('selected',p==='parado'); };
+function getCurrentDB(){
+  if(!analyserNode) return 0;
+  const data=new Uint8Array(analyserNode.frequencyBinCount);
+  analyserNode.getByteFrequencyData(data);
+  return 20*Math.log10(Math.max(1,data.reduce((a,b)=>a+b,0)/data.length));
+}
+
+function startWaveAnim(){
+  const bars=document.getElementById('waveformBar').querySelectorAll('.bar');
+  function tick(){
+    if(!micActive){ bars.forEach(b=>b.style.height='3px'); return; }
+    const db=getCurrentDB(); const norm=Math.min(1,Math.max(0,db-ambientBaseline)/40);
+    bars.forEach(b=>{ b.style.height=Math.max(3,norm*36*(0.3+Math.random()*0.7))+'px'; });
+    waveAnimFrame=requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+function stopMic(){
+  if(sampleInterval){ clearInterval(sampleInterval); sampleInterval=null; }
+  cancelAnimationFrame(waveAnimFrame);
+  if(stream) stream.getTracks().forEach(t=>t.stop());
+  if(aCtx) aCtx.close().catch(()=>{});
+  micActive=false;
+  document.getElementById('waveformBar').querySelectorAll('.bar').forEach(b=>b.style.height='3px');
+}
+
+function analyzeAcoustics(){
+  if(!acousticSamples.length) return null;
+  const active=acousticSamples.filter(s=>s.db>2);
+  if(active.length<3) return null;
+  const dbVals=active.map(s=>s.db);
+  const peakDB=Math.max(...dbVals);
+  const avgDB=dbVals.reduce((a,b)=>a+b,0)/dbVals.length;
+  let classification='weak';
+  if(avgDB>=FLOW_THRESHOLDS.strong.min) classification='strong';
+  else if(avgDB>=FLOW_THRESHOLDS.normal.min) classification='normal';
+  else if(avgDB>=FLOW_THRESHOLDS.low.min) classification='low';
+  const step=Math.max(1,Math.floor(acousticSamples.length/20));
+  const curve=[];
+  for(let i=0;i<acousticSamples.length;i+=step) curve.push({t:+(acousticSamples[i].t/1000).toFixed(1),db:+acousticSamples[i].db.toFixed(1)});
+  let inGap=false,gapStart=0,gaps=[];
+  acousticSamples.forEach(s=>{ if(s.db<2&&!inGap){inGap=true;gapStart=s.t;}else if(s.db>=2&&inGap){gaps.push(s.t-gapStart);inGap=false;} });
+  return {peakDB:+peakDB.toFixed(1),avgDB:+avgDB.toFixed(1),ambientDB:+ambientBaseline.toFixed(1),classification,pattern:gaps.filter(g=>g>500).length>1?'intermittent':'continuous',durationSec:+(acousticSamples[acousticSamples.length-1].t/1000).toFixed(1),curve,samplesCount:acousticSamples.length};
+}
 
 // ── CHRONOMETER ──
-let cRunning=false, cStart=0, cElapsed=0, cInterval=null;
-window.chronoStart = () => {
-  cRunning=true; cStart=Date.now()-cElapsed*1000;
+let cRunning=false,cStart=0,cElapsed=0,cInterval=null;
+
+window.chronoStart=async()=>{
   document.getElementById('btnStart').style.display='none';
-  document.getElementById('btnStop').style.display='';
   document.getElementById('btnReset').style.display='';
-  document.getElementById('chronoState').textContent = lang.current==='es'?'Midiendo...':'Measuring...';
+  await startMicAndChrono();
+};
+
+function startChronoTimer(){
+  cRunning=true; cStart=Date.now()-cElapsed*1000;
+  document.getElementById('btnStop').style.display='';
   cInterval=setInterval(()=>{
     cElapsed=(Date.now()-cStart)/1000;
     const m=Math.floor(cElapsed/60).toString().padStart(2,'0');
@@ -732,122 +1069,166 @@ window.chronoStart = () => {
     const f=(cElapsed%1).toFixed(1).slice(1);
     document.getElementById('chronoDisplay').textContent=m+':'+s+f;
   },100);
-};
-window.chronoStop = () => {
-  clearInterval(cInterval); cRunning=false;
+}
+
+window.chronoStop=()=>{
+  clearInterval(cInterval); cRunning=false; stopMic();
   document.getElementById('btnStop').style.display='none';
-  document.getElementById('chronoState').textContent=(lang.current==='es'?'Listo — ':'Done — ')+Math.round(cElapsed)+'s';
   document.getElementById('micDur').value=Math.round(cElapsed);
+  document.getElementById('chronoState').textContent='Completado: '+Math.round(cElapsed)+'s';
+  document.getElementById('chronoWrap').classList.remove('recording','calibrating');
+  document.getElementById('chronoLabel').textContent='CRONÓMETRO';
 };
-window.chronoReset = () => {
-  clearInterval(cInterval); cRunning=false; cElapsed=0;
+
+window.chronoReset=()=>{
+  clearInterval(cInterval); cRunning=false; cElapsed=0; stopMic(); acousticSamples=[];
   document.getElementById('chronoDisplay').textContent='00:00.0';
-  document.getElementById('chronoState').textContent=t('ready');
+  document.getElementById('chronoState').textContent='Presiona Iniciar — activa el micrófono automáticamente';
   document.getElementById('btnStart').style.display='';
   document.getElementById('btnStop').style.display='none';
   document.getElementById('btnReset').style.display='none';
+  document.getElementById('chronoWrap').classList.remove('recording','calibrating');
+  document.getElementById('chronoLabel').textContent='CRONÓMETRO';
+  document.getElementById('micDur').value='';
 };
 
-// ── MICROPHONE ──
-let micOn=false, aCtx=null, analyser=null, stream=null, animFrame=null, silTimer=null, sndDetected=false;
-window.toggleMic = async () => { micOn ? stopMic() : startMic(); };
-async function startMic() {
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({audio:true});
-    aCtx = new (window.AudioContext||window.webkitAudioContext)();
-    analyser = aCtx.createAnalyser(); analyser.fftSize=256;
-    aCtx.createMediaStreamSource(stream).connect(analyser);
-    micOn=true; sndDetected=false;
-    document.getElementById('btnMic').classList.add('active');
-    document.getElementById('btnMic').textContent='🔴 '+(lang.current==='es'?'Detener mic':'Stop mic');
-    document.getElementById('micStatus').textContent=t('micListening');
-    monitorAudio();
-  } catch(e) { document.getElementById('micStatus').textContent=lang.current==='es'?'Micrófono no disponible':'Microphone unavailable'; }
-}
-function stopMic() {
-  if (!micOn) return;
-  if (stream) stream.getTracks().forEach(t=>t.stop());
-  if (aCtx) aCtx.close();
-  cancelAnimationFrame(animFrame); clearTimeout(silTimer);
-  micOn=false; sndDetected=false;
-  document.getElementById('btnMic').classList.remove('active');
-  document.getElementById('btnMic').textContent='🎙 '+(lang.current==='es'?'Usar micrófono':'Use microphone');
-  document.getElementById('micStatus').textContent=t('micStopped');
-  document.getElementById('audioFill').style.width='0%';
-  if (cRunning) chronoStop();
-}
-function monitorAudio() {
-  const data=new Uint8Array(analyser.frequencyBinCount);
-  function tick() {
-    analyser.getByteFrequencyData(data);
-    const avg=data.reduce((a,b)=>a+b,0)/data.length;
-    document.getElementById('audioFill').style.width=Math.min(100,avg*2)+'%';
-    if (avg>20) {
-      clearTimeout(silTimer); silTimer=null;
-      if (!sndDetected && !cRunning) { sndDetected=true; chronoStart(); document.getElementById('micStatus').textContent=t('micDetected'); }
-    } else if (sndDetected && cRunning && !silTimer) {
-      silTimer=setTimeout(()=>{ if(cRunning){chronoStop();stopMic();} },1500);
-    }
-    animFrame=requestAnimationFrame(tick);
+// ── MODALS ──
+window.openModal=(type)=>{
+  const now=nowTime();
+  if(type==='miction'){
+    document.getElementById('micHora').value=now;
+    document.getElementById('micVol').value=''; document.getElementById('micNotes').value='';
+    selectedUrg=null; selectedPos=null;
+    document.querySelectorAll('.urgency-btn').forEach(b=>b.classList.remove('selected'));
+    document.querySelectorAll('.pos-btn').forEach(b=>b.classList.remove('selected'));
+    chronoReset();
+    clearMictionErrors();
+    if(patient?.genero){ document.getElementById('micGenero').value=patient.genero; togglePos(); }
+    document.getElementById('modalMiction').classList.add('open');
+  } else if(type==='drink'){
+    document.getElementById('drkHora').value=now; document.getElementById('drkVol').value=''; document.getElementById('drkNotes').value='';
+    document.querySelectorAll('#modalDrink .field-err').forEach(e=>e.remove());
+    ['drkHora','drkVol'].forEach(id=>{ const el=document.getElementById(id); if(el){el.style.borderColor='';el.style.background='';} });
+    document.getElementById('modalDrink').classList.add('open');
+  } else if(type==='leak'){
+    document.getElementById('leakHora').value=now; document.getElementById('leakMuda').checked=false; document.getElementById('leakNotes').value='';
+    document.getElementById('modalLeak').classList.add('open');
   }
-  tick();
+};
+window.closeM=(name)=>{ document.getElementById('modal'+name).classList.remove('open'); if(cRunning) chronoStop(); stopMic(); };
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m){ m.classList.remove('open'); if(cRunning) chronoStop(); stopMic(); } }));
+
+// ── VALIDATION HELPERS ──
+function showFieldError(id, msg){
+  const el=document.getElementById(id);
+  if(el){
+    el.style.borderColor='var(--red)';
+    el.style.background='var(--red-light)';
+    // Add error message below
+    const err=document.createElement('div');
+    err.className='field-err';
+    err.style.cssText='color:var(--red);font-size:11px;font-weight:600;margin-top:3px';
+    err.textContent=msg;
+    el.parentNode.insertBefore(err,el.nextSibling);
+  } else {
+    // It's a virtual error slot (urgency, pos, dur)
+    let slot=document.getElementById(id);
+    if(!slot){ slot=document.createElement('div'); slot.id=id; }
+    slot.className='field-err';
+    slot.style.cssText='color:var(--red);font-size:11px;font-weight:600;margin-top:3px;text-align:center';
+    slot.textContent=msg;
+    // Find parent section and append
+    const targets={'micUrgErr':'urgencySection','micPosErr':'posSection','micDurErr':'durSection'};
+    const parent=document.getElementById(targets[id]);
+    if(parent&&!parent.querySelector('#'+id)) parent.appendChild(slot);
+  }
+}
+function showFieldSuccess(id, msg){
+  const el=document.getElementById(id);
+  if(el){ el.style.color='var(--green)'; el.textContent=msg; setTimeout(()=>{ if(el) el.textContent=''; },3000); }
+}
+function clearMictionErrors(){
+  document.querySelectorAll('#modalMiction .field-err').forEach(e=>e.remove());
+  ['micHora','micVol','micDur'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.style.borderColor=''; el.style.background=''; }
+  });
+  ['micUrgErr','micPosErr','micDurErr'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.remove();
+  });
 }
 
-// ── SAVE RECORDS ──
-async function addRecord(data) {
-  if (!patient?.id) return;
-  await addDoc(collection(db,'patients',patient.id,'records'), { ...data, timestamp: serverTimestamp() });
-  await updateDoc(doc(db,'patients',patient.id), { lastRecord: Date.now() });
+// ── URGENCY / POS ──
+let selectedUrg=null,selectedPos=null;
+window.setUrg=(n)=>{ selectedUrg=n; document.querySelectorAll('.urgency-btn').forEach((b,i)=>b.classList.toggle('selected',i===n)); };
+window.togglePos=()=>{ document.getElementById('posSection').style.display=document.getElementById('micGenero').value==='m'?'block':'none'; };
+window.setPos=(p)=>{ selectedPos=p; document.getElementById('posSentado').classList.toggle('selected',p==='sentado'); document.getElementById('posParado').classList.toggle('selected',p==='parado'); };
+
+// ── SAVE ──
+async function addRecord(data){
+  if(!patient?.id) return;
+  await addDoc(collection(db,'patients',patient.id,'records'),{...data,timestamp:serverTimestamp()});
+  await updateDoc(doc(db,'patients',patient.id),{lastRecord:Date.now()});
 }
 
-window.saveMiction = async () => {
+window.saveMiction=async()=>{
   const hora=document.getElementById('micHora').value;
   const vol=parseFloat(document.getElementById('micVol').value)||null;
   const dur=parseFloat(document.getElementById('micDur').value)||null;
-  if (!hora) return;
-  await addRecord({
-    type:'miction', date:todayKey(), hora, vol, dur,
-    genero:document.getElementById('micGenero').value,
-    urgency:selectedUrg, pos:selectedPos,
-    flow:(vol&&dur)?+(vol/dur).toFixed(2):null,
-    notas:document.getElementById('micNotes').value
-  });
+  const genero=document.getElementById('micGenero').value;
+  // Validation
+  const errs=[];
+  if(!hora) errs.push(['micHora','Hora obligatoria']);
+  if(!vol) errs.push(['micVol','Volumen obligatorio — usa una jarra medidora']);
+  if(!dur) errs.push(['micDurErr','Duración obligatoria — usa el cronómetro']);
+  if(selectedUrg===null) errs.push(['micUrgErr','Selecciona nivel de urgencia']);
+  if(genero==='m' && !selectedPos) errs.push(['micPosErr','Selecciona posición']);
+  if(errs.length){
+    clearMictionErrors();
+    errs.forEach(([id,msg])=>showFieldError(id,msg));
+    return;
+  }
+  clearMictionErrors();
+  const acoustics=analyzeAcoustics();
+  await addRecord({type:'miction',date:todayKey(),hora,vol,dur,flow:(vol&&dur)?+(vol/dur).toFixed(2):null,genero,urgency:selectedUrg,pos:selectedPos,notas:document.getElementById('micNotes').value,acoustics:acoustics||null});
   closeM('Miction');
 };
-window.saveDrink = async () => {
+window.saveDrink=async()=>{
   const hora=document.getElementById('drkHora').value;
-  if (!hora) return;
-  await addRecord({ type:'drink', date:todayKey(), hora, vol:parseFloat(document.getElementById('drkVol').value)||null, tipo:document.getElementById('drkTipo').value, notas:document.getElementById('drkNotes').value });
+  const vol=parseFloat(document.getElementById('drkVol').value)||null;
+  const errs=[];
+  if(!hora) errs.push(['drkHora','Hora obligatoria']);
+  if(!vol) errs.push(['drkVol','Volumen obligatorio']);
+  if(errs.length){ errs.forEach(([id,msg])=>showFieldError(id,msg)); return; }
+  document.querySelectorAll('#modalDrink .field-err').forEach(e=>e.remove());
+  await addRecord({type:'drink',date:todayKey(),hora,vol,tipo:document.getElementById('drkTipo').value,notas:document.getElementById('drkNotes').value});
   closeM('Drink');
 };
-window.saveLeak = async () => {
-  const hora=document.getElementById('leakHora').value;
-  if (!hora) return;
-  await addRecord({ type:'leak', date:todayKey(), hora, tipo:document.getElementById('leakTipo').value, muda:document.getElementById('leakMuda').checked, notas:document.getElementById('leakNotes').value });
+window.saveLeak=async()=>{
+  const hora=document.getElementById('leakHora').value; if(!hora) return;
+  await addRecord({type:'leak',date:todayKey(),hora,tipo:document.getElementById('leakTipo').value,muda:document.getElementById('leakMuda').checked,notas:document.getElementById('leakNotes').value});
   closeM('Leak');
 };
 
 // ── PROFILE ──
-function renderProfile() {
-  if (!patient) return;
-  const gLabel = patient.genero==='m'?(lang.current==='es'?'Masculino':'Male'):patient.genero==='f'?(lang.current==='es'?'Femenino':'Female'):'—';
-  document.getElementById('profileView').innerHTML = `
+function renderProfile(){
+  if(!patient) return;
+  const gLabel=patient.genero==='m'?'Masculino':patient.genero==='f'?'Femenino':'—';
+  document.getElementById('profileView').innerHTML=`
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:1.25rem">
-      <div style="width:56px;height:56px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--accent2)">${(patient.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
+      <div style="width:56px;height:56px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--accent)">${(patient.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
       <div>
         <div style="font-size:1.1rem;font-weight:700">${patient.nombre||'—'}</div>
         <div style="font-size:12px;color:var(--text2)">${patient.diagnostico||''}</div>
-        ${patient.accessCode ? `<div style="font-size:11px;color:var(--text3);margin-top:2px">Código: <span style="font-family:'JetBrains Mono';font-weight:700;color:var(--accent2)">${patient.accessCode}</span></div>` : (patient.status==='pending'?`<div style="font-size:11px;color:var(--amber)">⏳ ${lang.current==='es'?'Pendiente de validación':'Pending validation'}</div>`:'')}
+        ${patient.accessCode?`<div style="font-size:11px;color:var(--text3);margin-top:2px">Código: <span style="font-family:'JetBrains Mono';font-weight:700;color:var(--accent)">${patient.accessCode}</span></div>`:(patient.status==='pending'?`<div style="font-size:11px;color:var(--amber);margin-top:2px">⏳ Pendiente de validación médica</div>`:'')}
       </div>
     </div>
-    ${[
-      [lang.current==='es'?'Fecha de nac.':'Date of birth', patient.fechaNac],
-      [lang.current==='es'?'Género':'Gender', gLabel],
-      [lang.current==='es'?'Teléfono':'Phone', patient.telefono],
-      ['Email', patient.email],
-      [lang.current==='es'?'Médico':'Doctor', patient.medicoTratante],
-      [lang.current==='es'?'Desde':'Since', patient.fechaInicio],
-    ].filter(([,v])=>v).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px"><span style="color:var(--text2)">${k}</span><span style="font-weight:600">${v}</span></div>`).join('')}
+    ${[['Fecha de nac.',patient.fechaNac],['Género',gLabel],['Teléfono',patient.telefono],['Email',patient.email],['Médico',patient.medicoTratante],['Desde',patient.fechaInicio]].filter(([,v])=>v).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px"><span style="color:var(--text2)">${k}</span><span style="font-weight:600">${v}</span></div>`).join('')}
+    <div style="margin-top:12px;padding:10px;background:var(--bg);border-radius:8px;font-size:11px;color:var(--text3)">
+      🔒 Consentimiento otorgado: ${JSON.parse(localStorage.getItem('curg_consent')||'{}').date?.slice(0,10)||'—'} ·
+      <span style="text-decoration:underline;cursor:pointer" onclick="revokeConsent()">Revocar</span>
+    </div>
   `;
 }
 </script>
