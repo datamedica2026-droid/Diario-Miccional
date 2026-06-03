@@ -900,69 +900,6 @@ window.delRec=async(id)=>{ await deleteDoc(doc(db,'patients',patient.id,'records
 // ── ANALYSIS ──
 window.setPeriod=(p,el)=>{ analysisPeriod=p; document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); renderAnalysis(); };
 
-async function renderAnalysis(){
-  if(!patient?.id) return;
-  const snap=await getDocs(query(collection(db,'patients',patient.id,'records'),orderBy('timestamp','desc')));
-  const allRecs=snap.docs.map(d=>({id:d.id,...d.data()}));
-  const from = analysisPeriod==='today' ? todayKey() : (() => { const d=new Date(); d.setDate(d.getDate()-6); return d.toISOString().slice(0,10); })();
-  const recs=allRecs.filter(r=>r.date>=from);
-  const mics=recs.filter(r=>r.type==='miction');
-  const drks=recs.filter(r=>r.type==='drink');
-  const leaks=recs.filter(r=>r.type==='leak');
-
-  const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0);
-  const avgVol=mics.length?Math.round(totalVol/mics.length):0;
-  const days=[...new Set(mics.map(r=>r.date))].length||1;
-  const micPerDay=+(mics.length/days).toFixed(1);
-  const totalDrink=drks.reduce((a,r)=>a+(r.vol||0),0);
-
-  // Semáforos
-  const semFreq = micPerDay<=7&&micPerDay>=4?'green':micPerDay>8?'red':'amber';
-  const semVol = avgVol>=250&&avgVol<=400?'green':avgVol>400?'amber':'red';
-  const semLeaks = leaks.length===0?'green':leaks.length<=2?'amber':'red';
-  const semBal = totalDrink>0?(totalDrink/totalVol>0.8&&totalDrink/totalVol<1.5?'green':'amber'):'gray';
-
-  const sem=(icon,label,val,cls)=>`<div class="sem-item sem-${cls}"><div class="sem-icon">${icon}</div><div class="sem-label">${label}</div><div class="sem-val">${val}</div></div>`;
-
-  document.getElementById('analysisContent').innerHTML=`
-    <div class="semaphore">
-      ${sem('🚽','Frec/día',micPerDay+'/día',semFreq)}
-      ${sem('📏','Vol. prom',avgVol+'ml',semVol)}
-      ${sem('⚠️','Fugas',leaks.length,semLeaks)}
-      ${sem('💧','Balance',totalDrink?Math.round(totalDrink/Math.max(totalVol,1)*100)+'%':'—',semBal)}
-    </div>
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-label">Micciones</div><div class="stat-val">${mics.length}<span class="stat-unit"></span></div><div class="stat-ref">Normal: 4–7/día</div></div>
-      <div class="stat-card"><div class="stat-label">Vol. total</div><div class="stat-val">${totalVol}<span class="stat-unit">ml</span></div><div class="stat-ref">Normal: 800–2000ml</div></div>
-      <div class="stat-card"><div class="stat-label">Vol. prom/micción</div><div class="stat-val">${avgVol}<span class="stat-unit">ml</span></div><div class="stat-ref">Normal: 250–400ml</div></div>
-      <div class="stat-card"><div class="stat-label">Ingerido</div><div class="stat-val">${totalDrink}<span class="stat-unit">ml</span></div><div class="stat-ref">Recomendado: 1.5–2L</div></div>
-    </div>
-    <div class="chart-section">
-      <div class="chart-title">Micciones por hora del día</div>
-      <div class="chart-wrap"><canvas id="chartHours"></canvas></div>
-      <div class="normal-range">ℹ️ Patrón normal: actividad concentrada entre 8h–22h, sin nicturia frecuente</div>
-    </div>
-    <div class="chart-section">
-      <div class="chart-title">Volumen por micción (ml)</div>
-      <div class="chart-wrap"><canvas id="chartVols"></canvas></div>
-      <div class="normal-range">ℹ️ Rango normal por micción: 250–400 ml (ICS 2019)</div>
-    </div>
-  `;
-
-  // Charts
-  setTimeout(()=>{
-    const hourCounts=Array(24).fill(0);
-    mics.forEach(r=>{ const h=parseInt((r.hora||'0').split(':')[0]); hourCounts[h]++; });
-    const ctx1=document.getElementById('chartHours');
-    if(ctx1){ if(chartInst) chartInst.destroy(); chartInst=new Chart(ctx1,{type:'bar',data:{labels:Array.from({length:24},(_,i)=>i+'h'),datasets:[{data:hourCounts,backgroundColor:hourCounts.map((_,i)=>i>=8&&i<=22?'#1976d299':'#ef535099'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{stepSize:1}}}}}); }
-    const ctx2=document.getElementById('chartVols');
-    if(ctx2){
-      const volData=mics.filter(r=>r.vol).map(r=>({x:r.hora,y:r.vol}));
-      new Chart(ctx2,{type:'scatter',data:{datasets:[{data:volData,backgroundColor:'#2e7d3299',pointRadius:7},{data:[{x:'00:00',y:250},{x:'23:59',y:250}],type:'line',borderColor:'#2e7d3244',borderDash:[4,4],pointRadius:0,label:'Min normal'},{data:[{x:'00:00',y:400},{x:'23:59',y:400}],type:'line',borderColor:'#e6510044',borderDash:[4,4],pointRadius:0,label:'Max normal'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{type:'category'},y:{min:0,title:{display:true,text:'ml'}}}}});
-    }
-  },100);
-}
-
 // ── PDF GENERATION ──
 window.generatePDF=async()=>{
   if(!patient?.id){ alert('Debes estar conectado para generar el informe'); return; }
@@ -980,97 +917,68 @@ window.generatePDF=async()=>{
   const urgCounts=[0,0,0,0,0]; mics.forEach(r=>{ if(r.urgency!=null) urgCounts[r.urgency]++; });
   const acousticRecs=mics.filter(r=>r.acoustics);
   const flowDist={weak:0,low:0,normal:0,strong:0}; acousticRecs.forEach(r=>{ if(r.acoustics?.classification) flowDist[r.acoustics.classification]++; });
-
-  const periodLabel=analysisPeriod==='today'?'Hoy ('+todayKey()+')':'Últimos 7 días ('+from+' al '+todayKey()+')';
-
-  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe Miccional CURG</title>
-  <style>
-    body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:2rem;color:#1a2236;font-size:13px;}
-    .header{background:#1565c0;color:#fff;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;}
-    .header h1{margin:0 0 4px;font-size:1.3rem;} .header p{margin:0;opacity:0.85;font-size:12px;}
-    .section{margin-bottom:1.5rem;border:1px solid #dde3ee;border-radius:8px;overflow:hidden;}
-    .section-title{background:#f0f4f8;padding:10px 14px;font-weight:700;font-size:13px;border-bottom:1px solid #dde3ee;}
-    .section-body{padding:14px;}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-    .stat{background:#f8fafc;border:1px solid #e0e7ef;border-radius:6px;padding:10px;}
-    .stat-l{font-size:11px;color:#5a6a85;font-weight:600;text-transform:uppercase;}
-    .stat-v{font-size:1.2rem;font-weight:700;margin-top:2px;}
-    .stat-r{font-size:10px;color:#9aaac0;margin-top:2px;}
-    table{width:100%;border-collapse:collapse;font-size:12px;}
-    th{background:#f0f4f8;padding:6px 8px;text-align:left;font-weight:600;}
-    td{padding:6px 8px;border-top:1px solid #eee;}
-    .tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin:1px;}
-    .tag-g{background:#e8f5e9;color:#2e7d32;} .tag-r{background:#ffebee;color:#c62828;}
-    .tag-a{background:#fff3e0;color:#e65100;} .tag-b{background:#e3f2fd;color:#1565c0;}
-    .footer{margin-top:2rem;padding:1rem;background:#f8fafc;border-radius:8px;font-size:11px;color:#9aaac0;text-align:center;}
-    .warn{background:#fff3e0;border:1px solid #e65100;border-radius:6px;padding:10px 12px;font-size:12px;color:#e65100;margin-bottom:1rem;}
+  const sleepData=await getSleepData(todayKey());
+  const periodLabel=analysisPeriod==='today'?'Hoy ('+todayKey()+')':'Últimos 7 días';
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe CURG</title>
+  <style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:2rem;color:#1a2236;font-size:13px;}
+  .header{background:#1565c0;color:#fff;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;}
+  .header h1{margin:0 0 4px;font-size:1.3rem;}.header p{margin:0;opacity:0.85;font-size:12px;}
+  .section{margin-bottom:1.5rem;border:1px solid #dde3ee;border-radius:8px;overflow:hidden;}
+  .section-title{background:#f0f4f8;padding:10px 14px;font-weight:700;font-size:13px;border-bottom:1px solid #dde3ee;}
+  .section-body{padding:14px;}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .stat{background:#f8fafc;border:1px solid #e0e7ef;border-radius:6px;padding:10px;}
+  .stat-l{font-size:11px;color:#5a6a85;font-weight:600;text-transform:uppercase;}
+  .stat-v{font-size:1.2rem;font-weight:700;margin-top:2px;}.stat-r{font-size:10px;color:#9aaac0;margin-top:2px;}
+  table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f0f4f8;padding:6px 8px;text-align:left;font-weight:600;}
+  td{padding:6px 8px;border-top:1px solid #eee;}.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin:1px;}
+  .tag-g{background:#e8f5e9;color:#2e7d32;}.tag-r{background:#ffebee;color:#c62828;}
+  .tag-a{background:#fff3e0;color:#e65100;}.tag-b{background:#e3f2fd;color:#1565c0;}
+  .footer{margin-top:2rem;padding:1rem;background:#f8fafc;border-radius:8px;font-size:11px;color:#9aaac0;text-align:center;}
+  .warn{background:#fff3e0;border:1px solid #e65100;border-radius:6px;padding:10px 12px;font-size:12px;color:#e65100;margin-bottom:1rem;}
   </style></head><body>
-  <div class="header">
-    <h1>🏥 CURG Diario Miccional — Informe Clínico</h1>
-    <p>Paciente: <strong>${patient.nombre||'—'}</strong> · Período: ${periodLabel} · Generado: ${new Date().toLocaleString('es')}</p>
-    ${patient.diagnostico?`<p>Diagnóstico: ${patient.diagnostico}</p>`:''}
-    ${patient.medicoTratante?`<p>Médico tratante: ${patient.medicoTratante}</p>`:''}
+  <div class="header"><h1>🏥 CURG Diario Miccional — Informe Clínico</h1>
+  <p>Paciente: <strong>${patient.nombre||'—'}</strong> · Período: ${periodLabel} · Generado: ${new Date().toLocaleString('es')}</p>
+  ${patient.diagnostico?`<p>Diagnóstico: ${patient.diagnostico}</p>`:''}
+  ${patient.medicoTratante?`<p>Médico tratante: ${patient.medicoTratante}</p>`:''}
+  ${sleepData?`<p>Horario: Despertar ${sleepData.wake||'—'} · Dormir ${sleepData.sleep||'—'}</p>`:''}
   </div>
-  <div class="warn">⚠️ Este informe es un complemento clínico. No constituye un diagnóstico médico. Debe ser interpretado por un profesional de salud calificado.</div>
-
-  <div class="section"><div class="section-title">📊 Resumen ejecutivo</div><div class="section-body">
-    <div class="grid2">
-      <div class="stat"><div class="stat-l">Total micciones</div><div class="stat-v">${mics.length}</div><div class="stat-r">Normal: 4–7/día</div></div>
-      <div class="stat"><div class="stat-l">Volumen promedio</div><div class="stat-v">${avgVol} ml</div><div class="stat-r">Normal: 250–400 ml</div></div>
-      <div class="stat"><div class="stat-l">Volumen total orina</div><div class="stat-v">${totalVol} ml</div><div class="stat-r">Normal: 800–2000 ml/24h</div></div>
-      <div class="stat"><div class="stat-l">Líquido ingerido</div><div class="stat-v">${totalDrink} ml</div><div class="stat-r">Recomendado: 1500–2000 ml</div></div>
-      <div class="stat"><div class="stat-l">Fugas registradas</div><div class="stat-v">${leaks.length}</div><div class="stat-r">Normal: 0</div></div>
-      <div class="stat"><div class="stat-l">Días con datos</div><div class="stat-v">${days}</div></div>
-    </div>
-  </div></div>
-
-  <div class="section"><div class="section-title">🚨 Distribución de urgencia</div><div class="section-body">
-    <table><tr><th>Nivel</th><th>Descripción</th><th>Nº micciones</th></tr>
-    <tr><td>U0</td><td>Sin urgencia (preventiva)</td><td>${urgCounts[0]}</td></tr>
-    <tr><td>U1</td><td>Urgencia leve</td><td>${urgCounts[1]}</td></tr>
-    <tr><td>U2</td><td>Urgencia moderada</td><td>${urgCounts[2]}</td></tr>
-    <tr><td>U3</td><td>Urgencia severa</td><td>${urgCounts[3]}</td></tr>
-    <tr><td>U4</td><td>Incontinencia de urgencia</td><td>${urgCounts[4]}</td></tr>
-    </table>
-  </div></div>
-
-  ${acousticRecs.length?`<div class="section"><div class="section-title">🎙 Análisis acústico de flujo</div><div class="section-body">
-    <p style="font-size:12px;color:#5a6a85;margin-bottom:10px">Clasificación basada en amplitud relativa al ruido ambiente calibrado (Tsui et al., 2006)</p>
-    <div class="grid2">
-      <div class="stat"><div class="stat-l">🔴 Débil</div><div class="stat-v">${flowDist.weak}</div><div class="stat-r">&lt;8 ml/s estimado</div></div>
-      <div class="stat"><div class="stat-l">🟡 Bajo</div><div class="stat-v">${flowDist.low}</div><div class="stat-r">8–15 ml/s estimado</div></div>
-      <div class="stat"><div class="stat-l">🟢 Normal</div><div class="stat-v">${flowDist.normal}</div><div class="stat-r">15–25 ml/s estimado</div></div>
-      <div class="stat"><div class="stat-l">🔵 Fuerte</div><div class="stat-v">${flowDist.strong}</div><div class="stat-r">&gt;25 ml/s estimado</div></div>
-    </div>
-    <table style="margin-top:10px"><tr><th>Hora</th><th>Vol (ml)</th><th>Dur (s)</th><th>Flujo calc.</th><th>Clasificación acústica</th><th>Patrón</th></tr>
-    ${acousticRecs.map(r=>`<tr><td>${r.hora}</td><td>${r.vol||'—'}</td><td>${r.dur||'—'}</td><td>${r.flow?r.flow+' ml/s':'—'}</td><td><span class="tag ${r.acoustics.classification==='normal'?'tag-g':r.acoustics.classification==='strong'?'tag-b':r.acoustics.classification==='low'?'tag-a':'tag-r'}">${r.acoustics.classification}</span></td><td>${r.acoustics.pattern||'—'}</td></tr>`).join('')}
-    </table>
-  </div></div>`:''}
-
-  <div class="section"><div class="section-title">📋 Registro completo de micciones</div><div class="section-body">
-    <table><tr><th>Fecha</th><th>Hora</th><th>Vol (ml)</th><th>Dur (s)</th><th>Flujo</th><th>Urgencia</th><th>Posición</th></tr>
-    ${mics.sort((a,b)=>a.date.localeCompare(b.date)||a.hora.localeCompare(b.hora)).map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.vol||'—'}</td><td>${r.dur||'—'}</td><td>${r.flow?r.flow+' ml/s':'—'}</td><td>U${r.urgency??'—'}</td><td>${r.pos||'—'}</td></tr>`).join('')}
-    </table>
-  </div></div>
-
-  <div class="section"><div class="section-title">💧 Registro de bebidas</div><div class="section-body">
-    <table><tr><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Volumen</th></tr>
-    ${drks.sort((a,b)=>a.date.localeCompare(b.date)||a.hora.localeCompare(b.hora)).map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.tipo}</td><td>${r.vol||0} ml</td></tr>`).join('')}
-    </table>
-  </div></div>
-
-  <div class="footer">
-    CURG Diario Miccional v2.0 · Informe generado el ${new Date().toLocaleString('es')} · Datos alojados en Google Firebase ·
-    Base científica: ICS 2019, EAU Guidelines 2023, Tsui et al. 2006 ·
-    Este informe está protegido bajo Ley 1581 de 2012 (Colombia) y equivalentes LATAM.
-    Para soporte: curg@datamedica.app
-  </div>
+  <div class="warn">⚠️ Este informe es un complemento clínico. No constituye un diagnóstico médico.</div>
+  <div class="section"><div class="section-title">📊 Resumen</div><div class="section-body"><div class="grid2">
+  <div class="stat"><div class="stat-l">Total micciones</div><div class="stat-v">${mics.length}</div><div class="stat-r">Normal: 4–7/día</div></div>
+  <div class="stat"><div class="stat-l">Vol. promedio</div><div class="stat-v">${avgVol} ml</div><div class="stat-r">Normal: 250–400 ml</div></div>
+  <div class="stat"><div class="stat-l">Vol. total orina</div><div class="stat-v">${totalVol} ml</div><div class="stat-r">Normal: 800–2000 ml/24h</div></div>
+  <div class="stat"><div class="stat-l">Líquido ingerido</div><div class="stat-v">${totalDrink} ml</div><div class="stat-r">Recomendado: 1500–2000 ml</div></div>
+  <div class="stat"><div class="stat-l">Fugas</div><div class="stat-v">${leaks.length}</div><div class="stat-r">Normal: 0</div></div>
+  <div class="stat"><div class="stat-l">Días con datos</div><div class="stat-v">${days}</div></div>
+  </div></div></div>
+  <div class="section"><div class="section-title">🚨 Urgencia</div><div class="section-body">
+  <table><tr><th>Nivel</th><th>Descripción</th><th>Nº</th></tr>
+  <tr><td>U0</td><td>Sin urgencia</td><td>${urgCounts[0]}</td></tr>
+  <tr><td>U1</td><td>Leve</td><td>${urgCounts[1]}</td></tr>
+  <tr><td>U2</td><td>Moderada</td><td>${urgCounts[2]}</td></tr>
+  <tr><td>U3</td><td>Severa</td><td>${urgCounts[3]}</td></tr>
+  <tr><td>U4</td><td>Incontinencia</td><td>${urgCounts[4]}</td></tr>
+  </table></div></div>
+  ${acousticRecs.length?`<div class="section"><div class="section-title">🎙 Análisis acústico</div><div class="section-body">
+  <div class="grid2">
+  <div class="stat"><div class="stat-l">🔴 Débil</div><div class="stat-v">${flowDist.weak}</div></div>
+  <div class="stat"><div class="stat-l">🟡 Bajo</div><div class="stat-v">${flowDist.low}</div></div>
+  <div class="stat"><div class="stat-l">🟢 Normal</div><div class="stat-v">${flowDist.normal}</div></div>
+  <div class="stat"><div class="stat-l">🔵 Fuerte</div><div class="stat-v">${flowDist.strong}</div></div>
+  </div></div></div>`:''}
+  <div class="section"><div class="section-title">📋 Micciones</div><div class="section-body">
+  <table><tr><th>Fecha</th><th>Hora</th><th>Vol</th><th>Dur</th><th>Flujo</th><th>Urgencia</th><th>Posición</th></tr>
+  ${mics.sort((a,b)=>a.date.localeCompare(b.date)||a.hora.localeCompare(b.hora)).map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.vol||'—'}</td><td>${r.dur||'—'}s</td><td>${r.flow?r.flow+' ml/s':'—'}</td><td>U${r.urgency??'—'}</td><td>${r.pos||'—'}</td></tr>`).join('')}
+  </table></div></div>
+  <div class="section"><div class="section-title">💧 Bebidas</div><div class="section-body">
+  <table><tr><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Vol</th></tr>
+  ${drks.sort((a,b)=>a.date.localeCompare(b.date)||a.hora.localeCompare(b.hora)).map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.tipo}</td><td>${r.vol||0} ml</td></tr>`).join('')}
+  </table></div></div>
+  <div class="footer">CURG Diario Miccional v2.0 · ${new Date().toLocaleString('es')} · ICS 2019, EAU 2023</div>
   </body></html>`;
-
-  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=`CURG_Informe_${patient.nombre?.replace(/ /g,'_')}_${todayKey()}.html`;
+  a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
+  a.download=`CURG_${patient.nombre?.replace(/ /g,'_')}_${todayKey()}.html`;
   a.click();
 };
 
