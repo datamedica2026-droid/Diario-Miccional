@@ -256,6 +256,20 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .print-instr strong{color:#1e2a3a;}
 .print-footer{margin-top:12px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;display:flex;justify-content:space-between;}
 
+/* ── COLLEAGUE CARDS ── */
+.colleagues-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
+.colleague-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:border-color .2s,transform .15s;}
+.colleague-card:hover{border-color:var(--blue-act);transform:translateY(-2px);}
+.colleague-card-banner{height:68px;width:100%;}
+.colleague-card-top{position:relative;}
+.colleague-card-avatar{width:56px;height:56px;border-radius:50%;border:3px solid var(--card);position:absolute;bottom:-28px;left:16px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;overflow:hidden;}
+.colleague-card-avatar img{width:100%;height:100%;object-fit:cover;}
+.colleague-card-body{padding:36px 16px 16px;}
+.colleague-card-name{font-size:14px;font-weight:600;margin-bottom:3px;}
+.colleague-card-spec{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:4px;margin-bottom:3px;}
+.colleague-card-spec i,.colleague-card-clinic i{font-size:13px;color:var(--blue-act);}
+.colleague-card-clinic{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;margin-bottom:12px;}
+.colleague-card-actions{display:flex;gap:6px;flex-wrap:wrap;}
 /* ── CONSULTATION ── */
 .consult-banner{background:linear-gradient(135deg,#0d2137,#1a3a5c);border:1px solid var(--blue-act);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:12px;}
 .consult-banner i{font-size:22px;color:var(--blue-act);flex-shrink:0;}
@@ -490,8 +504,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
     <!-- My consultations -->
     <div class="consult-entry">
-      <h3><i class="ti ti-share"></i>Mis interconsultas activas</h3>
-      <div id="myConsultsList"><p style="font-size:12px;color:var(--text2)">Selecciona un paciente y usa el botón "Interconsulta" para generar un código.</p></div>
+      <h3><i class="ti ti-share"></i>Interconsultas enviadas</h3>
+      <div id="myConsultsList"><p style="font-size:12px;color:var(--text2)">Selecciona un paciente y usa el botón Interconsulta para generar un código.</p></div>
+    </div>
+    <!-- Received consultations -->
+    <div class="consult-entry">
+      <h3><i class="ti ti-inbox"></i>Interconsultas recibidas <span id="receivedBadge" style="display:none;background:var(--coral);color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;margin-left:4px">Nuevas</span></h3>
+      <div id="receivedConsultsList"><p style="font-size:12px;color:var(--text2)">Cargando...</p></div>
     </div>
   </div>
 
@@ -658,6 +677,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </div>
 
+<!-- MODAL MESSAGE TO PATIENT -->
+<div class="modal-overlay" id="modalMsg">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-message-circle"></i>Mensaje al paciente</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:12px">El paciente verá este mensaje en la sección "Mensajes" de su app con una notificación.</p>
+    <div class="form-group"><label>Mensaje</label><textarea id="msgText" rows="4" placeholder="Escribe tu mensaje o indicación clínica..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeM('Msg')"><i class="ti ti-x"></i>Cancelar</button>
+      <button class="btn btn-primary" onclick="sendMsg()"><i class="ti ti-send"></i>Enviar mensaje</button>
+    </div>
+  </div>
+</div>
+
 <!-- PRINT AREA -->
 <div id="printArea" style="display:none"></div>
 
@@ -750,7 +782,7 @@ window.showTTab=(name,el)=>{
   document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
   ['patients','colleagues','science','guide','consult','consult-view'].forEach(n=>{ const e=document.getElementById('ttab-'+n); if(e) e.style.display=n===name?(n==='patients'?'flex':'block'):'none'; });
   if(name==='colleagues') loadColleagues();
-  if(name==='consult') loadMyConsults();
+  if(name==='consult'){ loadMyConsults(); loadReceivedConsults(); }
 };
 
 // ── FILTERS ──
@@ -858,6 +890,7 @@ function renderPatView(p,recs,sleepMap,wbMap){
         <button class="btn btn-sm" onclick="exportCSV('${p.id}')"><i class="ti ti-table-export"></i>CSV</button>
         <button class="btn btn-sm btn-primary" onclick="genFullReport('${p.id}')"><i class="ti ti-file-report"></i>Informe</button>
         <button class="btn btn-sm btn-amber" onclick="generateConsultCode('${p.id}')"><i class="ti ti-arrows-exchange"></i>Interconsulta</button>
+        <button class="btn btn-sm btn-danger" onclick="confirmDeletePat('${p.id}','${(p.nombre||'').replace(/'/g,'&apos;')}')"><i class="ti ti-trash"></i>Eliminar</button>
       </div>
     </div>
 
@@ -892,7 +925,10 @@ function renderPatView(p,recs,sleepMap,wbMap){
     </div>
     <div id="pd-acoustic" style="display:none">${renderAcousticTab(acRecs,fD)}</div>
     <div id="pd-notes" style="display:none">
-      <button class="btn btn-green" style="margin-bottom:12px" onclick="openNoteModal('${p.id}')"><i class="ti ti-plus"></i>Agregar nota</button>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn btn-green" onclick="openNoteModal('${p.id}')"><i class="ti ti-plus"></i>Nota clínica</button>
+        <button class="btn btn-primary" onclick="openMsgModal('${p.id}')"><i class="ti ti-message-circle"></i>Mensaje al paciente</button>
+      </div>
       ${(p.notes||[]).length?(p.notes||[]).map(n=>`<div class="card" style="margin-bottom:8px"><div style="font-size:11px;color:var(--text3);margin-bottom:4px;display:flex;align-items:center;gap:5px"><i class="ti ti-calendar" style="font-size:12px"></i>${n.date} · ${n.doctor||''}</div><div style="font-size:13px">${n.text}</div></div>`).join(''):'<div class="empty"><i class="ti ti-notes"></i><p>Sin notas clínicas</p></div>'}
     </div>
     <div id="pd-profile" style="display:none">
@@ -1145,6 +1181,85 @@ async function loadColleagues(){
     list.innerHTML=`<p style="font-size:12px;color:var(--text2)">Error al cargar colegas: ${e.message}</p>`;
   }
 }
+
+window.startColleagueConsult=(doctorId,doctorName)=>{
+  showTTab('patients',document.querySelector('.ttab'));
+  setTimeout(()=>{
+    document.getElementById('consultPrompt')?.remove();
+    const msg=document.createElement('div'); msg.id='consultPrompt';
+    msg.style.cssText='background:var(--blue-light);border:1px solid var(--blue-act);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--blue-act);margin-bottom:12px;display:flex;align-items:center;gap:8px;';
+    msg.innerHTML=`<i class="ti ti-arrows-exchange" style="font-size:14px;flex-shrink:0"></i><span>Selecciona el paciente para interconsultar con <strong>${doctorName}</strong></span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:transparent;border:none;cursor:pointer;color:var(--blue-act)"><i class="ti ti-x"></i></button>`;
+    const pc=document.getElementById('patContent'); if(pc) pc.insertBefore(msg,pc.firstChild);
+  },200);
+};
+
+window.confirmDeletePat=async(id,nombre)=>{
+  if(!confirm(`¿Eliminar a ${nombre}?
+
+Esta acción no se puede deshacer. Se eliminarán todos sus registros.`)) return;
+  try{
+    for(const col of ['records','sleep','wellbeing']){
+      const snap=await getDocs(collection(db,'patients',id,col));
+      for(const d of snap.docs) await deleteDoc(doc(db,'patients',id,col,d.id));
+    }
+    await deleteDoc(doc(db,'patients',id));
+    selPatId=null;
+    document.getElementById('patContent').innerHTML=`<div class="empty" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center"><i class="ti ti-check-circle" style="font-size:3rem;color:var(--green);margin-bottom:1rem"></i><div style="font-size:1rem;font-weight:600">Paciente eliminado</div></div>`;
+  }catch(e){ alert('Error al eliminar: '+e.message); }
+};
+
+let msgTargetId=null;
+window.openMsgModal=(id)=>{ msgTargetId=id; document.getElementById('msgText').value=''; document.getElementById('modalMsg').classList.add('open'); };
+window.sendMsg=async()=>{
+  const text=document.getElementById('msgText').value.trim();
+  if(!text||!msgTargetId) return;
+  const p=patsCache[msgTargetId];
+  const notes=[...(p.notes||[]),{text,date:new Date().toISOString().slice(0,10),doctor:curDocData?.nombre||'',readByPatient:false}];
+  await updateDoc(doc(db,'patients',msgTargetId),{notes});
+  closeM('Msg');
+  alert('Mensaje enviado. El paciente lo verá en su app.');
+};
+
+async function loadReceivedConsults(){
+  const list=document.getElementById('receivedConsultsList'); if(!list) return;
+  try{
+    const snap=await getDocs(collection(db,'consultations'));
+    const received=[];
+    snap.forEach(d=>{
+      const c=d.data();
+      if(c.fromDoctorId===curDoc.uid) return;
+      received.push({id:d.id,...c});
+    });
+    if(!received.length){ list.innerHTML='<p style="font-size:12px;color:var(--text2)">No has recibido interconsultas aún.</p>'; return; }
+    const badge=document.getElementById('receivedBadge');
+    const hasNew=received.some(c=>c.status==='active');
+    if(badge) badge.style.display=hasNew?'inline':'none';
+    list.innerHTML=received.slice(0,10).map(c=>{
+      const exp=c.expiresAt?.toDate?.();
+      const expired=exp&&exp<new Date();
+      return `<div class="consult-item">
+        <div class="consult-item-left">
+          <i class="ti ti-user-circle" style="font-size:20px;color:var(--text3)"></i>
+          <div class="consult-item-info">
+            <h4>${c.patientName||'—'} <span style="font-size:11px;color:var(--text2)">de ${c.fromDoctorName||'colega'}</span></h4>
+            <p><span class="consult-code" style="font-size:11px;padding:2px 8px">${c.code}</span> · ${c.notes?.length||0} nota(s)</p>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="consult-status ${expired||c.status==='revoked'?'cs-expired':'cs-active'}">${expired?'Expirada':c.status==='revoked'?'Revocada':'Activa'}</span>
+          ${!expired&&c.status==='active'?`<button class="btn btn-sm btn-primary" onclick="viewReceivedConsult('${c.code}')"><i class="ti ti-eye"></i>Ver</button>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){ list.innerHTML=`<p style="font-size:12px;color:var(--text2)">Error: ${e.message}</p>`; }
+}
+
+window.viewReceivedConsult=(code)=>{
+  document.getElementById('consultCodeInput').value=code;
+  showTTab('consult',document.querySelector('.ttab:nth-child(5)'));
+  setTimeout(()=>accessConsultation(),100);
+};
+
 window.exportCSV=async(id)=>{
   const snap=await getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc')));
   const recs=snap.docs.map(d=>d.data());const p=patsCache[id];
