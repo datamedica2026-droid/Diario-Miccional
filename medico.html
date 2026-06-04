@@ -385,7 +385,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="doctor-chip">
       <div class="doctor-av" id="docAv">DR</div>
       <span class="doctor-name" id="docName">...</span>
-      <button class="btn btn-sm btn-danger" style="margin-left:6px" onclick="doLogout()"><i class="ti ti-logout"></i>Salir</button>
+      <button class="btn btn-sm" style="margin-left:6px" onclick="openEditProfile()"><i class="ti ti-settings"></i></button>
+      <button class="btn btn-sm btn-danger" style="margin-left:4px" onclick="doLogout()"><i class="ti ti-logout"></i>Salir</button>
     </div>
   </div>
 
@@ -469,7 +470,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="ref-item"><span class="ref-num">[6]</span>Ley 1581 de 2012. Régimen General de Protección de Datos. Colombia.</div>
       </div>
     </div>
-    <div class="brand-footer"><span class="brand-footer-text">Desarrollado por <span class="innoia-text">InnoIA</span> · Verificado por <span class="curg-text">CURG</span> · Colombian Urology Research Group · v2.0 · 2026</span></div>
+    <div class="brand-footer"><span class="brand-footer-text">Desarrollado por <span class="innoia-text">InnoIA</span> · Verificado por <span class="curg-text">CURG</span> · Colombian Urology Research Group · v2.0 · 2026 · <span style="text-decoration:underline;cursor:pointer;color:var(--blue-act)" onclick="document.getElementById('modalTerms').classList.add('open')">Términos de uso</span></span></div>
   </div>
 
   <!-- INTERCONSULTA TAB -->
@@ -591,13 +592,79 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </div>
 
+<!-- MODAL EDIT DOCTOR PROFILE -->
+<div class="modal-overlay" id="modalEditProfile">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-user-edit"></i>Editar mi perfil</div>
+    <div class="form-row">
+      <div class="form-group"><label>Nombre completo</label><input type="text" id="epNombre"></div>
+      <div class="form-group"><label>Especialidad</label><input type="text" id="epEspec"></div>
+    </div>
+    <div class="form-group"><label>Clínicas / Instituciones <span style="font-size:11px;color:var(--text3);font-weight:400;text-transform:none">(separadas por coma)</span></label><input type="text" id="epClinicas" placeholder="Clínica A, Hospital B"></div>
+    <div id="epErr" class="msg-err" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeM('EditProfile')"><i class="ti ti-x"></i>Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEditProfile()"><i class="ti ti-device-floppy"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDIT PATIENT -->
+<div class="modal-overlay" id="modalEditPat">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-user-edit"></i>Editar paciente</div>
+    <div class="form-row">
+      <div class="form-group"><label>Nombre completo</label><input type="text" id="enpNombre"></div>
+      <div class="form-group"><label>Fecha de nacimiento</label><input type="date" id="enpFN"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Género</label><select id="enpG"><option value="">—</option><option value="f">Femenino</option><option value="m">Masculino</option><option value="o">Otro</option></select></div>
+      <div class="form-group"><label>Año inicio</label><input type="number" id="enpY" min="2020" max="2099"></div>
+    </div>
+    <div class="form-group"><label>Clínica</label><select id="enpC"><option value="">Selecciona...</option></select></div>
+    <div class="form-row">
+      <div class="form-group"><label>Teléfono</label><input type="tel" id="enpT"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="enpE"></div>
+    </div>
+    <div class="form-group"><label>Diagnóstico</label><input type="text" id="enpD"></div>
+    <div class="form-group"><label>Médico tratante</label><input type="text" id="enpM"></div>
+    <div class="form-group"><label>Notas iniciales</label><textarea id="enpNo" rows="2"></textarea></div>
+    <div id="enpErr" class="msg-err" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeM('EditPat')"><i class="ti ti-x"></i>Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEditPat()"><i class="ti ti-device-floppy"></i>Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TERMS -->
+<div class="modal-overlay" id="modalTerms">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-title"><i class="ti ti-file-text"></i>Términos y condiciones de uso</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.7;max-height:60vh;overflow-y:auto;padding-right:8px">
+      <p style="margin-bottom:10px"><strong style="color:var(--text)">1. Aceptación</strong><br>Al usar Diario Miccional (desarrollado por InnoIA, verificado por CURG), aceptas estos términos. Si no los aceptas, no uses la aplicación.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--text)">2. Uso permitido</strong><br>Esta aplicación es exclusivamente para uso clínico por profesionales de salud habilitados y sus pacientes. Está prohibido el uso comercial no autorizado, la ingeniería inversa o la distribución sin permiso.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--text)">3. Datos de salud</strong><br>Los datos registrados son información de salud protegida. El médico tratante es corresponsable de su tratamiento. Los datos se almacenan en Google Firebase (servidores en EE.UU.) bajo estándares HIPAA-eligible.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--text)">4. Limitación de responsabilidad</strong><br>Diario Miccional es una herramienta de apoyo clínico. No constituye diagnóstico médico ni reemplaza la evaluación profesional. InnoIA y CURG no son responsables de decisiones clínicas basadas en los datos de la aplicación.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--text)">5. Análisis acústico</strong><br>El análisis acústico del flujo urinario es orientativo y experimental. No reemplaza una flujometría urodinámica formal. Los valores en dB son relativos al baseline calibrado en cada sesión.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--text)">6. Interconsultas</strong><br>Los códigos de interconsulta tienen vigencia de 48 horas. El médico solicitante es responsable de a quién comparte el acceso.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--text)">7. Modificaciones</strong><br>InnoIA puede modificar estos términos con notificación previa de 30 días.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--text)">8. Ley aplicable</strong><br>Estos términos se rigen por las leyes de la República de Colombia. Cualquier disputa se resolverá en los tribunales competentes de Colombia.</p>
+      <p style="color:var(--text3);font-size:11px">Versión 2.0 · Junio 2026 · InnoIA · verificado CURG</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeM('Terms')"><i class="ti ti-check"></i>Entendido</button>
+    </div>
+  </div>
+</div>
+
 <!-- PRINT AREA -->
 <div id="printArea" style="display:none"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const fb = initializeApp({
   apiKey:"AIzaSyANR_4lIz4Z6At3FMykRIzRPyMCE2U4454",
@@ -786,6 +853,7 @@ function renderPatView(p,recs,sleepMap,wbMap){
         </div>
       </div>
       <div class="hero-actions">
+        <button class="btn btn-sm" onclick="openEditPat('${p.id}')"><i class="ti ti-pencil"></i>Editar</button>
         <button class="btn btn-sm btn-green" onclick="openNoteModal('${p.id}')"><i class="ti ti-notes"></i>Nota</button>
         <button class="btn btn-sm" onclick="exportCSV('${p.id}')"><i class="ti ti-table-export"></i>CSV</button>
         <button class="btn btn-sm btn-primary" onclick="genFullReport('${p.id}')"><i class="ti ti-file-report"></i>Informe</button>
@@ -964,6 +1032,79 @@ window.printCard=(id,patData)=>{
 };
 window.openNoteModal=(id)=>{noteTargetId=id;document.getElementById('noteText').value='';document.getElementById('modalNote').classList.add('open');};
 window.saveNote=async()=>{const text=document.getElementById('noteText').value.trim();if(!text||!noteTargetId)return;const p=patsCache[noteTargetId];const notes=[...(p.notes||[]),{text,date:new Date().toISOString().slice(0,10),doctor:curDocData?.nombre||''}];await updateDoc(doc(db,'patients',noteTargetId),{notes});closeM('Note');selectPat(noteTargetId);};
+// ── EDIT DOCTOR PROFILE ──
+window.openEditProfile=()=>{
+  document.getElementById('epNombre').value=curDocData?.nombre||'';
+  document.getElementById('epEspec').value=curDocData?.especialidad||'';
+  document.getElementById('epClinicas').value=(curDocData?.clinicas||[]).join(', ');
+  document.getElementById('epErr').style.display='none';
+  document.getElementById('modalEditProfile').classList.add('open');
+};
+window.saveEditProfile=async()=>{
+  const nombre=document.getElementById('epNombre').value.trim();
+  const err=document.getElementById('epErr');
+  if(!nombre){err.querySelector('span').textContent='El nombre es obligatorio';err.style.display='flex';return;}
+  const clinicas=document.getElementById('epClinicas').value.split(',').map(c=>c.trim()).filter(Boolean);
+  try{
+    await updateDoc(doc(db,'doctors',curDoc.uid),{
+      nombre,
+      especialidad:document.getElementById('epEspec').value.trim(),
+      clinicas
+    });
+    curDocData={...curDocData,nombre,especialidad:document.getElementById('epEspec').value.trim(),clinicas};
+    document.getElementById('docName').textContent=nombre;
+    document.getElementById('docAv').textContent=nombre.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    populateFilters();
+    closeM('EditProfile');
+  }catch(e){err.querySelector('span').textContent=e.message;err.style.display='flex';}
+};
+
+// ── EDIT PATIENT ──
+let editPatId=null;
+window.openEditPat=(id)=>{
+  editPatId=id;
+  const p=patsCache[id]; if(!p) return;
+  document.getElementById('enpNombre').value=p.nombre||'';
+  document.getElementById('enpFN').value=p.fechaNac||'';
+  document.getElementById('enpG').value=p.genero||'';
+  document.getElementById('enpY').value=p.yearInicio||new Date().getFullYear();
+  document.getElementById('enpT').value=p.telefono||'';
+  document.getElementById('enpE').value=p.email||'';
+  document.getElementById('enpD').value=p.diagnostico||'';
+  document.getElementById('enpM').value=p.medicoTratante||'';
+  document.getElementById('enpNo').value=p.notasIniciales||'';
+  document.getElementById('enpErr').style.display='none';
+  // Populate clinic select
+  const sel=document.getElementById('enpC');
+  sel.innerHTML='<option value="">Selecciona...</option>';
+  (curDocData?.clinicas||[]).forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;if(c===p.clinica)o.selected=true;sel.appendChild(o);});
+  document.getElementById('modalEditPat').classList.add('open');
+};
+window.saveEditPat=async()=>{
+  if(!editPatId) return;
+  const err=document.getElementById('enpErr');
+  const nombre=document.getElementById('enpNombre').value.trim();
+  if(!nombre){err.querySelector('span').textContent='El nombre es obligatorio';err.style.display='flex';return;}
+  try{
+    const updates={
+      nombre,
+      fechaNac:document.getElementById('enpFN').value,
+      genero:document.getElementById('enpG').value,
+      yearInicio:parseInt(document.getElementById('enpY').value)||new Date().getFullYear(),
+      clinica:document.getElementById('enpC').value,
+      telefono:document.getElementById('enpT').value.trim(),
+      email:document.getElementById('enpE').value.trim(),
+      diagnostico:document.getElementById('enpD').value.trim(),
+      medicoTratante:document.getElementById('enpM').value.trim(),
+      notasIniciales:document.getElementById('enpNo').value.trim()
+    };
+    await updateDoc(doc(db,'patients',editPatId),updates);
+    closeM('EditPat');
+    // Refresh patient view
+    selectPat(editPatId);
+  }catch(e){err.querySelector('span').textContent=e.message;err.style.display='flex';}
+};
+
 async function loadColleagues(){
   const list=document.getElementById('colleaguesList');
   if(!list) return;
@@ -1182,11 +1323,10 @@ window.generateConsultCode=async(patId)=>{
   const p=patsCache[patId]; if(!p) return;
   currentConsultPatId=patId;
 
-  // Check for existing active consultation
+  // Check for existing active consultation - single where to avoid composite index
   const existing=await getDocs(query(collection(db,'consultations'),
     where('patientId','==',patId),
-    where('fromDoctorId','==',curDoc.uid),
-    where('status','==','active')
+    where('fromDoctorId','==',curDoc.uid)
   ));
 
   let code, consultId;
@@ -1275,14 +1415,16 @@ Válido por 48 horas.`;
 async function loadMyConsults(){
   const list=document.getElementById('myConsultsList'); if(!list) return;
   try{
+    // Avoid composite index - filter client side
     const snap=await getDocs(query(collection(db,'consultations'),
-      where('fromDoctorId','==',curDoc.uid),
-      orderBy('createdAt','desc')
+      where('fromDoctorId','==',curDoc.uid)
     ));
     if(snap.empty){ list.innerHTML='<p style="font-size:12px;color:var(--text2)">Sin interconsultas activas.</p>'; return; }
     const now=Date.now();
     // Auto-expire
-    const items=snap.docs.map(d=>({id:d.id,...d.data()})).map(c=>{
+    const items=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>{ const ta=a.createdAt?.seconds||0; const tb=b.createdAt?.seconds||0; return tb-ta; })
+      .map(c=>{
       const exp=c.expiresAt?.toDate?.()?.getTime()||c.expiresAt;
       const expired=exp&&exp<now;
       return {...c,expired};
@@ -1319,6 +1461,7 @@ window.accessConsultation=async()=>{
   if(code.length<8){ errEl.textContent='Ingresa el código completo'; errEl.style.display='block'; return; }
 
   try{
+    // Search by code only - no composite index needed
     const snap=await getDocs(query(collection(db,'consultations'),where('code','==',code)));
     if(snap.empty){ errEl.textContent='Código no encontrado.'; errEl.style.display='block'; return; }
 
