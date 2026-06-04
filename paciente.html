@@ -325,6 +325,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .brand-footer-text .curg{color:var(--blue-act);font-weight:600;}
 
 .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--text3);}
+.offline-banner{position:fixed;top:54px;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#c62828;color:#fff;padding:8px 16px;font-size:12px;font-weight:600;text-align:center;z-index:99;display:none;align-items:center;justify-content:center;gap:6px;}
+.offline-banner i{font-size:14px;}
+.onboard-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:1.25rem;}
+.onboard-step{display:flex;align-items:flex-start;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;}
+.onboard-step-num{width:28px;height:28px;border-radius:50%;background:var(--blue-act);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.onboard-step-text h4{font-size:13px;font-weight:600;margin-bottom:2px;}
+.onboard-step-text p{font-size:12px;color:var(--text2);line-height:1.5;}
+.terms-link{font-size:11px;color:var(--text3);text-align:center;margin-top:8px;}
+.terms-link a{color:var(--blue-act);text-decoration:underline;cursor:pointer;}
 .empty-state i{font-size:2.5rem;display:block;margin-bottom:.75rem;}
 </style>
 </head>
@@ -385,16 +394,52 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <button class="btn-theme" onclick="toggleTheme()"><i class="ti ti-moon" id="themeIcon"></i></button>
 </div>
 
+<!-- OFFLINE BANNER -->
+<div class="offline-banner" id="offlineBanner"><i class="ti ti-wifi-off"></i>Sin conexión — los registros se guardarán cuando vuelva el internet</div>
+
+<!-- TERMS MODAL -->
+<div class="modal-overlay" id="modalTermsPac">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><i class="ti ti-file-text"></i>Términos y condiciones</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.7;max-height:55vh;overflow-y:auto;padding-right:6px">
+      <p style="margin-bottom:10px"><strong style="color:var(--text)">1. Uso de la aplicación</strong><br>Diario Miccional es una herramienta de apoyo clínico desarrollada por InnoIA y verificada por CURG. Su uso es exclusivamente clínico bajo supervisión médica.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--text)">2. Tus datos</strong><br>Tus datos de salud se almacenan de forma segura en Google Firebase. Solo tú y tu médico tratante pueden acceder a ellos. No se venden ni comparten con terceros comerciales.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--text)">3. Análisis acústico</strong><br>El análisis del sonido de la micción es orientativo y no reemplaza una evaluación médica formal.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--text)">4. Limitación de responsabilidad</strong><br>Esta app no constituye diagnóstico médico. Ante cualquier síntoma, consulta siempre con tu médico.</p>
+      <p style="margin-bottom:10px"><strong style="color:var(--text)">5. Menores de edad</strong><br>La app requiere ser mayor de 18 años o tener autorización del tutor legal.</p>
+      <p style="color:var(--text3);font-size:11px">Versión 2.0 · Junio 2026 · InnoIA · verificado CURG · Ley 1581/2012 Colombia</p>
+    </div>
+    <div style="margin-top:1rem;display:flex;justify-content:flex-end">
+      <button class="btn btn-primary" onclick="document.getElementById('modalTermsPac').classList.remove('open')"><i class="ti ti-check"></i>Entendido</button>
+    </div>
+  </div>
+</div>
+
 <!-- ONBOARDING -->
 <div class="screen active" id="screen-onboard">
   <div class="onboard-hero">
     <div class="onboard-icon"><i class="ti ti-clipboard-heart"></i></div>
     <div class="onboard-title">Diario Miccional</div>
-    <div class="onboard-sub">Registra y comparte tu diario con tu médico de forma segura.</div>
+    <div class="onboard-sub">Registra y comparte tu diario con tu médico de forma segura y en tiempo real.</div>
     <div style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:10px">
       <span style="font-size:11px;color:var(--coral);font-weight:600">by InnoIA</span>
       <span style="font-size:11px;color:var(--text3)">·</span>
       <span style="font-size:11px;color:var(--blue-act);font-weight:600">verificado CURG</span>
+    </div>
+  </div>
+  <div class="onboard-steps">
+    <div class="onboard-step">
+      <div class="onboard-step-num">1</div>
+      <div class="onboard-step-text"><h4>Ingresa tu código</h4><p>Tu médico te dio un código de 8 caracteres tipo <strong>XXXX-XXXX</strong>. Si no lo tienes, regístrate directamente.</p></div>
+    </div>
+    <div class="onboard-step">
+      <div class="onboard-step-num">2</div>
+      <div class="onboard-step-text"><h4>Registra cada micción</h4><p>Usa el cronómetro y la jarra medidora para anotar hora, volumen y urgencia de cada micción.</p></div>
+    </div>
+    <div class="onboard-step">
+      <div class="onboard-step-num">3</div>
+      <div class="onboard-step-text"><h4>Tu médico lo ve en tiempo real</h4><p>Todos tus registros llegan instantáneamente al panel de tu médico. Sin necesidad de impresiones.</p></div>
     </div>
   </div>
   <div class="onboard-card">
@@ -423,6 +468,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <button class="btn btn-primary btn-full" onclick="selfReg()"><i class="ti ti-user-plus"></i>Crear perfil</button>
       <div id="regErr" class="msg-error" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
       <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px">Tu perfil quedará pendiente hasta que tu médico lo confirme.</p>
+      <div class="terms-link">Al registrarte aceptas nuestros <a onclick="document.getElementById('modalTermsPac').classList.add('open')">Términos y condiciones</a> y <a onclick="document.getElementById('consentOverlay').style.display='flex'">Política de privacidad</a></div>
     </div>
   </div>
   <div class="brand-footer">
@@ -637,8 +683,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div id="notifStatus" style="font-size:11px;color:var(--text2);text-align:center;margin-bottom:1rem"></div>
   <button class="btn btn-danger btn-full" style="margin-bottom:10px" onclick="revokeConsent()"><i class="ti ti-trash"></i>Revocar consentimiento y eliminar datos</button>
   <button class="btn btn-full" onclick="logout()" style="border-color:var(--border2)"><i class="ti ti-logout"></i>Cerrar sesión</button>
-  <div class="brand-footer" style="margin-top:1rem">
+  <div class="brand-footer" style="margin-top:1rem;flex-direction:column;gap:4px">
     <span class="brand-footer-text">Desarrollado por <span class="innoia">InnoIA</span> · Verificado por <span class="curg">CURG</span></span>
+    <span class="brand-footer-text"><span style="text-decoration:underline;cursor:pointer;color:var(--blue-act)" onclick="document.getElementById('modalTermsPac').classList.add('open')">Términos de uso</span> · <span style="text-decoration:underline;cursor:pointer;color:var(--blue-act)" onclick="document.getElementById('consentOverlay').style.display='flex'">Política de privacidad</span></span>
   </div>
 </div>
 
@@ -1169,6 +1216,21 @@ window.genPDF=async()=>{
   <div class="footer">Diario Miccional v2.0 · by InnoIA · verificado CURG · ${new Date().toLocaleString('es')} · ICS 2019, EAU Guidelines 2023, Tsui et al. 2006 · Ley 1581/2012 Colombia</div></body></html>`;
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'})); a.download=`DiarioMiccional_${patient.nombre?.replace(/ /g,'_')}_${todayKey()}.html`; a.click();
 };
+
+// ── OFFLINE DETECTION ──
+function updateOnlineStatus(){
+  const banner=document.getElementById('offlineBanner');
+  if(banner){
+    if(!navigator.onLine){
+      banner.style.display='flex';
+    } else {
+      banner.style.display='none';
+    }
+  }
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
 
 // ── PROFILE ──
 function renderProfile(){
