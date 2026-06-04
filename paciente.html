@@ -325,6 +325,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .brand-footer-text .curg{color:var(--blue-act);font-weight:600;}
 
 .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--text3);}
+.msg-bubble{background:var(--blue-light);border:1px solid var(--blue-act);border-radius:14px 14px 14px 4px;padding:10px 14px;margin-bottom:10px;position:relative;}
+.msg-bubble-doctor{font-size:11px;font-weight:600;color:var(--blue-act);margin-bottom:4px;display:flex;align-items:center;gap:4px;}
+.msg-bubble-text{font-size:13px;color:var(--text);line-height:1.6;}
+.msg-bubble-date{font-size:10px;color:var(--text3);margin-top:4px;}
+.msg-unread-dot{width:8px;height:8px;border-radius:50%;background:var(--coral);position:absolute;top:10px;right:12px;}
+.notif-badge{background:var(--coral);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:4px;}
 .offline-banner{position:fixed;top:54px;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#c62828;color:#fff;padding:8px 16px;font-size:12px;font-weight:600;text-align:center;z-index:99;display:none;align-items:center;justify-content:center;gap:6px;}
 .offline-banner i{font-size:14px;}
 .onboard-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:1.25rem;}
@@ -526,6 +532,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="wb-status" id="wbStatus"></div>
   </div>
   <!-- Actions -->
+  <div id="doctorMsgBanner" style="display:none;margin-bottom:1rem"></div>
   <div class="action-grid">
     <div class="action-btn primary" onclick="openM('miction')" style="grid-column:1/-1">
       <div class="action-btn-icon"><i class="ti ti-droplets"></i></div>
@@ -542,6 +549,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
   <div class="records-header"><i class="ti ti-list"></i>Registros de hoy</div>
   <div id="recordsList"></div>
+</div>
+
+<!-- MENSAJES -->
+<div class="screen" id="screen-messages">
+  <div style="font-size:1rem;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px">
+    <i class="ti ti-message-circle" style="color:var(--blue-act);font-size:20px"></i>Mensajes de tu médico
+  </div>
+  <div id="msgContent"><div class="empty-state"><i class="ti ti-message-off"></i><p>Sin mensajes de tu médico aún.</p></div></div>
 </div>
 
 <!-- ANÁLISIS -->
@@ -659,7 +674,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <!-- PERFIL -->
 <div class="screen" id="screen-profile">
-  <div style="font-size:1rem;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px"><i class="ti ti-user-circle" style="color:var(--blue-act);font-size:20px"></i>Mi perfil</div>
+  <div style="font-size:1rem;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:8px"><i class="ti ti-user-circle" style="color:var(--blue-act);font-size:20px"></i>Mi perfil</div>
+    <button class="btn btn-sm btn-outline" onclick="openEditPatProfile()"><i class="ti ti-pencil"></i>Editar</button>
+  </div>
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem" id="profileView"></div>
   <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.04em">Recordatorios</div>
   <div class="notif-card">
@@ -693,9 +711,33 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="bottom-nav" id="bottomNav" style="display:none">
   <div class="nav-item active" onclick="showScreen('main',this)"><i class="ti ti-clipboard-list nav-icon"></i><span class="nav-lbl">Diario</span></div>
   <div class="nav-item" onclick="showScreen('analysis',this)"><i class="ti ti-chart-bar nav-icon"></i><span class="nav-lbl">Análisis</span></div>
+  <div class="nav-item" onclick="showScreen('messages',this)" style="position:relative"><i class="ti ti-message-circle nav-icon"></i><span class="nav-lbl">Mensajes</span><span id="msgDot" style="display:none;position:absolute;top:6px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--coral)"></span></div>
   <div class="nav-item" onclick="showScreen('instructions',this)"><i class="ti ti-info-circle nav-icon"></i><span class="nav-lbl">Guía</span></div>
-  <div class="nav-item" onclick="showScreen('about',this)"><i class="ti ti-flask nav-icon"></i><span class="nav-lbl">Ciencia</span></div>
   <div class="nav-item" onclick="showScreen('profile',this)"><i class="ti ti-user-circle nav-icon"></i><span class="nav-lbl">Perfil</span></div>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-overlay" id="modalEditProfile">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title"><i class="ti ti-user-edit"></i>Editar mi perfil</div>
+    <div class="form-row">
+      <div class="form-group"><label>Nombre *</label><input type="text" id="ppN" placeholder="Tu nombre completo"></div>
+      <div class="form-group"><label>Fecha de nac.</label><input type="date" id="ppD"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Género</label>
+        <select id="ppG"><option value="">—</option><option value="f">Femenino</option><option value="m">Masculino</option><option value="o">Otro</option></select>
+      </div>
+      <div class="form-group"><label>Teléfono</label><input type="tel" id="ppT"></div>
+    </div>
+    <div class="form-group"><label>Email</label><input type="email" id="ppE"></div>
+    <div id="ppErr" class="msg-error" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeM('EditProfile')"><i class="ti ti-x"></i>Cancelar</button>
+      <button class="btn btn-primary" onclick="savePatProfile()"><i class="ti ti-device-floppy"></i>Guardar</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL MICCIÓN -->
@@ -831,6 +873,12 @@ function todayKey(){ return new Date().toISOString().slice(0,10); }
 function nowTime(){ const d=new Date(); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
 
 checkConsentStatus();
+const _urlP=new URLSearchParams(window.location.search);
+const _urlCode=_urlP.get('code');
+if(_urlCode&&!patient){
+  const _ci=document.getElementById('codeInput');
+  if(_ci){ let v=_urlCode.toUpperCase().replace(/[^A-Z0-9]/g,''); if(v.length>4)v=v.slice(0,4)+'-'+v.slice(4,8); _ci.value=v; setTimeout(()=>connectCode(),600); }
+}
 if(patient) enterApp();
 
 function enterApp(){
@@ -840,6 +888,7 @@ function enterApp(){
   showScreen('main',document.querySelector('.nav-item'));
   renderGreeting(); renderProfile(); loadSleep(); subscribeRecords();
   updateStreak(); loadWb(); renderNotifToggles(); scheduleNotifs();
+  loadDoctorMessages();
 }
 
 // ── ONBOARD ──
@@ -884,6 +933,7 @@ window.showScreen=(name,el)=>{
   if(el) el.closest('.nav-item').classList.add('active');
   if(name==='analysis') renderAnalysis();
   if(name==='profile'){ renderProfile(); renderNotifToggles(); }
+  if(name==='messages') loadDoctorMessages();
 };
 
 // ── GREETING ──
@@ -1231,6 +1281,76 @@ function updateOnlineStatus(){
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 updateOnlineStatus();
+
+// ── DOCTOR MESSAGES ──
+async function loadDoctorMessages(){
+  if(!patient?.id) return;
+  try{
+    const snap=await getDoc(doc(db,'patients',patient.id));
+    if(!snap.exists()) return;
+    const notes=(snap.data().notes||[]).filter(n=>n.text);
+    const unread=notes.filter(n=>!n.readByPatient);
+    // Badge on nav
+    const dot=document.getElementById('msgDot');
+    if(dot) dot.style.display=unread.length>0?'block':'none';
+    // Banner on main
+    const banner=document.getElementById('doctorMsgBanner');
+    if(banner){
+      if(unread.length>0){
+        banner.style.display='block';
+        banner.innerHTML=`<div class="msg-bubble" style="cursor:pointer" onclick="showScreen('messages',document.querySelectorAll('.nav-item')[2])">
+          <div class="msg-bubble-doctor"><i class="ti ti-stethoscope"></i>${unread[0].doctor||'Tu médico'}<span class="notif-badge">${unread.length} nuevo${unread.length>1?'s':''}</span></div>
+          <div class="msg-bubble-text">${unread[0].text}</div>
+          <div class="msg-bubble-date">${unread[0].date||''} · Toca para ver todos</div>
+          <div class="msg-unread-dot"></div>
+        </div>`;
+      } else { banner.style.display='none'; }
+    }
+    // Full messages screen
+    const mc=document.getElementById('msgContent');
+    if(!mc) return;
+    if(!notes.length){ mc.innerHTML='<div class="empty-state"><i class="ti ti-message-off"></i><p>Sin mensajes de tu médico aún.</p></div>'; return; }
+    mc.innerHTML=[...notes].reverse().map(n=>`
+      <div class="msg-bubble">
+        <div class="msg-bubble-doctor"><i class="ti ti-stethoscope"></i>${n.doctor||'Tu médico'}${!n.readByPatient?'<span class="notif-badge">Nuevo</span>':''}</div>
+        <div class="msg-bubble-text">${n.text}</div>
+        <div class="msg-bubble-date">${n.date||''}</div>
+      </div>`).join('');
+    // Mark all read
+    if(unread.length>0){
+      const updated=notes.map(n=>({...n,readByPatient:true}));
+      await updateDoc(doc(db,'patients',patient.id),{notes:updated});
+      if(dot) dot.style.display='none';
+      if(banner) banner.style.display='none';
+    }
+  }catch(e){ console.log('msg err:',e); }
+}
+
+// ── EDIT PATIENT PROFILE ──
+window.openEditPatProfile=()=>{
+  if(!patient) return;
+  document.getElementById('ppN').value=patient.nombre||'';
+  document.getElementById('ppD').value=patient.fechaNac||'';
+  document.getElementById('ppG').value=patient.genero||'';
+  document.getElementById('ppT').value=patient.telefono||'';
+  document.getElementById('ppE').value=patient.email||'';
+  document.getElementById('ppErr').style.display='none';
+  document.getElementById('modalEditProfile').classList.add('open');
+};
+window.savePatProfile=async()=>{
+  const nombre=document.getElementById('ppN').value.trim();
+  const err=document.getElementById('ppErr');
+  if(!nombre){ err.querySelector('span').textContent='El nombre es obligatorio'; err.style.display='flex'; return; }
+  try{
+    const updates={nombre,fechaNac:document.getElementById('ppD').value,genero:document.getElementById('ppG').value,telefono:document.getElementById('ppT').value.trim(),email:document.getElementById('ppE').value.trim()};
+    if(patient?.id) await updateDoc(doc(db,'patients',patient.id),updates);
+    patient={...patient,...updates};
+    localStorage.setItem('dm_patient',JSON.stringify(patient));
+    closeM('EditProfile');
+    renderProfile();
+    renderGreeting();
+  }catch(e){ err.querySelector('span').textContent=e.message; err.style.display='flex'; }
+};
 
 // ── PROFILE ──
 function renderProfile(){
