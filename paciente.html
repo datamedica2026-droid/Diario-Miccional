@@ -3,406 +3,472 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>CURG Diario Miccional</title>
+<title>Diario Miccional — by InnoIA</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#1565c0">
+<meta name="theme-color" content="#042C53">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="CURG">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231565c0'/><text y='130' x='96' text-anchor='middle' font-size='120'>🏥</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Diario Miccional">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#f0f4f8;--surface:#fff;--card:#fff;--border:#dde3ee;--border2:#c5cedf;
-  --text:#1a2236;--text2:#5a6a85;--text3:#9aaac0;
-  --accent:#1565c0;--accent2:#1976d2;--accent-light:#e3f2fd;
-  --green:#2e7d32;--green-light:#e8f5e9;
-  --amber:#e65100;--amber-light:#fff3e0;
-  --red:#c62828;--red-light:#ffebee;
-  --purple:#6a1b9a;--purple-light:#f3e5f5;
-  --radius:14px;--radius-lg:20px;--radius-xl:28px;
+  --bg:#f4f6f9;--surface:#ffffff;--card:#ffffff;
+  --border:#e2e8f0;--border2:#cbd5e1;
+  --text:#1e2a3a;--text2:#64748b;--text3:#94a3b8;
+  --blue-deep:#042C53;--blue-mid:#185FA5;--blue-act:#378ADD;--blue-light:#E6F1FB;
+  --coral:#D85A30;--coral-light:#FAECE7;--coral-dark:#712B13;
+  --green:#3B6D11;--green-light:#EAF3DE;
+  --amber:#854F0B;--amber-light:#FAEEDA;
+  --red:#A32D2D;--red-light:#FCEBEB;
+  --gray-warm:#2C2C2A;--gray-bg:#F1EFE8;
+  --radius:10px;--radius-lg:16px;--radius-xl:22px;
 }
 [data-theme="dark"]{
-  --bg:#0d1117;--surface:#161b27;--card:#1c2235;--border:#252d45;--border2:#323d58;
-  --text:#e8eef8;--text2:#8896b3;--text3:#4a5675;
-  --accent:#4fc3f7;--accent2:#0288d1;--accent-light:#0d2137;
-  --green:#43d98c;--green-light:#0a2e1e;
-  --amber:#ffb74d;--amber-light:#2e1f00;
-  --red:#ef5350;--red-light:#2e0a0a;
-  --purple:#ce93d8;--purple-light:#1e0a2e;
+  --bg:#0d1117;--surface:#161c28;--card:#1c2438;
+  --border:#253048;--border2:#304060;
+  --text:#e2e8f0;--text2:#8896b3;--text3:#4a5675;
+  --blue-light:#0d2137;--coral-light:#2e1208;--green-light:#0a2e1e;--amber-light:#2e1f00;--red-light:#2e0a0a;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;font-size:15px;}
 
-/* ── CONSENT SCREEN ── */
-.consent-screen{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:flex-end;justify-content:center;}
-.consent-box{background:var(--surface);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:1.5rem;width:100%;max-width:430px;max-height:90vh;overflow-y:auto;}
-.consent-logo{text-align:center;margin-bottom:1rem;}
-.consent-logo-icon{font-size:2.5rem;}
-.consent-title{font-size:1.1rem;font-weight:700;text-align:center;margin-bottom:0.25rem;}
-.consent-sub{font-size:12px;color:var(--text2);text-align:center;margin-bottom:1.25rem;}
-.consent-section{background:var(--bg);border-radius:var(--radius);padding:1rem;margin-bottom:10px;}
-.consent-section h3{font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
-.consent-section p{font-size:12px;color:var(--text2);line-height:1.6;}
-.consent-section ul{padding-left:1.25rem;margin-top:4px;}
-.consent-section li{font-size:12px;color:var(--text2);margin-bottom:3px;line-height:1.5;}
-.consent-check{display:flex;align-items:flex-start;gap:10px;padding:10px;border:1.5px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;}
-.consent-check input{width:18px;height:18px;flex-shrink:0;margin-top:1px;cursor:pointer;}
+/* ── CONSENT ── */
+.consent-overlay{position:fixed;inset:0;background:rgba(4,44,83,0.85);z-index:9999;display:flex;align-items:flex-end;justify-content:center;}
+.consent-sheet{background:var(--surface);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:1.5rem;width:100%;max-width:430px;max-height:92vh;overflow-y:auto;padding-bottom:2rem;}
+.consent-brand{text-align:center;margin-bottom:1.25rem;}
+.consent-brand-logo{width:56px;height:56px;background:var(--blue-deep);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;}
+.consent-brand-logo i{font-size:28px;color:#fff;}
+.consent-brand h2{font-size:1.1rem;font-weight:600;margin-bottom:2px;}
+.consent-brand p{font-size:12px;color:var(--text2);}
+.consent-block{background:var(--bg);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;}
+.consent-block h3{font-size:13px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px;color:var(--text);}
+.consent-block h3 i{font-size:15px;color:var(--blue-act);}
+.consent-block p,.consent-block li{font-size:12px;color:var(--text2);line-height:1.65;}
+.consent-block ul{padding-left:1.25rem;margin-top:4px;}
+.consent-check{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;cursor:pointer;transition:border-color .15s;}
+.consent-check:has(input:checked){border-color:var(--blue-act);background:var(--blue-light);}
+.consent-check input{width:18px;height:18px;flex-shrink:0;margin-top:1px;accent-color:var(--blue-act);}
 .consent-check span{font-size:13px;color:var(--text);line-height:1.5;}
-.consent-check span a{color:var(--accent2);text-decoration:underline;}
-.btn-consent{width:100%;padding:14px;border-radius:var(--radius-lg);border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;opacity:0.4;pointer-events:none;transition:all .2s;}
-.btn-consent.ready{opacity:1;pointer-events:all;}
+.btn-consent{width:100%;padding:14px;border-radius:var(--radius-lg);border:none;background:var(--blue-mid);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:10px;opacity:.4;pointer-events:none;transition:all .2s;font-family:inherit;}
+.btn-consent.ready{opacity:1;pointer-events:all;background:var(--blue-act);}
+.consent-legal{font-size:11px;color:var(--text3);text-align:center;margin-top:10px;}
 
-/* ── TOP BAR ── */
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 1rem;height:52px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:100;}
-.topbar-logo{font-size:13px;font-weight:700;color:var(--accent);flex:1;}
-.btn-lang{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);font-family:inherit;}
-.btn-theme{background:transparent;border:none;cursor:pointer;font-size:18px;}
+/* ── TOPBAR ── */
+.topbar{background:var(--blue-deep);height:54px;display:flex;align-items:center;padding:0 1rem;gap:10px;position:sticky;top:0;z-index:100;}
+.topbar-dot{width:8px;height:8px;border-radius:50%;background:var(--coral);}
+.topbar-line{width:2px;height:20px;background:rgba(216,90,48,.25);margin-left:3px;}
+.topbar-title{font-size:14px;font-weight:600;color:#fff;margin-left:4px;flex:1;}
+.topbar-curg{font-size:10px;color:#B5D4F4;white-space:nowrap;}
+.topbar-spacer{flex:1;}
+.btn-lang{background:rgba(255,255,255,.12);border:none;color:#fff;padding:4px 10px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-theme{background:transparent;border:none;cursor:pointer;color:#fff;font-size:18px;padding:4px;}
 
 /* ── SCREENS ── */
 .screen{display:none;padding:1.25rem 1rem 6rem;}
 .screen.active{display:block;}
 
-/* ── ONBOARDING ── */
-.welcome-hero{text-align:center;padding:2rem 1rem 1.5rem;}
-.welcome-icon{font-size:3.5rem;margin-bottom:1rem;}
-.welcome-title{font-size:1.4rem;font-weight:700;margin-bottom:0.5rem;}
-.welcome-sub{font-size:14px;color:var(--text2);line-height:1.6;}
+/* ── ONBOARD ── */
+.onboard-hero{text-align:center;padding:2rem 1rem 1.5rem;}
+.onboard-icon{width:72px;height:72px;background:var(--blue-deep);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;}
+.onboard-icon i{font-size:36px;color:#fff;}
+.onboard-title{font-size:1.3rem;font-weight:700;margin-bottom:6px;}
+.onboard-sub{font-size:14px;color:var(--text2);line-height:1.6;}
 .onboard-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;}
-.tab-row{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1.25rem;}
-.tab-btn{flex:1;padding:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text2);border-bottom:2px solid transparent;font-family:inherit;}
-.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
-
-/* ── BUTTONS ── */
-.btn{padding:10px 20px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--card);color:var(--text);font-size:14px;cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s;}
-.btn:active{transform:scale(0.97);}
-.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
-.btn-full{width:100%;padding:14px;font-size:15px;border-radius:var(--radius-lg);}
-.btn-outline{background:transparent;border:1.5px solid var(--accent);color:var(--accent);}
-.btn-danger-outline{background:var(--red-light);border:1px solid var(--red);color:var(--red);}
-.btn-pdf{background:var(--purple-light);border:1px solid var(--purple);color:var(--purple);display:flex;align-items:center;justify-content:center;gap:8px;}
+.tab-row{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.25rem;}
+.tab-btn{flex:1;padding:10px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--text2);border-bottom:2px solid transparent;font-family:inherit;}
+.tab-btn.active{color:var(--blue-act);border-bottom-color:var(--blue-act);}
 
 /* ── FORMS ── */
 .form-group{margin-bottom:14px;}
-.form-group label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;letter-spacing:0.04em;text-transform:uppercase;}
-.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--text);font-family:inherit;}
-.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--accent);}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+.form-group input,.form-group select,.form-group textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:11px;padding:11px 13px;font-size:15px;color:var(--text);font-family:inherit;transition:border-color .15s;}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--blue-act);}
+.form-group .req{color:var(--coral);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.field-err{background:var(--red-light);border:1.5px solid var(--red);border-radius:11px;}
+.err-msg{color:var(--red);font-size:11px;font-weight:600;margin-top:3px;}
 
-/* ── BOTTOM NAV ── */
+/* ── BUTTONS ── */
+.btn{padding:10px 18px;border-radius:var(--radius);border:1.5px solid var(--border2);background:var(--card);color:var(--text);font-size:14px;cursor:pointer;font-family:inherit;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:6px;}
+.btn:active{transform:scale(.97);}
+.btn i{font-size:15px;}
+.btn-primary{background:var(--blue-act);border-color:var(--blue-act);color:#fff;}
+.btn-coral{background:var(--coral);border-color:var(--coral);color:#fff;}
+.btn-outline{background:transparent;border-color:var(--blue-act);color:var(--blue-act);}
+.btn-danger{background:var(--red-light);border-color:var(--red);color:var(--red);}
+.btn-full{width:100%;justify-content:center;padding:14px;}
+.btn-pdf{background:var(--coral-light);border-color:var(--coral);color:var(--coral-dark);}
+
+/* ── NAV ── */
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0;cursor:pointer;}
-.nav-item.active .nav-icon,.nav-item.active .nav-label{color:var(--accent);}
-.nav-icon{font-size:20px;margin-bottom:2px;}
-.nav-label{font-size:9px;font-weight:600;color:var(--text3);}
+.nav-item.active .nav-icon,.nav-item.active .nav-lbl{color:var(--blue-act);}
+.nav-icon{font-size:22px;color:var(--text3);margin-bottom:2px;}
+.nav-lbl{font-size:9px;font-weight:600;color:var(--text3);}
+
+/* ── MAIN ── */
+.greeting-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;}
+.streak-badge{background:linear-gradient(135deg,#c05a20,#e87040);color:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;display:none;align-items:center;gap:5px;}
+.streak-badge i{font-size:12px;}
+
+/* ── SLEEP CARD ── */
+.sleep-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1.25rem;}
+.sleep-row{display:flex;gap:10px;align-items:flex-end;}
+.sleep-field{flex:1;}
+.sleep-label{font-size:11px;font-weight:600;color:var(--text2);display:flex;align-items:center;gap:4px;margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+.sleep-label i{font-size:13px;color:var(--blue-act);}
+.sleep-err{font-size:11px;color:var(--coral);margin-top:6px;display:flex;align-items:center;gap:4px;}
+
+/* ── WELLBEING ── */
+.wb-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1.25rem;}
+.wb-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.wb-title i{font-size:14px;color:var(--blue-act);}
+.wb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;}
+.wb-btn{padding:10px 6px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:11px;font-weight:600;text-align:center;font-family:inherit;transition:all .15s;color:var(--text2);}
+.wb-btn i{display:block;font-size:1.4rem;margin-bottom:3px;color:var(--text2);}
+.wb-btn.selected{border-color:var(--blue-act);background:var(--blue-light);color:var(--blue-mid);}
+.wb-btn.selected i{color:var(--blue-act);}
+.pain-row{display:flex;gap:4px;}
+.pain-btn{flex:1;padding:8px 2px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:12px;font-weight:600;text-align:center;font-family:inherit;color:var(--text2);}
+.pain-btn.selected{background:var(--red-light);border-color:var(--red);color:var(--red);}
+.wb-status{font-size:11px;color:var(--text3);text-align:right;margin-top:6px;}
 
 /* ── ACTION BUTTONS ── */
-.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem;}
-.action-btn{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;}
-.action-btn:active{transform:scale(0.96);}
-.action-btn-icon{font-size:2rem;}
-.action-btn-label{font-size:13px;font-weight:700;}
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem;}
+.action-btn{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1rem;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .15s;}
+.action-btn:active{transform:scale(.96);}
+.action-btn-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.action-btn-icon i{font-size:22px;}
+.action-btn-label{font-size:13px;font-weight:600;color:var(--text);}
 .action-btn-sub{font-size:11px;color:var(--text2);}
-.action-btn.primary{background:var(--accent-light);border-color:var(--accent);}
-.action-btn.primary .action-btn-label{color:var(--accent);}
+.action-btn.primary{background:var(--blue-light);border-color:var(--blue-act);}
+.action-btn.primary .action-btn-label{color:var(--blue-mid);}
+.action-btn.primary .action-btn-icon{background:var(--blue-act);}
+.action-btn.primary .action-btn-icon i{color:#fff;}
+.action-btn-icon.drink-icon{background:var(--green-light);}
+.action-btn-icon.drink-icon i{color:var(--green);}
+.action-btn-icon.leak-icon{background:var(--amber-light);}
+.action-btn-icon.leak-icon i{color:var(--amber);}
 
-/* ── CHRONOMETER ── */
-.chrono-wrap{border-radius:var(--radius-lg);padding:1.25rem;text-align:center;margin-bottom:1.25rem;background:var(--accent-light);border:1.5px solid var(--accent);}
-.chrono-wrap.calibrating{background:var(--amber-light);border-color:var(--amber);}
-.chrono-wrap.recording{background:var(--green-light);border-color:var(--green);}
-.chrono-label{font-size:10px;font-weight:700;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;margin-bottom:4px;}
-.chrono-wrap.calibrating .chrono-label{color:var(--amber);}
-.chrono-wrap.recording .chrono-label{color:var(--green);}
-.chrono-time{font-family:'JetBrains Mono',monospace;font-size:3rem;font-weight:500;color:var(--accent);letter-spacing:0.04em;}
-.chrono-wrap.recording .chrono-time{color:var(--green);}
-.chrono-state{font-size:12px;color:var(--text2);margin-top:4px;margin-bottom:10px;}
-.waveform-bar{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:40px;margin:8px 0;}
-.waveform-bar .bar{width:4px;background:var(--accent);border-radius:2px;transition:height .08s;min-height:3px;}
-.chrono-wrap.recording .waveform-bar .bar{background:var(--green);}
-.chrono-btns{display:flex;gap:10px;justify-content:center;}
-.btn-chrono-start{background:var(--accent);color:#fff;border:none;padding:12px 32px;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
-.btn-chrono-stop{background:var(--red);color:#fff;border:none;padding:12px 32px;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
-.btn-chrono-reset{background:transparent;border:1px solid var(--border2);padding:12px 14px;border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:inherit;color:var(--text2);}
-.mic-banner{display:none;background:var(--amber-light);border:1px solid var(--amber);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--amber);margin-bottom:8px;align-items:center;gap:6px;}
-
-/* ── URGENCY ── */
-.urgency-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
-.urgency-btn{padding:10px 4px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:11px;font-weight:600;text-align:center;font-family:inherit;color:var(--text2);}
-.urgency-btn.selected{background:var(--accent);color:#fff;border-color:var(--accent);}
-.u-num{font-size:1.1rem;display:block;font-family:'JetBrains Mono',monospace;}
-
-/* ── POSITION ── */
-.pos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.pos-btn{padding:14px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--bg);cursor:pointer;text-align:center;font-family:inherit;}
-.pos-btn.selected{background:var(--green-light);border-color:var(--green);}
-.pos-icon{font-size:2rem;display:block;margin-bottom:4px;}
-.pos-label{font-size:13px;font-weight:700;color:var(--text2);}
+/* ── INSTALL BANNER ── */
+.install-banner{background:var(--blue-deep);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:1.25rem;display:none;align-items:center;gap:12px;}
+.install-banner i{font-size:24px;color:var(--coral);flex-shrink:0;}
+.install-banner-text{flex:1;}
+.install-banner-text h3{font-size:13px;font-weight:600;color:#fff;margin-bottom:2px;}
+.install-banner-text p{font-size:11px;color:#B5D4F4;}
+.btn-install{background:var(--coral);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.btn-dismiss-banner{background:transparent;border:none;color:#B5D4F4;cursor:pointer;font-size:18px;padding:4px;}
 
 /* ── RECORDS ── */
-.record-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:10px;display:flex;align-items:flex-start;gap:12px;}
-.record-icon-wrap{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.records-header{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.records-header i{font-size:14px;color:var(--blue-act);}
+.record-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;}
+.record-icon-wrap{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.record-icon-wrap i{font-size:19px;}
+.ri-mic{background:var(--blue-light);}
+.ri-mic i{color:var(--blue-act);}
+.ri-drink{background:var(--green-light);}
+.ri-drink i{color:var(--green);}
+.ri-leak{background:var(--amber-light);}
+.ri-leak i{color:var(--amber);}
 .record-body{flex:1;}
-.record-time{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
-.record-title{font-size:14px;font-weight:700;margin-top:2px;}
+.record-time{font-size:11px;color:var(--text3);font-family:'Inter',monospace;display:flex;align-items:center;gap:4px;}
+.record-time i{font-size:12px;}
+.record-title{font-size:14px;font-weight:600;margin-top:2px;}
 .record-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
-.chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-.chip-blue{background:var(--accent-light);color:var(--accent);}
+.chip{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:500;}
+.chip i{font-size:11px;}
+.chip-blue{background:var(--blue-light);color:var(--blue-mid);}
 .chip-green{background:var(--green-light);color:var(--green);}
 .chip-amber{background:var(--amber-light);color:var(--amber);}
 .chip-red{background:var(--red-light);color:var(--red);}
-.chip-gray{background:var(--border);color:var(--text2);}
-.delete-btn{background:transparent;border:none;cursor:pointer;font-size:16px;color:var(--text3);padding:4px;border-radius:6px;}
+.chip-gray{background:var(--gray-bg);color:var(--text2);border:1px solid var(--border);}
+.chip-coral{background:var(--coral-light);color:var(--coral-dark);}
+.record-del{background:transparent;border:none;cursor:pointer;color:var(--text3);padding:4px;border-radius:6px;font-size:16px;}
+
+/* ── CHRONO ── */
+.chrono-wrap{border-radius:var(--radius-lg);padding:1.5rem;text-align:center;margin-bottom:1.25rem;background:var(--blue-light);border:1.5px solid var(--blue-act);transition:all .3s;}
+.chrono-wrap.calibrating{background:var(--amber-light);border-color:var(--amber);}
+.chrono-wrap.recording{background:var(--green-light);border-color:var(--green);}
+.chrono-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--blue-act);text-transform:uppercase;margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:6px;}
+.chrono-wrap.calibrating .chrono-label{color:var(--amber);}
+.chrono-wrap.recording .chrono-label{color:var(--green);}
+.chrono-label i{font-size:13px;}
+.chrono-time{font-family:'Inter',monospace;font-size:2.8rem;font-weight:300;color:var(--blue-mid);letter-spacing:.04em;}
+.chrono-wrap.recording .chrono-time{color:var(--green);}
+.chrono-state{font-size:12px;color:var(--text2);margin-top:4px;margin-bottom:12px;}
+.waveform{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:36px;margin:8px 0;}
+.wbar{width:3px;background:var(--blue-act);border-radius:2px;min-height:3px;transition:height .08s;}
+.chrono-wrap.recording .wbar{background:var(--green);}
+.chrono-btns{display:flex;gap:8px;justify-content:center;}
+.btn-start{background:var(--blue-act);color:#fff;border:none;padding:12px 28px;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;}
+.btn-start i{font-size:15px;}
+.btn-stop{background:var(--red);color:#fff;border:none;padding:12px 28px;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;}
+.btn-reset{background:transparent;border:1px solid var(--border2);padding:12px 14px;border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:inherit;color:var(--text2);}
+.mic-banner{display:none;background:var(--amber-light);border:1px solid var(--amber);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--amber);margin-bottom:8px;align-items:center;gap:6px;}
+.mic-banner i{font-size:14px;}
+
+/* ── URGENCY ── */
+.urgency-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
+.urg-btn{padding:10px 3px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:10px;font-weight:600;text-align:center;font-family:inherit;color:var(--text2);transition:all .15s;}
+.urg-btn .un{font-size:1rem;display:block;font-weight:500;margin-bottom:2px;}
+.urg-btn.selected{background:var(--blue-act);color:#fff;border-color:var(--blue-act);}
+
+/* ── POSITION ── */
+.pos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.pos-btn{padding:14px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--bg);cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;}
+.pos-btn i{display:block;font-size:28px;color:var(--text2);margin-bottom:4px;}
+.pos-btn span{font-size:13px;font-weight:600;color:var(--text2);}
+.pos-btn.selected{background:var(--green-light);border-color:var(--green);}
+.pos-btn.selected i,.pos-btn.selected span{color:var(--green);}
 
 /* ── ANALYSIS ── */
-.period-selector{display:flex;gap:6px;margin-bottom:1.25rem;}
-.period-btn{flex:1;padding:8px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text2);}
-.period-btn.active{background:var(--accent-light);border-color:var(--accent);color:var(--accent);}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem;}
-.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;}
-.stat-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;}
-.stat-val{font-size:1.4rem;font-weight:700;margin-top:4px;font-family:'JetBrains Mono',monospace;}
-.stat-unit{font-size:12px;color:var(--text2);font-weight:400;}
-.stat-ref{font-size:10px;color:var(--text3);margin-top:2px;}
-.semaphore{display:flex;gap:8px;margin-bottom:1.25rem;}
-.sem-item{flex:1;border-radius:var(--radius);padding:12px 8px;text-align:center;}
-.sem-icon{font-size:1.5rem;margin-bottom:4px;}
-.sem-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;}
+.period-sel{display:flex;gap:6px;margin-bottom:1.25rem;}
+.period-btn{flex:1;padding:8px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text2);}
+.period-btn.active{background:var(--blue-light);border-color:var(--blue-act);color:var(--blue-mid);}
+.sem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem;}
+.sem-item{border-radius:var(--radius);padding:10px 6px;text-align:center;}
+.sem-item i{font-size:1.4rem;display:block;margin-bottom:4px;}
+.sem-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;}
 .sem-val{font-size:13px;font-weight:600;margin-top:2px;}
 .sem-green{background:var(--green-light);color:var(--green);}
 .sem-amber{background:var(--amber-light);color:var(--amber);}
 .sem-red{background:var(--red-light);color:var(--red);}
-.sem-gray{background:var(--bg);color:var(--text2);border:1px solid var(--border);}
-.chart-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1rem;}
-.chart-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+.sem-gray{background:var(--gray-bg);color:var(--text2);border:1px solid var(--border);}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:.875rem;}
+.stat-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
+.stat-val{font-size:1.3rem;font-weight:500;margin-top:4px;color:var(--text);}
+.stat-unit{font-size:12px;color:var(--text2);font-weight:400;}
+.stat-ref{font-size:10px;color:var(--text3);margin-top:2px;}
+.chart-sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1rem;}
+.chart-lbl{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+.chart-lbl i{font-size:14px;color:var(--blue-act);}
 .chart-wrap{height:160px;position:relative;}
-.normal-range{font-size:11px;color:var(--text3);margin-top:6px;padding:6px 10px;background:var(--bg);border-radius:8px;display:flex;align-items:center;gap:6px;}
+.night-sec{background:rgba(106,27,154,.08);border:1px solid rgba(106,27,154,.2);border-radius:var(--radius);padding:10px 12px;margin-bottom:1rem;}
+.night-sec h4{font-size:12px;font-weight:700;color:#6a1b9a;margin-bottom:4px;display:flex;align-items:center;gap:5px;}
+.night-sec h4 i{font-size:14px;}
+.night-sec p{font-size:12px;color:var(--text2);}
+.ref-note{font-size:11px;color:var(--text3);margin-top:6px;padding:6px 10px;background:var(--bg);border-radius:8px;display:flex;align-items:center;gap:5px;}
+.ref-note i{font-size:12px;}
 
 /* ── INSTRUCTIONS ── */
-.instr-section{margin-bottom:1.5rem;}
-.instr-h2{font-size:1rem;font-weight:700;margin-bottom:0.75rem;display:flex;align-items:center;gap:8px;}
-.instr-h3{font-size:14px;font-weight:700;margin-bottom:0.5rem;display:flex;align-items:center;gap:6px;}
+.instr-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
+.instr-h2{font-size:15px;font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:8px;color:var(--text);}
+.instr-h2 i{font-size:18px;color:var(--blue-act);}
+.instr-h3{font-size:13px;font-weight:600;margin:.875rem 0 .5rem;display:flex;align-items:center;gap:6px;}
+.instr-h3 i{font-size:15px;color:var(--text2);}
 .instr-p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px;}
 .instr-ul{padding-left:1.25rem;margin-bottom:8px;}
-.instr-ul li{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:4px;}
-.scale-row{display:flex;gap:10px;align-items:flex-start;padding:8px;border-radius:8px;margin-bottom:6px;}
-.scale-num{font-size:13px;font-weight:700;min-width:24px;padding:2px 6px;border-radius:6px;text-align:center;}
-.scale-desc{font-size:13px;color:var(--text2);line-height:1.5;}
-.info-box{background:var(--accent-light);border:1px solid var(--accent);border-radius:var(--radius);padding:12px 14px;margin-bottom:1rem;}
-.info-box p{font-size:13px;color:var(--accent);line-height:1.6;}
+.instr-ul li{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:3px;}
+.scale-row{display:flex;gap:10px;align-items:flex-start;padding:8px;border-radius:8px;margin-bottom:5px;}
+.scale-num{font-size:12px;font-weight:700;min-width:24px;padding:2px 6px;border-radius:6px;text-align:center;}
+.scale-desc{font-size:12px;color:var(--text2);line-height:1.5;}
+.info-box{background:var(--blue-light);border:1px solid var(--blue-act);border-radius:var(--radius);padding:12px 14px;margin-bottom:1rem;display:flex;gap:10px;}
+.info-box i{font-size:18px;color:var(--blue-act);flex-shrink:0;margin-top:1px;}
+.info-box p{font-size:13px;color:var(--blue-mid);line-height:1.6;}
 
 /* ── ABOUT ── */
-.about-hero{background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;color:#fff;text-align:center;}
-.about-hero h2{font-size:1.2rem;font-weight:700;margin-bottom:6px;}
-.about-hero p{font-size:13px;opacity:0.85;line-height:1.6;}
-.about-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
-.about-section h3{font-size:14px;font-weight:700;margin-bottom:0.75rem;display:flex;align-items:center;gap:8px;}
-.about-section p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px;}
-.about-section ul{padding-left:1.25rem;}
-.about-section li{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:4px;}
+.about-hero{background:var(--blue-deep);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;text-align:center;}
+.about-hero h2{font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:6px;}
+.about-hero p{font-size:13px;color:#B5D4F4;line-height:1.6;}
+.about-brands{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.15);}
+.brand-pill{background:rgba(255,255,255,.1);border-radius:20px;padding:4px 12px;font-size:12px;}
+.brand-pill span{color:#fff;font-weight:600;}
+.brand-pill.coral span{color:var(--coral);}
+.about-sec{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
+.about-h3{font-size:14px;font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:8px;}
+.about-h3 i{font-size:17px;color:var(--blue-act);}
+.about-p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px;}
+.about-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
+.about-table th{background:var(--bg);padding:6px 8px;text-align:left;font-weight:600;color:var(--text2);}
+.about-table td{padding:6px 8px;border-top:1px solid var(--border);color:var(--text2);}
 .ref-item{padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.6;}
 .ref-item:last-child{border-bottom:none;}
-.ref-num{font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;margin-right:6px;}
-.threshold-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
-.threshold-table th{background:var(--bg);padding:6px 8px;text-align:left;font-weight:600;color:var(--text2);}
-.threshold-table td{padding:6px 8px;border-top:1px solid var(--border);}
-.version-badge{font-size:11px;color:var(--text3);text-align:center;margin-top:1rem;padding-bottom:0.5rem;}
+.ref-num{font-weight:700;color:var(--blue-act);margin-right:5px;}
+.version-note{font-size:11px;color:var(--text3);text-align:center;padding:1rem 0 .5rem;}
 
-/* ── STREAK ── */
-.streak-banner{background:linear-gradient(135deg,#ff6f00,#ffa000);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:12px;color:#fff;}
-.streak-fire{font-size:2rem;}
-.streak-text h3{font-size:1rem;font-weight:700;margin-bottom:2px;}
-.streak-text p{font-size:12px;opacity:0.85;}
-
-/* ── WELLBEING ── */
-.wb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;}
-.wb-btn{padding:10px 6px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:11px;font-weight:600;text-align:center;font-family:inherit;transition:all .15s;}
-.wb-btn.selected{border-color:var(--accent);background:var(--accent-light);}
-.wb-btn .wb-icon{font-size:1.4rem;display:block;margin-bottom:3px;}
-.pain-row{display:flex;gap:4px;margin-top:6px;}
-.pain-btn{flex:1;padding:7px 2px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:11px;font-weight:600;text-align:center;font-family:inherit;}
-.pain-btn.selected{background:var(--red-light);border-color:var(--red);color:var(--red);}
-
-/* ── INSTALL BANNER ── */
-.install-banner{background:linear-gradient(135deg,var(--accent),#42a5f5);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:12px;color:#fff;}
-.install-banner-text{flex:1;}
-.install-banner-text h3{font-size:13px;font-weight:700;margin-bottom:2px;}
-.install-banner-text p{font-size:11px;opacity:0.85;}
-.btn-install{background:#fff;color:var(--accent);border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;}
-.btn-dismiss{background:transparent;border:none;color:#fff;cursor:pointer;font-size:18px;padding:4px;}
-
-/* ── NOTIFICATIONS ── */
+/* ── PROFILE ── */
+.profile-avatar{width:56px;height:56px;border-radius:50%;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:var(--blue-mid);}
 .notif-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
 .notif-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
 .notif-row:last-child{border-bottom:none;}
-.notif-info{flex:1;}
-.notif-label{font-size:13px;font-weight:600;}
-.notif-sub{font-size:11px;color:var(--text2);margin-top:2px;}
-.toggle{width:44px;height:24px;background:var(--border2);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;border:none;flex-shrink:0;}
-.toggle.on{background:var(--accent);}
+.notif-info h4{font-size:13px;font-weight:600;}
+.notif-info p{font-size:11px;color:var(--text2);margin-top:2px;}
+.notif-icon{width:32px;height:32px;border-radius:8px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;margin-right:10px;flex-shrink:0;}
+.notif-icon i{font-size:16px;color:var(--blue-act);}
+.notif-left{display:flex;align-items:center;}
+.toggle{width:44px;height:24px;background:var(--border2);border-radius:12px;position:relative;cursor:pointer;border:none;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--blue-act);}
 .toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s;}
 .toggle.on::after{left:23px;}
 
-/* ── NIGHT SECTION ── */
-.night-section{background:var(--purple-light);border:1px solid var(--purple);border-radius:var(--radius);padding:10px 12px;margin-bottom:1rem;}
-.night-section h4{font-size:12px;font-weight:700;color:var(--purple);margin-bottom:4px;}
-.night-section p{font-size:12px;color:var(--text2);}
-
 /* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay{position:fixed;inset:0;background:rgba(4,44,83,.6);z-index:200;display:none;align-items:flex-end;justify-content:center;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--surface);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:1.5rem;width:100%;max-width:430px;max-height:92vh;overflow-y:auto;padding-bottom:2rem;}
-.modal-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 1.25rem;}
-.modal-title{font-size:1.1rem;font-weight:700;margin-bottom:1.25rem;}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 1.25rem;}
+.modal-title{font-size:1rem;font-weight:700;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;}
+.modal-title i{font-size:20px;color:var(--blue-act);}
 .modal-footer{display:flex;gap:10px;margin-top:1.25rem;}
-.modal-footer .btn{flex:1;}
-.code-input{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;text-align:center;letter-spacing:0.2em;text-transform:uppercase;border:2px solid var(--accent);border-radius:var(--radius);padding:14px;width:100%;}
-.msg-error{color:var(--red);font-size:12px;margin-top:8px;text-align:center;font-weight:600;}
+.modal-footer .btn{flex:1;justify-content:center;}
+.code-input{font-family:'Inter',monospace;font-size:1.8rem;font-weight:500;text-align:center;letter-spacing:.2em;text-transform:uppercase;border:2px solid var(--blue-act);border-radius:var(--radius);padding:14px;width:100%;background:var(--bg);color:var(--text);}
+.msg-error{color:var(--red);font-size:12px;margin-top:8px;text-align:center;font-weight:500;display:flex;align-items:center;justify-content:center;gap:4px;}
+.msg-error i{font-size:13px;}
+
+/* ── FOOTER BRAND ── */
+.brand-footer{padding:1rem;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+.brand-footer-text{font-size:11px;color:var(--text3);}
+.brand-footer-text .innoia{color:var(--coral);font-weight:600;}
+.brand-footer-text .curg{color:var(--blue-act);font-weight:600;}
+
 .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--text3);}
-.empty-state .ei{font-size:2.5rem;margin-bottom:0.75rem;}
+.empty-state i{font-size:2.5rem;display:block;margin-bottom:.75rem;}
 </style>
 </head>
 <body>
 
-<!-- ══ CONSENT SCREEN ══ -->
-<div id="consentScreen" class="consent-screen" style="display:none">
-  <div class="consent-box">
-    <div class="consent-logo"><div class="consent-logo-icon">🏥</div></div>
-    <div class="consent-title">CURG Diario Miccional</div>
-    <div class="consent-sub">Antes de continuar, necesitamos tu consentimiento</div>
-
-    <div class="consent-section">
-      <h3>🔒 ¿Qué datos recopilamos?</h3>
+<!-- CONSENT -->
+<div id="consentOverlay" class="consent-overlay" style="display:none">
+  <div class="consent-sheet">
+    <div class="consent-brand">
+      <div class="consent-brand-logo"><i class="ti ti-clipboard-heart"></i></div>
+      <h2>Diario Miccional</h2>
+      <p>Desarrollado por <strong style="color:var(--coral)">InnoIA</strong> · Verificado por <strong style="color:var(--blue-act)">CURG</strong></p>
+    </div>
+    <div class="consent-block">
+      <h3><i class="ti ti-lock"></i> Datos que recopilamos</h3>
       <ul>
-        <li>Datos de salud: registros de micción, volumen, urgencia, fugas y bebidas.</li>
-        <li>Datos personales básicos: nombre, edad, género, teléfono, email.</li>
-        <li>Datos de uso del micrófono: análisis acústico durante la micción (solo audio procesado, no grabaciones).</li>
-        <li>No recopilamos ubicación, contactos ni ningún otro dato del dispositivo.</li>
+        <li>Registros de salud: micciones, bebidas, fugas, bienestar y sueño</li>
+        <li>Datos personales: nombre, edad, género, teléfono, email</li>
+        <li>Análisis acústico: señal de audio procesada en tiempo real (no se graba)</li>
+        <li>No recopilamos ubicación, contactos ni datos del dispositivo</li>
       </ul>
     </div>
-    <div class="consent-section">
-      <h3>🎯 ¿Para qué los usamos?</h3>
+    <div class="consent-block">
+      <h3><i class="ti ti-target"></i> Para qué los usamos</h3>
       <ul>
-        <li>Generar tu diario miccional y compartirlo con tu médico tratante.</li>
-        <li>Calcular análisis clínicos de apoyo diagnóstico.</li>
-        <li>Nunca vendemos ni compartimos tus datos con terceros comerciales.</li>
+        <li>Generar tu diario y compartirlo con tu médico tratante</li>
+        <li>Calcular análisis clínicos de apoyo diagnóstico</li>
+        <li>No vendemos ni compartimos tus datos con terceros comerciales</li>
       </ul>
     </div>
-    <div class="consent-section">
-      <h3>⚖️ Base legal</h3>
-      <p>Tratamos tus datos bajo tu consentimiento explícito, conforme a la <strong>Ley 1581 de 2012</strong> (Colombia), <strong>Ley Federal de Protección de Datos Personales</strong> (México), y normativas equivalentes en países latinoamericanos.</p>
+    <div class="consent-block">
+      <h3><i class="ti ti-scale"></i> Base legal</h3>
+      <p>Tratamiento de datos bajo consentimiento explícito conforme a la <strong>Ley 1581 de 2012</strong> (Colombia) y normativas equivalentes en Latinoamérica.</p>
     </div>
-    <div class="consent-section">
-      <h3>🗑️ Tus derechos</h3>
+    <div class="consent-block">
+      <h3><i class="ti ti-user-check"></i> Tus derechos</h3>
       <ul>
-        <li>Acceder, corregir o eliminar tus datos en cualquier momento.</li>
-        <li>Revocar este consentimiento desde la sección Perfil.</li>
-        <li>Solicitar portabilidad de tus datos escribiendo a: <strong>curg@datamedica.app</strong></li>
+        <li>Acceder, corregir o eliminar tus datos desde la sección Perfil</li>
+        <li>Revocar este consentimiento en cualquier momento</li>
+        <li>Contacto: <strong>privacidad@innoia.app</strong></li>
       </ul>
     </div>
-
-    <label class="consent-check" onclick="checkConsent()">
-      <input type="checkbox" id="check1">
-      <span>He leído y acepto el tratamiento de mis datos de salud según la política de privacidad de CURG Diario Miccional.</span>
-    </label>
-    <label class="consent-check" onclick="checkConsent()">
-      <input type="checkbox" id="check2">
-      <span>Entiendo que el análisis acústico del micrófono es un apoyo clínico y <strong>no reemplaza</strong> una evaluación médica profesional.</span>
-    </label>
-    <label class="consent-check" onclick="checkConsent()">
-      <input type="checkbox" id="check3">
-      <span>Soy mayor de 18 años o cuento con autorización de mi tutor legal.</span>
-    </label>
-
+    <label class="consent-check"><input type="checkbox" id="ck1" onchange="checkConsent()"><span>Acepto el tratamiento de mis datos de salud según la política de privacidad de Diario Miccional by InnoIA.</span></label>
+    <label class="consent-check"><input type="checkbox" id="ck2" onchange="checkConsent()"><span>Entiendo que el análisis acústico es un apoyo clínico y no reemplaza una evaluación médica profesional.</span></label>
+    <label class="consent-check"><input type="checkbox" id="ck3" onchange="checkConsent()"><span>Soy mayor de 18 años o cuento con autorización de mi tutor legal.</span></label>
     <button class="btn-consent" id="btnConsent" onclick="acceptConsent()">Aceptar y continuar</button>
-    <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px">Versión de política: junio 2026 · CURG Diario Miccional</div>
+    <div class="consent-legal">Política v2.0 · junio 2026 · InnoIA · Verificado CURG</div>
   </div>
 </div>
 
-<!-- TOP BAR -->
+<!-- TOPBAR -->
 <div class="topbar" id="topbar" style="display:none">
-  <div class="topbar-logo">🏥 CURG</div>
-  <button class="btn-lang" onclick="toggleLang()" id="langBtn">EN</button>
-  <button class="btn-theme" onclick="toggleTheme()">🌙</button>
+  <div class="topbar-dot"></div>
+  <div class="topbar-line"></div>
+  <span class="topbar-title">Diario Miccional</span>
+  <span class="topbar-curg">verificado por CURG</span>
+  <button class="btn-lang" id="langBtn" onclick="toggleLang()">EN</button>
+  <button class="btn-theme" onclick="toggleTheme()"><i class="ti ti-moon" id="themeIcon"></i></button>
 </div>
 
-<!-- ══ ONBOARDING ══ -->
+<!-- ONBOARDING -->
 <div class="screen active" id="screen-onboard">
-  <div class="welcome-hero">
-    <div class="welcome-icon">🚿</div>
-    <div class="welcome-title">Diario Miccional</div>
-    <div class="welcome-sub">Registra y comparte tu diario con tu médico de forma segura.</div>
+  <div class="onboard-hero">
+    <div class="onboard-icon"><i class="ti ti-clipboard-heart"></i></div>
+    <div class="onboard-title">Diario Miccional</div>
+    <div class="onboard-sub">Registra y comparte tu diario con tu médico de forma segura.</div>
+    <div style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:10px">
+      <span style="font-size:11px;color:var(--coral);font-weight:600">by InnoIA</span>
+      <span style="font-size:11px;color:var(--text3)">·</span>
+      <span style="font-size:11px;color:var(--blue-act);font-weight:600">verificado CURG</span>
+    </div>
   </div>
   <div class="onboard-card">
     <div class="tab-row">
-      <button class="tab-btn active" onclick="onboardTab(this,'ob-code')">Tengo un código</button>
-      <button class="tab-btn" onclick="onboardTab(this,'ob-register')">Registrarme</button>
+      <button class="tab-btn active" onclick="obTab(this,'ob-code')">Tengo un código</button>
+      <button class="tab-btn" onclick="obTab(this,'ob-reg')">Registrarme</button>
     </div>
     <div id="ob-code">
-      <div style="font-size:14px;color:var(--text2);margin-bottom:1rem">Tu médico te dio un código de 8 letras. Ingrésalo aquí:</div>
-      <div class="form-group">
-        <input class="code-input" type="text" id="accessCodeInput" maxlength="9" placeholder="XXXX-XXXX" oninput="formatCode(this)">
-      </div>
-      <div class="form-group">
-        <label>Tu nombre (para confirmar)</label>
-        <input type="text" id="codePatientName" placeholder="Tu nombre completo">
-      </div>
-      <button class="btn btn-primary btn-full" onclick="connectWithCode()">Conectar</button>
-      <div id="codeError" class="msg-error"></div>
+      <p style="font-size:14px;color:var(--text2);margin-bottom:1rem">Tu médico te dio un código de 8 caracteres. Ingrésalo aquí:</p>
+      <div class="form-group"><input class="code-input" type="text" id="codeInput" maxlength="9" placeholder="XXXX-XXXX" oninput="fmtCode(this)"></div>
+      <div class="form-group"><label>Tu nombre</label><input type="text" id="codeName" placeholder="Tu nombre completo"></div>
+      <button class="btn btn-primary btn-full" onclick="connectCode()"><i class="ti ti-link"></i>Conectar</button>
+      <div id="codeErr" class="msg-error" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
     </div>
-    <div id="ob-register" style="display:none">
+    <div id="ob-reg" style="display:none">
       <div class="form-row">
-        <div class="form-group"><label>Nombre *</label><input type="text" id="regNombre" placeholder="María López"></div>
-        <div class="form-group"><label>Fecha de nac.</label><input type="date" id="regNac"></div>
+        <div class="form-group"><label>Nombre <span class="req">*</span></label><input type="text" id="rN" placeholder="María López"></div>
+        <div class="form-group"><label>Fecha nac.</label><input type="date" id="rD"></div>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label>Género</label>
-          <select id="regGenero"><option value="">—</option><option value="f">Femenino</option><option value="m">Masculino</option><option value="o">Otro</option></select>
-        </div>
-        <div class="form-group"><label>Teléfono</label><input type="tel" id="regTel" placeholder="+57 300..."></div>
+        <div class="form-group"><label>Género</label><select id="rG"><option value="">—</option><option value="f">Femenino</option><option value="m">Masculino</option><option value="o">Otro</option></select></div>
+        <div class="form-group"><label>Teléfono</label><input type="tel" id="rT" placeholder="+57 300..."></div>
       </div>
-      <div class="form-group"><label>Email</label><input type="email" id="regEmail" placeholder="tu@email.com"></div>
-      <div class="form-group"><label>Diagnóstico (si lo conoces)</label><input type="text" id="regDiag" placeholder="Opcional"></div>
-      <button class="btn btn-primary btn-full" onclick="selfRegister()">Crear perfil</button>
-      <div id="regError" class="msg-error"></div>
-      <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px">Tu perfil quedará pendiente hasta que tu médico lo confirme.</div>
+      <div class="form-group"><label>Email</label><input type="email" id="rE" placeholder="tu@email.com"></div>
+      <div class="form-group"><label>Diagnóstico (si lo conoces)</label><input type="text" id="rDiag" placeholder="Opcional"></div>
+      <button class="btn btn-primary btn-full" onclick="selfReg()"><i class="ti ti-user-plus"></i>Crear perfil</button>
+      <div id="regErr" class="msg-error" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
+      <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:10px">Tu perfil quedará pendiente hasta que tu médico lo confirme.</p>
     </div>
+  </div>
+  <div class="brand-footer">
+    <span class="brand-footer-text">Desarrollado por <span class="innoia">InnoIA</span> · Verificado por <span class="curg">CURG</span> · Colombian Urology Research Group</span>
   </div>
 </div>
 
-<!-- ══ DIARIO ══ -->
+<!-- DIARIO -->
 <div class="screen" id="screen-main">
-  <!-- Install Banner -->
-  <div class="install-banner" id="installBanner" style="display:none">
-    <div style="font-size:2rem">📲</div>
-    <div class="install-banner-text">
-      <h3>Instalar como app</h3>
-      <p>Accede más rápido desde tu pantalla de inicio</p>
-    </div>
-    <button class="btn-install" id="btnInstall" onclick="installPWA()">Instalar</button>
-    <button class="btn-dismiss" onclick="dismissInstall()">✕</button>
+  <div class="install-banner" id="installBanner">
+    <i class="ti ti-device-mobile-down"></i>
+    <div class="install-banner-text"><h3>Instalar como app</h3><p>Accede desde tu pantalla de inicio</p></div>
+    <button class="btn-install" onclick="installPWA()">Instalar</button>
+    <button class="btn-dismiss-banner" onclick="dismissInstall()"><i class="ti ti-x"></i></button>
   </div>
-
-  <div style="margin-bottom:1.25rem;display:flex;align-items:flex-start;justify-content:space-between">
+  <div class="greeting-row">
     <div>
-      <div style="font-size:1.1rem;font-weight:700" id="greetingName">Hola 👋</div>
-      <div style="font-size:13px;color:var(--text2)" id="greetingDate"></div>
+      <div style="font-size:1.05rem;font-weight:600" id="greetName">Hola</div>
+      <div style="font-size:13px;color:var(--text2)" id="greetDate"></div>
     </div>
-    <div id="streakBadge" style="display:none;background:linear-gradient(135deg,#ff6f00,#ffa000);color:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px">
-      🔥 <span id="streakDays">0</span> días
-    </div>
+    <div class="streak-badge" id="streakBadge"><i class="ti ti-flame"></i><span id="streakDays">0</span> días</div>
   </div>
-
-  <!-- Wellbeing daily check -->
-  <div id="wellbeingSection" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1.25rem">
-    <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">¿Cómo te sientes hoy?</div>
-    <div class="wb-grid">
-      <button class="wb-btn" onclick="setWellbeing('great')"><span class="wb-icon">😊</span>Muy bien</button>
-      <button class="wb-btn" onclick="setWellbeing('ok')"><span class="wb-icon">😐</span>Regular</button>
-      <button class="wb-btn" onclick="setWellbeing('bad')"><span class="wb-icon">😔</span>Mal</button>
+  <!-- Sleep -->
+  <div class="sleep-card">
+    <div class="sleep-row">
+      <div class="sleep-field">
+        <div class="sleep-label"><i class="ti ti-sun"></i>Me levanté</div>
+        <input type="time" id="wakeTime" style="background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:15px;color:var(--text);font-family:inherit;width:100%">
+      </div>
+      <div class="sleep-field">
+        <div class="sleep-label"><i class="ti ti-moon"></i>Me acuesto</div>
+        <input type="time" id="sleepTime" style="background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;font-size:15px;color:var(--text);font-family:inherit;width:100%">
+      </div>
+      <button class="btn btn-primary" style="height:44px;padding:0 14px;border-radius:10px;font-size:13px;align-self:flex-end" onclick="saveSleep()"><i class="ti ti-device-floppy"></i></button>
     </div>
-    <div style="font-size:11px;font-weight:600;color:var(--text2);margin:8px 0 4px;text-transform:uppercase;letter-spacing:0.04em">Dolor / malestar pélvico</div>
+    <div class="sleep-err" id="sleepErr" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
+  </div>
+  <!-- Wellbeing -->
+  <div class="wb-card">
+    <div class="wb-title"><i class="ti ti-heart-rate-monitor"></i>¿Cómo te sientes hoy?</div>
+    <div class="wb-grid">
+      <button class="wb-btn" onclick="setWb('great')"><i class="ti ti-mood-happy"></i>Muy bien</button>
+      <button class="wb-btn" onclick="setWb('ok')"><i class="ti ti-mood-neutral"></i>Regular</button>
+      <button class="wb-btn" onclick="setWb('bad')"><i class="ti ti-mood-sad"></i>Mal</button>
+    </div>
+    <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">Dolor / malestar pélvico</div>
     <div class="pain-row">
       <button class="pain-btn" onclick="setPain(0)">0<br><span style="font-size:9px">Nada</span></button>
       <button class="pain-btn" onclick="setPain(1)">1</button>
@@ -411,320 +477,271 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
       <button class="pain-btn" onclick="setPain(4)">4</button>
       <button class="pain-btn" onclick="setPain(5)">5<br><span style="font-size:9px">Mucho</span></button>
     </div>
-    <div id="wellbeingStatus" style="font-size:11px;color:var(--text3);margin-top:8px;text-align:right"></div>
+    <div class="wb-status" id="wbStatus"></div>
   </div>
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1.25rem;display:flex;gap:10px;align-items:flex-end">
-    <div class="form-group" style="flex:1;margin:0"><label>🌅 Me levanté</label><input type="time" id="wakeTime"></div>
-    <div class="form-group" style="flex:1;margin:0"><label>🌙 Me acuesto</label><input type="time" id="sleepTime"></div>
-    <button class="btn btn-primary" style="height:46px;padding:0 14px;border-radius:12px;font-size:13px" onclick="saveSleep()">Guardar</button>
-  </div>
-  <div id="sleepErr" style="font-size:12px;margin-top:4px;text-align:center"></div>
+  <!-- Actions -->
   <div class="action-grid">
-    <div class="action-btn primary" onclick="openModal('miction')" style="grid-column:1/-1">
-      <div class="action-btn-icon">🚽</div>
-      <div class="action-btn-label">+ Registrar micción</div>
-      <div class="action-btn-sub">Con cronómetro y análisis acústico</div>
+    <div class="action-btn primary" onclick="openM('miction')" style="grid-column:1/-1">
+      <div class="action-btn-icon"><i class="ti ti-droplets"></i></div>
+      <div><div class="action-btn-label">Registrar micción</div><div class="action-btn-sub">Con cronómetro y análisis acústico</div></div>
     </div>
-    <div class="action-btn" onclick="openModal('drink')"><div class="action-btn-icon">💧</div><div class="action-btn-label">+ Bebida</div></div>
-    <div class="action-btn" onclick="openModal('leak')"><div class="action-btn-icon">⚠️</div><div class="action-btn-label">+ Fuga</div></div>
+    <div class="action-btn" onclick="openM('drink')">
+      <div class="action-btn-icon drink-icon"><i class="ti ti-droplet"></i></div>
+      <div class="action-btn-label">Bebida</div>
+    </div>
+    <div class="action-btn" onclick="openM('leak')">
+      <div class="action-btn-icon leak-icon"><i class="ti ti-alert-triangle"></i></div>
+      <div class="action-btn-label">Fuga</div>
+    </div>
   </div>
-  <div style="font-size:13px;font-weight:700;margin-bottom:10px">Registros de hoy</div>
+  <div class="records-header"><i class="ti ti-list"></i>Registros de hoy</div>
   <div id="recordsList"></div>
 </div>
 
-<!-- ══ MI ANÁLISIS ══ -->
+<!-- ANÁLISIS -->
 <div class="screen" id="screen-analysis">
-  <div style="font-size:1.1rem;font-weight:700;margin-bottom:1rem">📊 Mi análisis</div>
-  <div class="period-selector">
+  <div style="font-size:1rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:8px"><i class="ti ti-chart-bar" style="color:var(--blue-act);font-size:20px"></i>Mi análisis</div>
+  <div class="period-sel">
     <button class="period-btn active" onclick="setPeriod('today',this)">Hoy</button>
     <button class="period-btn" onclick="setPeriod('week',this)">7 días</button>
   </div>
   <div id="analysisContent"></div>
-  <button class="btn btn-pdf btn-full" onclick="generatePDF()" style="margin-top:0.5rem">
-    📄 Descargar informe PDF
-  </button>
-  <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px">El informe incluye análisis clínico completo para llevar a tu consulta médica</div>
+  <button class="btn btn-pdf btn-full" onclick="genPDF()" style="margin-top:.5rem"><i class="ti ti-file-report"></i>Descargar informe PDF</button>
+  <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px">Informe clínico completo para llevar a consulta médica</p>
 </div>
 
-<!-- ══ INSTRUCCIONES ══ -->
+<!-- INSTRUCCIONES -->
 <div class="screen" id="screen-instructions">
-  <div class="info-box"><p>💡 <strong>¿Por qué es tan importante este diario?</strong><br>Piensa en él como una "fotografía" de tu salud urinaria. Los datos precisos que anotes son la herramienta más valiosa para que tu médico pueda diagnosticar correctamente y ofrecerte el mejor tratamiento. ¡Tu colaboración es fundamental!</p></div>
-
-  <div class="instr-section">
-    <div class="instr-h2">💧 Al registrar una Bebida</div>
+  <div class="info-box"><i class="ti ti-info-circle"></i><p><strong>¿Por qué es tan importante este diario?</strong> Piensa en él como una fotografía de tu salud urinaria. Los datos precisos que anotes son la herramienta más valiosa para que tu médico pueda diagnosticar correctamente y ofrecerte el mejor tratamiento.</p></div>
+  <div class="instr-card">
+    <div class="instr-h2"><i class="ti ti-droplet"></i>Al registrar una Bebida</div>
     <ul class="instr-ul">
-      <li><strong>Tipo de bebida:</strong> sé específico. No es lo mismo "café" que "café descafeinado", ni "agua" que "refresco de cola". El tipo afecta la producción de orina.</li>
-      <li><strong>Cantidad (ml):</strong> mide el volumen lo mejor que puedas. Usa la referencia del envase (una lata = 330 ml) o un vaso medidor de cocina.</li>
+      <li><strong>Tipo:</strong> sé específico — café vs café descafeinado, agua vs refresco. El tipo afecta la producción de orina.</li>
+      <li><strong>Cantidad (ml):</strong> usa el envase como referencia (lata = 330 ml) o un vaso medidor.</li>
+    </ul>
+    <div class="instr-h2" style="margin-top:1rem"><i class="ti ti-droplets"></i>Al registrar una Micción</div>
+    <ul class="instr-ul">
+      <li><strong>Volumen (ml):</strong> el dato más importante. Orina en una jarra medidora y anota la cantidad.</li>
+      <li><strong>Cronómetro:</strong> presiona Iniciar al comenzar y Detener al terminar.</li>
+      <li><strong>Análisis acústico:</strong> el micrófono se activa solo. Calibra 2 seg el ruido ambiente y luego analiza la fuerza del chorro. No se graba nada.</li>
+      <li><strong>Posición (hombres):</strong> sentado o de pie influye en el patrón de flujo.</li>
+    </ul>
+    <div class="instr-h3"><i class="ti ti-ruler"></i>Escala de Urgencia</div>
+    <div class="scale-row" style="background:var(--bg)"><span class="scale-num" style="background:#e0e0e0;color:#555">0</span><span class="scale-desc"><strong>Sin urgencia:</strong> fuiste por comodidad o precaución.</span></div>
+    <div class="scale-row" style="background:var(--green-light)"><span class="scale-num" style="background:var(--green-light);color:var(--green)">1</span><span class="scale-desc"><strong>Leve:</strong> podías haber esperado sin problema.</span></div>
+    <div class="scale-row" style="background:var(--amber-light)"><span class="scale-num" style="background:var(--amber-light);color:var(--amber)">2</span><span class="scale-desc"><strong>Moderada:</strong> necesitabas ir pronto.</span></div>
+    <div class="scale-row" style="background:var(--red-light)"><span class="scale-num" style="background:var(--red-light);color:var(--red)">3</span><span class="scale-desc"><strong>Severa:</strong> tuviste que correr al baño.</span></div>
+    <div class="scale-row" style="background:var(--red-light)"><span class="scale-num" style="background:var(--red-light);color:var(--red)">4</span><span class="scale-desc"><strong>Incontinencia:</strong> escape antes de llegar.</span></div>
+    <div class="instr-h2" style="margin-top:1rem"><i class="ti ti-alert-triangle"></i>Al registrar una Fuga</div>
+    <ul class="instr-ul">
+      <li><strong>Por Urgencia:</strong> deseo súbito incontrolable.</li>
+      <li><strong>Por Esfuerzo:</strong> al toser, reír, estornudar o hacer ejercicio.</li>
+      <li><strong>Muda:</strong> marca si mojó tu ropa o cambiaste un protector. Anota fugas pequeñas — son clínicamente relevantes.</li>
+    </ul>
+    <div class="instr-h2" style="margin-top:1rem"><i class="ti ti-microphone"></i>Análisis acústico</div>
+    <ul class="instr-ul">
+      <li>Al iniciar el cronómetro: 2 seg de calibración del ambiente → análisis en vivo cada 100 ms.</li>
+      <li>El médico recibe la curva completa de flujo acústico.</li>
+      <li>Coloca el teléfono cerca pero no encima del inodoro.</li>
+      <li>Sin micrófono: el cronómetro funciona en modo manual.</li>
     </ul>
   </div>
-
-  <div class="instr-section">
-    <div class="instr-h2">🚽 Al registrar una Micción</div>
+  <div class="instr-card">
+    <div class="instr-h2"><i class="ti ti-clipboard-list"></i>Parámetros normales</div>
     <ul class="instr-ul">
-      <li><strong>Volumen (ml):</strong> es el dato más importante. Orina en un recipiente limpio (una jarra medidora de cocina funciona bien) y anota la cantidad.</li>
-      <li><strong>Cronómetro:</strong> presiona Iniciar al comenzar y Detener al terminar. Se mide automáticamente.</li>
-      <li><strong>Análisis acústico:</strong> el micrófono se activa solo al iniciar el cronómetro. Primero calibra el ruido ambiente (2 seg) y luego analiza la fuerza del chorro. No se graba nada — solo se procesa la señal en tiempo real.</li>
-      <li><strong>Posición (hombres):</strong> anota si fue sentado o de pie. Influye en el patrón de flujo.</li>
-    </ul>
-
-    <div class="instr-h3">📏 Escala de Urgencia</div>
-    <div class="scale-row" style="background:var(--bg)"><span class="scale-num" style="background:#e0e0e0;color:#555">0</span><span class="scale-desc"><strong>Sin urgencia:</strong> fuiste por comodidad o "por si acaso", sin tener ganas.</span></div>
-    <div class="scale-row" style="background:var(--green-light)"><span class="scale-num" style="background:var(--green-light);color:var(--green)">1</span><span class="scale-desc"><strong>Leve:</strong> sensación normal, podías haber esperado sin problema.</span></div>
-    <div class="scale-row" style="background:var(--amber-light)"><span class="scale-num" style="background:var(--amber-light);color:var(--amber)">2</span><span class="scale-desc"><strong>Moderada:</strong> necesidad clara de ir, no podías posponerlo mucho tiempo.</span></div>
-    <div class="scale-row" style="background:var(--red-light)"><span class="scale-num" style="background:var(--red-light);color:var(--red)">3</span><span class="scale-desc"><strong>Severa:</strong> deseo muy fuerte y repentino. Tuviste que correr al baño.</span></div>
-    <div class="scale-row" style="background:var(--red-light)"><span class="scale-num" style="background:var(--red-light);color:var(--red)">4</span><span class="scale-desc"><strong>Incontinencia:</strong> se te escapó la orina antes de poder llegar al baño.</span></div>
-  </div>
-
-  <div class="instr-section">
-    <div class="instr-h2">⚠️ Al registrar una Fuga</div>
-    <ul class="instr-ul">
-      <li><strong>Por Urgencia:</strong> se asocia a un deseo súbito e incontrolable de orinar.</li>
-      <li><strong>Por Esfuerzo:</strong> ocurrió al toser, reír, estornudar o hacer ejercicio.</li>
-      <li><strong>Muda:</strong> marca la casilla si la fuga mojó tu ropa o necesitaste cambiar un protector.</li>
-      <li>Anota la fuga aunque sea muy pequeña — cualquier cantidad es clínicamente relevante.</li>
-    </ul>
-  </div>
-
-  <div class="instr-section">
-    <div class="instr-h2">🎙 Análisis acústico del micrófono</div>
-    <p class="instr-p">Al presionar Iniciar en el cronómetro, la app pide acceso al micrófono y realiza dos fases:</p>
-    <ul class="instr-ul">
-      <li><strong>Calibración (2 seg):</strong> mide el ruido de fondo del baño para establecer una línea base.</li>
-      <li><strong>Análisis en vivo:</strong> captura la amplitud del sonido del chorro cada 100 ms y clasifica la fuerza en: Débil / Bajo / Normal / Fuerte.</li>
-      <li>El médico recibe la curva completa de flujo acústico con cada registro.</li>
-      <li><strong>Importante:</strong> coloca el teléfono cerca pero no encima del inodoro. La distancia afecta la lectura.</li>
-      <li>Si no tienes micrófono o no das permiso, el cronómetro funciona igualmente en modo manual.</li>
-    </ul>
-  </div>
-
-  <div class="instr-section">
-    <div class="instr-h2">📊 Mi análisis y PDF</div>
-    <ul class="instr-ul">
-      <li>La pestaña <strong>Mi análisis</strong> muestra tu resumen del día o de los últimos 7 días con semáforos de normalidad.</li>
-      <li>El botón <strong>Descargar informe PDF</strong> genera un documento clínico completo que puedes llevar a tu consulta médica.</li>
-      <li>El informe incluye: frecuencia, volúmenes, flujo acústico, balance de líquidos e interpretación según rangos urológicos normales.</li>
-    </ul>
-  </div>
-
-  <div class="instr-section">
-    <div class="instr-h2">📋 Parámetros normales de referencia</div>
-    <ul class="instr-ul">
-      <li>Volumen total en 24h: <strong>800 – 2.000 ml</strong></li>
-      <li>Frecuencia diurna: <strong>4 – 7 micciones</strong></li>
-      <li>Volumen por micción: <strong>250 – 400 ml</strong> (adulto)</li>
-      <li>Nicturia (micciones nocturnas): <strong>0 – 1</strong></li>
+      <li>Volumen total 24h: <strong>800–2.000 ml</strong></li>
+      <li>Frecuencia diurna: <strong>4–7 micciones</strong></li>
+      <li>Volumen por micción: <strong>250–400 ml</strong></li>
+      <li>Nicturia: <strong>0–1 micción</strong></li>
       <li>Poliuria: más de <strong>2.800 ml</strong> en 24h</li>
-      <li>Polaquiuria: más de <strong>8 micciones</strong> en 24h</li>
     </ul>
   </div>
 </div>
 
-<!-- ══ ACERCA DE ══ -->
+<!-- ACERCA DE -->
 <div class="screen" id="screen-about">
   <div class="about-hero">
-    <h2>🔬 Base Científica</h2>
-    <p>CURG Diario Miccional está fundamentado en guías internacionales de urología y estudios clínicos validados sobre el diario miccional como herramienta diagnóstica.</p>
+    <h2>Base Científica</h2>
+    <p>CURG Diario Miccional está fundamentado en guías internacionales de urología y estudios clínicos validados.</p>
+    <div class="about-brands">
+      <div class="brand-pill coral"><span>by InnoIA</span></div>
+      <div class="brand-pill"><span>verificado CURG</span></div>
+      <div class="brand-pill"><span style="color:#B5D4F4">Colombian Urology Research Group</span></div>
+    </div>
   </div>
-
-  <div class="about-section">
-    <h3>📖 ¿Qué es el diario miccional?</h3>
-    <p>El diario miccional (voiding diary o bladder diary) es un registro estructurado del comportamiento vesical durante un período determinado. La Sociedad Internacional de Continencia (ICS) lo define como el estándar de oro no invasivo para la evaluación de disfunciones del tracto urinario inferior.</p>
-    <p>Según las guías EAU 2023, un diario de 3 días tiene una sensibilidad del 85% para detectar vejiga hiperactiva y una correlación de r=0.78 con los resultados urodinámicos formales.</p>
+  <div class="about-sec">
+    <div class="about-h3"><i class="ti ti-book"></i>El diario miccional</div>
+    <p class="about-p">Estándar de oro no invasivo para evaluación de disfunciones del tracto urinario inferior (ICS). Un diario de 3 días tiene sensibilidad del 85% para vejiga hiperactiva y correlación r=0.78 con urodinamia formal (EAU 2023).</p>
   </div>
-
-  <div class="about-section">
-    <h3>🎙 Análisis acústico — Fundamento</h3>
-    <p>La correlación entre las características acústicas del chorro urinario y el flujo real ha sido investigada en múltiples estudios. El principio físico es que la amplitud sonora del chorro correlaciona con la velocidad de flujo (Q en ml/s).</p>
-    <p><strong>Umbrales de clasificación utilizados</strong> (dB por encima del ruido ambiente calibrado):</p>
-    <table class="threshold-table">
-      <tr><th>Clasificación</th><th>dB sobre baseline</th><th>Flujo aprox.</th><th>Interpretación</th></tr>
-      <tr><td>🔴 Débil</td><td>2 – 12 dB</td><td>&lt; 8 ml/s</td><td>Posible obstrucción o hipoactividad del detrusor</td></tr>
-      <tr><td>🟡 Bajo</td><td>12 – 22 dB</td><td>8 – 15 ml/s</td><td>Flujo por debajo del rango normal</td></tr>
-      <tr><td>🟢 Normal</td><td>22 – 35 dB</td><td>15 – 25 ml/s</td><td>Rango normal para adulto</td></tr>
-      <tr><td>🔵 Fuerte</td><td>&gt; 35 dB</td><td>&gt; 25 ml/s</td><td>Flujo vigoroso</td></tr>
+  <div class="about-sec">
+    <div class="about-h3"><i class="ti ti-microphone"></i>Análisis acústico — metodología</div>
+    <p class="about-p">La amplitud del sonido del chorro correlaciona con la velocidad de flujo (Tsui et al., 2006). Umbral calibrado contra ruido ambiente en cada sesión.</p>
+    <table class="about-table">
+      <tr><th>Clasificación</th><th>dB sobre baseline</th><th>Flujo est.</th></tr>
+      <tr><td style="color:var(--red)">Débil</td><td>2–12 dB</td><td>&lt;8 ml/s</td></tr>
+      <tr><td style="color:var(--amber)">Bajo</td><td>12–22 dB</td><td>8–15 ml/s</td></tr>
+      <tr><td style="color:var(--green)">Normal</td><td>22–35 dB</td><td>15–25 ml/s</td></tr>
+      <tr><td style="color:var(--blue-act)">Fuerte</td><td>&gt;35 dB</td><td>&gt;25 ml/s</td></tr>
     </table>
-    <p style="margin-top:8px;font-size:12px;color:var(--text3)">⚠️ El análisis acústico es una herramienta de apoyo clínico. No reemplaza la flujometría urodinámica formal. Los valores son relativos al baseline calibrado en cada sesión.</p>
+    <p class="about-p" style="margin-top:8px;font-size:11px">⚠️ El análisis acústico es orientativo. No reemplaza flujometría urodinámica formal.</p>
   </div>
-
-  <div class="about-section">
-    <h3>📊 Rangos normales de referencia</h3>
-    <table class="threshold-table">
-      <tr><th>Parámetro</th><th>Rango normal</th><th>Fuente</th></tr>
-      <tr><td>Frecuencia diurna</td><td>4 – 7 micciones/día</td><td>ICS 2019</td></tr>
-      <tr><td>Nicturia</td><td>0 – 1 micción/noche</td><td>EAU 2023</td></tr>
-      <tr><td>Volumen por micción</td><td>250 – 400 ml</td><td>ICS 2019</td></tr>
-      <tr><td>Volumen 24h</td><td>800 – 2.000 ml</td><td>OMS</td></tr>
-      <tr><td>Poliuria</td><td>&gt; 2.800 ml/24h</td><td>ICS 2019</td></tr>
-      <tr><td>Flujo máximo (Qmax) ♀</td><td>&gt; 15 ml/s</td><td>EAU 2023</td></tr>
-      <tr><td>Flujo máximo (Qmax) ♂</td><td>&gt; 12 ml/s</td><td>EAU 2023</td></tr>
-      <tr><td>Capacidad vesical funcional</td><td>300 – 500 ml</td><td>ICS 2019</td></tr>
+  <div class="about-sec">
+    <div class="about-h3"><i class="ti ti-table"></i>Rangos normales</div>
+    <table class="about-table">
+      <tr><th>Parámetro</th><th>Normal</th><th>Fuente</th></tr>
+      <tr><td>Frec. diurna</td><td>4–7/día</td><td>ICS 2019</td></tr>
+      <tr><td>Nicturia</td><td>0–1/noche</td><td>EAU 2023</td></tr>
+      <tr><td>Vol./micción</td><td>250–400 ml</td><td>ICS 2019</td></tr>
+      <tr><td>Qmax ♀</td><td>&gt;15 ml/s</td><td>EAU 2023</td></tr>
+      <tr><td>Qmax ♂</td><td>&gt;12 ml/s</td><td>EAU 2023</td></tr>
     </table>
   </div>
-
-  <div class="about-section">
-    <h3>📚 Bibliografía</h3>
-    <div class="ref-item"><span class="ref-num">[1]</span>Abrams P, et al. "The standardisation of terminology of lower urinary tract function." <em>Neurourology and Urodynamics</em>, 21(2):167-178, 2002. ICS Report.</div>
-    <div class="ref-item"><span class="ref-num">[2]</span>EAU Guidelines on Urinary Incontinence. European Association of Urology, 2023. <em>eauguide lines.eu</em></div>
-    <div class="ref-item"><span class="ref-num">[3]</span>Homma Y, et al. "Voiding and storage symptoms of the lower urinary tract: their clinical significance." <em>Int J Urol</em>, 15(6):484-9, 2008.</div>
-    <div class="ref-item"><span class="ref-num">[4]</span>Tsui BC, et al. "Acoustic characteristics of urinary flow: a pilot study toward non-invasive uroflowmetry." <em>Journal of Urology</em>, 2006.</div>
-    <div class="ref-item"><span class="ref-num">[5]</span>Chapple CR, et al. "Terminology report from the International Continence Society (ICS) Working Group on Underactive Bladder." <em>Neurourology and Urodynamics</em>, 37(8):2928-2931, 2018.</div>
-    <div class="ref-item"><span class="ref-num">[6]</span>Nambiar AK, et al. "EAU Guidelines on Assessment and Nonsurgical Management of Urinary Incontinence." <em>European Urology</em>, 75(5):799-820, 2018.</div>
-    <div class="ref-item"><span class="ref-num">[7]</span>Haylen BT, et al. "An International Urogynecological Association (IUGA)/ICS joint report on the terminology for female pelvic floor dysfunction." <em>Neurourology and Urodynamics</em>, 29(1):4-20, 2010.</div>
-    <div class="ref-item"><span class="ref-num">[8]</span>Ley 1581 de 2012. "Régimen General de Protección de Datos Personales." República de Colombia.</div>
+  <div class="about-sec">
+    <div class="about-h3"><i class="ti ti-books"></i>Bibliografía</div>
+    <div class="ref-item"><span class="ref-num">[1]</span>Abrams P, et al. "Standardisation of terminology of lower urinary tract function." <em>Neurourol Urodynam</em> 21:167-178, 2002.</div>
+    <div class="ref-item"><span class="ref-num">[2]</span>EAU Guidelines on Urinary Incontinence. European Association of Urology, 2023.</div>
+    <div class="ref-item"><span class="ref-num">[3]</span>Tsui BC, et al. "Acoustic characteristics of urinary flow." <em>J Urology</em>, 2006.</div>
+    <div class="ref-item"><span class="ref-num">[4]</span>Chapple CR, et al. "ICS Working Group on Underactive Bladder." <em>Neurourol Urodynam</em> 37:2928-2931, 2018.</div>
+    <div class="ref-item"><span class="ref-num">[5]</span>Ley 1581 de 2012. Régimen General de Protección de Datos Personales. Colombia.</div>
   </div>
-
-  <div class="about-section">
-    <h3>⚕️ Aviso médico importante</h3>
-    <p>CURG Diario Miccional es una herramienta de <strong>apoyo clínico</strong>. Los datos registrados y los análisis generados son información complementaria para el profesional de salud tratante. <strong>No constituyen un diagnóstico médico</strong> y no reemplazan la evaluación clínica, urodinámica ni ningún otro procedimiento diagnóstico formal.</p>
-    <p>Ante cualquier síntoma urinario, consulta siempre con un médico urólogo, uroginecólogo o médico general.</p>
+  <div class="about-sec">
+    <div class="about-h3"><i class="ti ti-shield-check"></i>Aviso médico</div>
+    <p class="about-p">CURG Diario Miccional es una herramienta de apoyo clínico. Los análisis generados no constituyen diagnóstico médico. Consulta siempre con un profesional de salud.</p>
   </div>
-
-  <div class="version-badge">CURG Diario Miccional v2.0 · © 2026 · Datos alojados en Google Firebase (Tier HIPAA-eligible)</div>
+  <div class="version-note">Diario Miccional v2.0 · by InnoIA · verificado CURG · © 2026</div>
 </div>
 
-<!-- ══ PERFIL ══ -->
+<!-- PERFIL -->
 <div class="screen" id="screen-profile">
-  <div style="font-size:1.1rem;font-weight:700;margin-bottom:1.25rem">👤 Mi perfil</div>
+  <div style="font-size:1rem;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px"><i class="ti ti-user-circle" style="color:var(--blue-act);font-size:20px"></i>Mi perfil</div>
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem" id="profileView"></div>
-  <!-- Notifications -->
-  <div style="font-size:13px;font-weight:700;margin:1.25rem 0 0.75rem">🔔 Recordatorios</div>
+  <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.04em">Recordatorios</div>
   <div class="notif-card">
     <div class="notif-row">
-      <div class="notif-info"><div class="notif-label">🌅 Hora de despertar</div><div class="notif-sub">Recuerda registrar tu hora de levantada (5:00 AM)</div></div>
+      <div class="notif-left"><div class="notif-icon"><i class="ti ti-sun"></i></div><div class="notif-info"><h4>Hora de despertar</h4><p>Recordatorio 5:00 AM</p></div></div>
       <button class="toggle" id="togWake" onclick="toggleNotif('wake')"></button>
     </div>
     <div class="notif-row">
-      <div class="notif-info"><div class="notif-label">💧 Recordatorio de agua</div><div class="notif-sub">Cada 2 horas entre 8am y 6pm</div></div>
+      <div class="notif-left"><div class="notif-icon"><i class="ti ti-droplet"></i></div><div class="notif-info"><h4>Toma de agua</h4><p>Cada 2h entre 8am–6pm</p></div></div>
       <button class="toggle" id="togWater" onclick="toggleNotif('water')"></button>
     </div>
     <div class="notif-row">
-      <div class="notif-info"><div class="notif-label">🚽 Recordatorio micción</div><div class="notif-sub">Cada 3 horas (9am, 12pm, 3pm, 6pm)</div></div>
+      <div class="notif-left"><div class="notif-icon"><i class="ti ti-droplets"></i></div><div class="notif-info"><h4>Recordatorio micción</h4><p>9am, 12pm, 3pm, 6pm</p></div></div>
       <button class="toggle" id="togMiction" onclick="toggleNotif('miction')"></button>
     </div>
     <div class="notif-row">
-      <div class="notif-info"><div class="notif-label">🌙 Hora de acostarse</div><div class="notif-sub">Recuerda registrar tu hora de dormir (6:00 PM)</div></div>
+      <div class="notif-left"><div class="notif-icon"><i class="ti ti-moon"></i></div><div class="notif-info"><h4>Hora de acostarse</h4><p>Recordatorio 6:00 PM</p></div></div>
       <button class="toggle" id="togSleep" onclick="toggleNotif('sleep')"></button>
     </div>
   </div>
   <div id="notifStatus" style="font-size:11px;color:var(--text2);text-align:center;margin-bottom:1rem"></div>
-  <button class="btn btn-danger-outline btn-full" style="margin-bottom:10px" onclick="revokeConsent()">🗑️ Revocar consentimiento y eliminar datos</button>
-  <button class="btn btn-danger-outline btn-full" onclick="logout()">Cerrar sesión / Cambiar paciente</button>
+  <button class="btn btn-danger btn-full" style="margin-bottom:10px" onclick="revokeConsent()"><i class="ti ti-trash"></i>Revocar consentimiento y eliminar datos</button>
+  <button class="btn btn-full" onclick="logout()" style="border-color:var(--border2)"><i class="ti ti-logout"></i>Cerrar sesión</button>
+  <div class="brand-footer" style="margin-top:1rem">
+    <span class="brand-footer-text">Desarrollado por <span class="innoia">InnoIA</span> · Verificado por <span class="curg">CURG</span></span>
+  </div>
 </div>
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav" id="bottomNav" style="display:none">
-  <div class="nav-item active" onclick="showScreen('main',this)"><div class="nav-icon">📋</div><div class="nav-label">Diario</div></div>
-  <div class="nav-item" onclick="showScreen('analysis',this)"><div class="nav-icon">📊</div><div class="nav-label">Análisis</div></div>
-  <div class="nav-item" onclick="showScreen('instructions',this)"><div class="nav-icon">ℹ️</div><div class="nav-label">Guía</div></div>
-  <div class="nav-item" onclick="showScreen('about',this)"><div class="nav-icon">🔬</div><div class="nav-label">Ciencia</div></div>
-  <div class="nav-item" onclick="showScreen('profile',this)"><div class="nav-icon">👤</div><div class="nav-label">Perfil</div></div>
+  <div class="nav-item active" onclick="showScreen('main',this)"><i class="ti ti-clipboard-list nav-icon"></i><span class="nav-lbl">Diario</span></div>
+  <div class="nav-item" onclick="showScreen('analysis',this)"><i class="ti ti-chart-bar nav-icon"></i><span class="nav-lbl">Análisis</span></div>
+  <div class="nav-item" onclick="showScreen('instructions',this)"><i class="ti ti-info-circle nav-icon"></i><span class="nav-lbl">Guía</span></div>
+  <div class="nav-item" onclick="showScreen('about',this)"><i class="ti ti-flask nav-icon"></i><span class="nav-lbl">Ciencia</span></div>
+  <div class="nav-item" onclick="showScreen('profile',this)"><i class="ti ti-user-circle nav-icon"></i><span class="nav-lbl">Perfil</span></div>
 </div>
 
-<!-- ══ MODAL MICCIÓN ══ -->
+<!-- MODAL MICCIÓN -->
 <div class="modal-overlay" id="modalMiction">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">🚽 Registrar micción</div>
-    <div class="mic-banner" id="micBanner">⚠️ Sin micrófono — el cronómetro funciona en modo manual</div>
+    <div class="modal-title"><i class="ti ti-droplets"></i>Registrar micción</div>
+    <div class="mic-banner" id="micBanner"><i class="ti ti-microphone-off"></i>Sin micrófono — cronómetro en modo manual</div>
     <div class="chrono-wrap" id="chronoWrap">
-      <div class="chrono-label" id="chronoLabel">CRONÓMETRO</div>
+      <div class="chrono-label"><i class="ti ti-clock" id="chronoLabelIcon"></i><span id="chronoLabel">CRONÓMETRO</span></div>
       <div class="chrono-time" id="chronoDisplay">00:00.0</div>
       <div class="chrono-state" id="chronoState">Presiona Iniciar — activa el micrófono automáticamente</div>
-      <div class="waveform-bar" id="waveformBar">
-        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <div class="waveform" id="waveform">
+        <div class="wbar"></div><div class="wbar"></div><div class="wbar"></div><div class="wbar"></div>
+        <div class="wbar"></div><div class="wbar"></div><div class="wbar"></div><div class="wbar"></div>
+        <div class="wbar"></div><div class="wbar"></div><div class="wbar"></div><div class="wbar"></div>
+        <div class="wbar"></div><div class="wbar"></div><div class="wbar"></div><div class="wbar"></div>
       </div>
       <div class="chrono-btns">
-        <button class="btn-chrono-start" id="btnStart" onclick="chronoStart()">▶ Iniciar</button>
-        <button class="btn-chrono-stop" id="btnStop" onclick="chronoStop()" style="display:none">■ Detener</button>
-        <button class="btn-chrono-reset" id="btnReset" onclick="chronoReset()" style="display:none">↺</button>
+        <button class="btn-start" id="btnStart" onclick="chronoStart()"><i class="ti ti-player-play"></i>Iniciar</button>
+        <button class="btn-stop" id="btnStop" onclick="chronoStop()" style="display:none"><i class="ti ti-player-stop"></i>Detener</button>
+        <button class="btn-reset" id="btnReset" onclick="chronoReset()" style="display:none"><i class="ti ti-refresh"></i></button>
       </div>
     </div>
     <div class="form-row" style="margin-bottom:10px">
-      <div class="form-group" style="margin:0"><label>Hora</label><input type="time" id="micHora"></div>
-      <div class="form-group" style="margin:0"><label>Volumen (ml) <span style="color:var(--red)">*</span></label><input type="number" id="micVol" placeholder="250" min="0" max="1000"></div>
+      <div class="form-group" style="margin:0"><label>Hora <span class="req">*</span></label><input type="time" id="micHora"></div>
+      <div class="form-group" style="margin:0"><label>Volumen (ml) <span class="req">*</span></label><input type="number" id="micVol" placeholder="250" min="0" max="1000"></div>
     </div>
     <div class="form-row" style="margin-bottom:14px">
-      <div class="form-group" id="durSection" style="margin:0"><label>Duración (seg) <span style="color:var(--red)">*</span><span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;margin-left:4px">usa el cronómetro</span></label><input type="number" id="micDur" placeholder="autodetectado" readonly style="background:var(--border);cursor:not-allowed"></div>
-      <div class="form-group" style="margin:0">
-        <label>Género</label>
-        <select id="micGenero" onchange="togglePos()"><option value="">—</option><option value="f">Femenino</option><option value="m">Masculino</option></select>
-      </div>
+      <div class="form-group" id="durSection" style="margin:0"><label>Duración (seg) <span class="req">*</span><span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;margin-left:4px">usa el cronómetro</span></label><input type="number" id="micDur" placeholder="autodetectado" readonly style="background:var(--border);cursor:not-allowed;border-radius:11px;padding:11px 13px;font-size:15px;color:var(--text);font-family:inherit;width:100%;border:1.5px solid var(--border)"></div>
+      <div class="form-group" style="margin:0"><label>Género</label><select id="micGenero" onchange="togglePos()"><option value="">—</option><option value="f">Femenino</option><option value="m">Masculino</option></select></div>
     </div>
     <div id="posSection" style="display:none;margin-bottom:14px">
-      <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em">Posición <span style="color:var(--red)">*</span></label>
+      <label style="display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Posición <span class="req">*</span></label>
       <div class="pos-grid">
-        <button class="pos-btn" id="posSentado" onclick="setPos('sentado')"><span class="pos-icon">🪑</span><span class="pos-label">Sentado</span></button>
-        <button class="pos-btn" id="posParado" onclick="setPos('parado')"><span class="pos-icon">🧍</span><span class="pos-label">De pie</span></button>
+        <button class="pos-btn" id="posSit" onclick="setPos('sentado')"><i class="ti ti-armchair"></i><span>Sentado</span></button>
+        <button class="pos-btn" id="posStand" onclick="setPos('parado')"><i class="ti ti-man"></i><span>De pie</span></button>
       </div>
     </div>
     <div id="urgencySection" style="margin-bottom:14px">
-      <label style="display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em">Urgencia <span style="color:var(--red)">*</span></label>
+      <label style="display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em">Urgencia <span class="req">*</span></label>
       <div class="urgency-grid">
-        <button class="urgency-btn" onclick="setUrg(0)"><span class="u-num">0</span>Nada</button>
-        <button class="urgency-btn" onclick="setUrg(1)"><span class="u-num">1</span>Leve</button>
-        <button class="urgency-btn" onclick="setUrg(2)"><span class="u-num">2</span>Mod.</button>
-        <button class="urgency-btn" onclick="setUrg(3)"><span class="u-num">3</span>Severa</button>
-        <button class="urgency-btn" onclick="setUrg(4)"><span class="u-num">4</span>Escape</button>
+        <button class="urg-btn" onclick="setUrg(0)"><span class="un">0</span>Nada</button>
+        <button class="urg-btn" onclick="setUrg(1)"><span class="un">1</span>Leve</button>
+        <button class="urg-btn" onclick="setUrg(2)"><span class="un">2</span>Mod.</button>
+        <button class="urg-btn" onclick="setUrg(3)"><span class="un">3</span>Severa</button>
+        <button class="urg-btn" onclick="setUrg(4)"><span class="un">4</span>Escape</button>
       </div>
     </div>
-    <div class="form-group"><label>Notas</label><input type="text" id="micNotes" placeholder="Observaciones..."></div>
+    <div class="form-group"><label>Notas</label><input type="text" id="micNotes" placeholder="Observaciones opcionales..."></div>
+    <div id="micErrors"></div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeM('Miction')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveMiction()">Guardar</button>
+      <button class="btn" onclick="closeM('Miction')"><i class="ti ti-x"></i>Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMiction()"><i class="ti ti-device-floppy"></i>Guardar</button>
     </div>
   </div>
 </div>
 
-<!-- ══ MODAL BEBIDA ══ -->
+<!-- MODAL BEBIDA -->
 <div class="modal-overlay" id="modalDrink">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">💧 Registrar bebida</div>
+    <div class="modal-title"><i class="ti ti-droplet"></i>Registrar bebida</div>
     <div class="form-row" style="margin-bottom:10px">
-      <div class="form-group" style="margin:0"><label>Hora</label><input type="time" id="drkHora"></div>
-      <div class="form-group" style="margin:0"><label>Volumen (ml) <span style="color:var(--red)">*</span></label><input type="number" id="drkVol" placeholder="250"></div>
+      <div class="form-group" style="margin:0"><label>Hora <span class="req">*</span></label><input type="time" id="drkHora"></div>
+      <div class="form-group" style="margin:0"><label>Volumen (ml) <span class="req">*</span></label><input type="number" id="drkVol" placeholder="250"></div>
     </div>
-    <div class="form-group">
-      <label>Tipo de bebida</label>
-      <select id="drkTipo">
-        <option>Agua</option><option>Café</option><option>Café descafeinado</option><option>Té</option>
-        <option>Infusión sin cafeína</option><option>Leche</option><option>Jugo natural</option>
-        <option>Refresco / Gaseosa</option><option>Bebida energética</option><option>Alcohol (cerveza)</option>
-        <option>Alcohol (vino)</option><option>Alcohol (licor)</option><option>Sopa / Caldo</option><option>Otro</option>
-      </select>
+    <div class="form-group"><label>Tipo de bebida</label>
+      <select id="drkTipo"><option>Agua</option><option>Café</option><option>Café descafeinado</option><option>Té</option><option>Infusión sin cafeína</option><option>Leche</option><option>Jugo natural</option><option>Refresco / Gaseosa</option><option>Bebida energética</option><option>Alcohol (cerveza)</option><option>Alcohol (vino)</option><option>Alcohol (licor)</option><option>Sopa / Caldo</option><option>Otro</option></select>
     </div>
     <div class="form-group"><label>Notas</label><input type="text" id="drkNotes" placeholder="..."></div>
+    <div id="drkErrors"></div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeM('Drink')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveDrink()">Guardar</button>
+      <button class="btn" onclick="closeM('Drink')"><i class="ti ti-x"></i>Cancelar</button>
+      <button class="btn btn-primary" onclick="saveDrink()"><i class="ti ti-device-floppy"></i>Guardar</button>
     </div>
   </div>
 </div>
 
-<!-- ══ MODAL FUGA ══ -->
+<!-- MODAL FUGA -->
 <div class="modal-overlay" id="modalLeak">
   <div class="modal">
     <div class="modal-handle"></div>
-    <div class="modal-title">⚠️ Registrar fuga</div>
+    <div class="modal-title"><i class="ti ti-alert-triangle"></i>Registrar fuga</div>
     <div class="form-row" style="margin-bottom:10px">
-      <div class="form-group" style="margin:0"><label>Hora</label><input type="time" id="leakHora"></div>
-      <div class="form-group" style="margin:0">
-        <label>Tipo</label>
-        <select id="leakTipo"><option value="urgencia">Por Urgencia</option><option value="esfuerzo">Por Esfuerzo</option><option value="mixta">Mixta</option><option value="otra">Otra</option></select>
-      </div>
+      <div class="form-group" style="margin:0"><label>Hora <span class="req">*</span></label><input type="time" id="leakHora"></div>
+      <div class="form-group" style="margin:0"><label>Tipo</label><select id="leakTipo"><option value="urgencia">Por Urgencia</option><option value="esfuerzo">Por Esfuerzo</option><option value="mixta">Mixta</option><option value="otra">Otra</option></select></div>
     </div>
-    <div class="form-group">
-      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600;text-transform:none;letter-spacing:0">
-        <input type="checkbox" id="leakMuda" style="width:18px;height:18px"> Requirió cambio de ropa / protector
-      </label>
-    </div>
+    <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:500;text-transform:none;letter-spacing:0"><input type="checkbox" id="leakMuda" style="width:18px;height:18px;accent-color:var(--blue-act)"> Requirió cambio de ropa / protector</label></div>
     <div class="form-group"><label>Notas</label><input type="text" id="leakNotes" placeholder="..."></div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeM('Leak')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveLeak()">Guardar</button>
+      <button class="btn" onclick="closeM('Leak')"><i class="ti ti-x"></i>Cancelar</button>
+      <button class="btn btn-primary" onclick="saveLeak()"><i class="ti ti-device-floppy"></i>Guardar</button>
     </div>
   </div>
 </div>
@@ -733,103 +750,84 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyANR_4lIz4Z6At3FMykRIzRPyMCE2U4454",
-  authDomain: "diario-miccional-26954.firebaseapp.com",
-  projectId: "diario-miccional-26954",
-  storageBucket: "diario-miccional-26954.firebasestorage.app",
-  messagingSenderId: "403511441490",
-  appId: "1:403511441490:web:4b4ccc666036588a50078b"
-};
-const fbApp = initializeApp(firebaseConfig);
-const db = getFirestore(fbApp);
+const fb = initializeApp({
+  apiKey:"AIzaSyANR_4lIz4Z6At3FMykRIzRPyMCE2U4454",
+  authDomain:"diario-miccional-26954.firebaseapp.com",
+  projectId:"diario-miccional-26954",
+  storageBucket:"diario-miccional-26954.firebasestorage.app",
+  messagingSenderId:"403511441490",
+  appId:"1:403511441490:web:4b4ccc666036588a50078b"
+});
+const db = getFirestore(fb);
 
 // ── CONSENT ──
-function checkConsentStatus() {
-  const consent = localStorage.getItem('curg_consent');
-  if (!consent) {
-    document.getElementById('consentScreen').style.display = 'flex';
-  }
-}
-window.checkConsent = () => {
-  const all = document.getElementById('check1').checked && document.getElementById('check2').checked && document.getElementById('check3').checked;
-  document.getElementById('btnConsent').classList.toggle('ready', all);
-};
-window.acceptConsent = () => {
-  localStorage.setItem('curg_consent', JSON.stringify({ date: new Date().toISOString(), version: '2026-06' }));
-  document.getElementById('consentScreen').style.display = 'none';
-};
-window.revokeConsent = () => {
-  if (confirm('¿Estás seguro? Se eliminarán tus preferencias locales. Los datos en servidor deben solicitarse por email.')) {
-    localStorage.removeItem('curg_consent');
-    localStorage.removeItem('dm_patient');
-    location.reload();
-  }
-};
+function checkConsentStatus(){ if(!localStorage.getItem('curg_consent')) document.getElementById('consentOverlay').style.display='flex'; }
+window.checkConsent=()=>{ const ok=document.getElementById('ck1').checked&&document.getElementById('ck2').checked&&document.getElementById('ck3').checked; document.getElementById('btnConsent').classList.toggle('ready',ok); };
+window.acceptConsent=()=>{ localStorage.setItem('curg_consent',JSON.stringify({date:new Date().toISOString(),v:'2.0'})); document.getElementById('consentOverlay').style.display='none'; };
+window.revokeConsent=()=>{ if(confirm('¿Estás seguro? Se eliminarán tus preferencias locales.')){ localStorage.removeItem('curg_consent'); localStorage.removeItem('dm_patient'); location.reload(); } };
 
-// ── LANG / THEME ──
-let currentLang = localStorage.getItem('dm_lang') || 'es';
-let darkMode = localStorage.getItem('dm_theme') === 'dark';
-function applyTheme() { document.documentElement.setAttribute('data-theme', darkMode?'dark':'light'); document.querySelector('.btn-theme').textContent = darkMode?'☀️':'🌙'; }
-window.toggleTheme = () => { darkMode=!darkMode; localStorage.setItem('dm_theme',darkMode?'dark':'light'); applyTheme(); };
-window.toggleLang = () => { currentLang=currentLang==='es'?'en':'es'; localStorage.setItem('dm_lang',currentLang); document.getElementById('langBtn').textContent=currentLang==='es'?'EN':'ES'; };
+// ── THEME / LANG ──
+let dark=localStorage.getItem('dm_theme')==='dark';
+let lang=localStorage.getItem('dm_lang')||'es';
+function applyTheme(){ document.documentElement.setAttribute('data-theme',dark?'dark':'light'); document.getElementById('themeIcon').className=dark?'ti ti-sun':'ti ti-moon'; }
+window.toggleTheme=()=>{ dark=!dark; localStorage.setItem('dm_theme',dark?'dark':'light'); applyTheme(); };
+window.toggleLang=()=>{ lang=lang==='es'?'en':'es'; localStorage.setItem('dm_lang',lang); document.getElementById('langBtn').textContent=lang==='es'?'EN':'ES'; renderRecords(todayRecs()); };
 applyTheme();
 
 // ── PATIENT ──
-let patient = JSON.parse(localStorage.getItem('dm_patient')||'null');
-let unsub = null;
-let analysisPeriod = 'today';
-let chartInst = null;
+let patient=JSON.parse(localStorage.getItem('dm_patient')||'null');
+let unsub=null, analysisPeriod='today';
+let selUrg=null,selPos=null,selWb=null,selPain=null;
+let charts={};
 
 function todayKey(){ return new Date().toISOString().slice(0,10); }
 function nowTime(){ const d=new Date(); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
 
 checkConsentStatus();
-if (patient) enterApp();
+if(patient) enterApp();
 
-function enterApp() {
+function enterApp(){
   document.getElementById('screen-onboard').classList.remove('active');
   document.getElementById('topbar').style.display='flex';
   document.getElementById('bottomNav').style.display='flex';
-  showScreen('main', document.querySelector('.nav-item'));
+  showScreen('main',document.querySelector('.nav-item'));
   renderGreeting(); renderProfile(); loadSleep(); subscribeRecords();
-  updateStreak();
-  loadWellbeing();
-  renderNotifToggles();
-  scheduleNotifications();
+  updateStreak(); loadWb(); renderNotifToggles(); scheduleNotifs();
 }
 
 // ── ONBOARD ──
-window.onboardTab=(el,id)=>{ el.closest('.tab-row').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); ['ob-code','ob-register'].forEach(i=>{ document.getElementById(i).style.display=i===id?'block':'none'; }); };
-window.formatCode=(el)=>{ let v=el.value.toUpperCase().replace(/[^A-Z0-9]/g,''); if(v.length>4) v=v.slice(0,4)+'-'+v.slice(4,8); el.value=v; };
+window.obTab=(el,id)=>{ el.closest('.tab-row').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); ['ob-code','ob-reg'].forEach(i=>{ document.getElementById(i).style.display=i===id?'block':'none'; }); };
+window.fmtCode=(el)=>{ let v=el.value.toUpperCase().replace(/[^A-Z0-9]/g,''); if(v.length>4) v=v.slice(0,4)+'-'+v.slice(4,8); el.value=v; };
 
-window.connectWithCode=async()=>{
-  const code=document.getElementById('accessCodeInput').value.trim().toUpperCase();
-  document.getElementById('codeError').textContent='';
-  if(code.length<9){ document.getElementById('codeError').textContent='Ingresa el código completo (XXXX-XXXX)'; return; }
-  try {
+window.connectCode=async()=>{
+  const code=document.getElementById('codeInput').value.trim().toUpperCase();
+  const errEl=document.getElementById('codeErr');
+  errEl.style.display='none';
+  if(code.length<9){ errEl.querySelector('span').textContent='Ingresa el código completo (XXXX-XXXX)'; errEl.style.display='flex'; return; }
+  try{
     const snap=await getDocs(query(collection(db,'patients'),where('accessCode','==',code)));
-    if(snap.empty){ document.getElementById('codeError').textContent='Código no encontrado. Verifica con tu médico.'; return; }
+    if(snap.empty){ errEl.querySelector('span').textContent='Código no encontrado. Verifica con tu médico.'; errEl.style.display='flex'; return; }
     patient={id:snap.docs[0].id,...snap.docs[0].data()};
     localStorage.setItem('dm_patient',JSON.stringify(patient));
     enterApp();
-  } catch(e){ document.getElementById('codeError').textContent=e.message; }
+  }catch(e){ errEl.querySelector('span').textContent=e.message; errEl.style.display='flex'; }
 };
 
-window.selfRegister=async()=>{
-  const nombre=document.getElementById('regNombre').value.trim();
-  document.getElementById('regError').textContent='';
-  if(!nombre){ document.getElementById('regError').textContent='El nombre es obligatorio'; return; }
-  try {
-    const data={nombre,fechaNac:document.getElementById('regNac').value,genero:document.getElementById('regGenero').value,telefono:document.getElementById('regTel').value.trim(),email:document.getElementById('regEmail').value.trim(),diagnostico:document.getElementById('regDiag').value.trim(),status:'pending',doctorId:null,accessCode:null,notes:[],createdAt:serverTimestamp()};
+window.selfReg=async()=>{
+  const nombre=document.getElementById('rN').value.trim();
+  const errEl=document.getElementById('regErr');
+  errEl.style.display='none';
+  if(!nombre){ errEl.querySelector('span').textContent='El nombre es obligatorio'; errEl.style.display='flex'; return; }
+  try{
+    const data={nombre,fechaNac:document.getElementById('rD').value,genero:document.getElementById('rG').value,telefono:document.getElementById('rT').value.trim(),email:document.getElementById('rE').value.trim(),diagnostico:document.getElementById('rDiag').value.trim(),status:'pending',doctorId:null,accessCode:null,notes:[],createdAt:serverTimestamp()};
     const ref=await addDoc(collection(db,'patients'),data);
     patient={id:ref.id,...data};
     localStorage.setItem('dm_patient',JSON.stringify(patient));
     enterApp();
-  } catch(e){ document.getElementById('regError').textContent=e.message; }
+  }catch(e){ errEl.querySelector('span').textContent=e.message; errEl.style.display='flex'; }
 };
 
-window.logout=()=>{ if(unsub)unsub(); localStorage.removeItem('dm_patient'); patient=null; location.reload(); };
+window.logout=()=>{ if(unsub) unsub(); localStorage.removeItem('dm_patient'); patient=null; location.reload(); };
 
 // ── NAV ──
 window.showScreen=(name,el)=>{
@@ -838,37 +836,84 @@ window.showScreen=(name,el)=>{
   document.getElementById('screen-'+name).classList.add('active');
   if(el) el.closest('.nav-item').classList.add('active');
   if(name==='analysis') renderAnalysis();
-  if(name==='profile') { renderNotifToggles(); }
+  if(name==='profile'){ renderProfile(); renderNotifToggles(); }
 };
 
 // ── GREETING ──
 function renderGreeting(){
   const h=new Date().getHours();
-  const g=h<12?'Buenos días':h<18?'Buenas tardes':'Buenas noches';
-  document.getElementById('greetingName').textContent=g+', '+(patient?.nombre?.split(' ')[0]||'')+' 👋';
-  document.getElementById('greetingDate').textContent=new Date().toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'});
+  const g=h<12?(lang==='es'?'Buenos días':'Good morning'):h<18?(lang==='es'?'Buenas tardes':'Good afternoon'):(lang==='es'?'Buenas noches':'Good evening');
+  document.getElementById('greetName').textContent=g+', '+(patient?.nombre?.split(' ')[0]||'');
+  document.getElementById('greetDate').textContent=new Date().toLocaleDateString(lang==='es'?'es':'en',{weekday:'long',day:'numeric',month:'long'});
 }
 
 // ── SLEEP ──
 function loadSleep(){ const d=JSON.parse(localStorage.getItem('dm_sleep_'+patient?.id)||'{}'); const t=d[todayKey()]||{}; document.getElementById('wakeTime').value=t.wake||''; document.getElementById('sleepTime').value=t.sleep||''; }
 window.saveSleep=async()=>{
-  const wake=document.getElementById('wakeTime').value;
-  const sleep=document.getElementById('sleepTime').value;
-  if(!wake||!sleep){ showFieldError('sleepErr','Ingresa ambas horas'); return; }
-  // Save locally
-  const d=JSON.parse(localStorage.getItem('dm_sleep_'+patient?.id)||'{}');
-  d[todayKey()]={wake,sleep};
+  const wake=document.getElementById('wakeTime').value; const sleep=document.getElementById('sleepTime').value;
+  const err=document.getElementById('sleepErr');
+  if(!wake||!sleep){ err.querySelector('span').textContent=lang==='es'?'Ingresa ambas horas':'Enter both times'; err.style.display='flex'; return; }
+  err.style.display='none';
+  const d=JSON.parse(localStorage.getItem('dm_sleep_'+patient?.id)||'{}'); d[todayKey()]={wake,sleep};
   localStorage.setItem('dm_sleep_'+patient?.id,JSON.stringify(d));
-  // Save to Firebase
-  if(patient?.id){
-    try{
-      await setDoc(doc(db,'patients',patient.id,'sleep',todayKey()),{wake,sleep,date:todayKey(),timestamp:serverTimestamp()},{merge:true});
-      showFieldSuccess('sleepErr','✓ Guardado');
-    }catch(e){ showFieldError('sleepErr','Error al guardar: '+e.message); }
-  }
+  if(patient?.id){ try{ await setDoc(doc(db,'patients',patient.id,'sleep',todayKey()),{wake,sleep,date:todayKey(),timestamp:serverTimestamp()},{merge:true}); err.style.color='var(--green)'; err.querySelector('span').textContent='✓ Guardado'; err.style.display='flex'; setTimeout(()=>{ err.style.display='none'; err.style.color='var(--coral)'; },2500); }catch(e){ err.querySelector('span').textContent='Error: '+e.message; err.style.display='flex'; } }
 };
 
+// ── WELLBEING ──
+window.setWb=(v)=>{ selWb=v; document.querySelectorAll('.wb-btn').forEach((b,i)=>b.classList.toggle('selected',i==={great:0,ok:1,bad:2}[v])); saveWb(); };
+window.setPain=(v)=>{ selPain=v; document.querySelectorAll('.pain-btn').forEach((b,i)=>b.classList.toggle('selected',i===v)); saveWb(); };
+async function saveWb(){
+  if(!patient?.id||selWb===null) return;
+  try{ await setDoc(doc(db,'patients',patient.id,'wellbeing',todayKey()),{date:todayKey(),wellbeing:selWb,pain:selPain,timestamp:serverTimestamp()},{merge:true}); const s=document.getElementById('wbStatus'); s.textContent='✓ '+(lang==='es'?'Guardado':'Saved'); setTimeout(()=>{ s.textContent=''; },2000); }catch(e){}
+}
+async function loadWb(){
+  if(!patient?.id) return;
+  try{ const snap=await getDoc(doc(db,'patients',patient.id,'wellbeing',todayKey())); if(snap.exists()){ const d=snap.data(); if(d.wellbeing){ selWb=d.wellbeing; document.querySelectorAll('.wb-btn')[{great:0,ok:1,bad:2}[d.wellbeing]]?.classList.add('selected'); } if(d.pain!=null){ selPain=d.pain; document.querySelectorAll('.pain-btn').forEach((b,i)=>b.classList.toggle('selected',i===d.pain)); } } }catch(e){}
+}
+
+// ── STREAK ──
+function updateStreak(){
+  if(!patient?.id) return;
+  const key='curg_streak_'+patient.id; const data=JSON.parse(localStorage.getItem(key)||'{"days":0,"last":""}');
+  const today=todayKey(); const yest=new Date(); yest.setDate(yest.getDate()-1); const yKey=yest.toISOString().slice(0,10);
+  if(data.last===today){}else if(data.last===yKey){data.days++;data.last=today;}else{data.days=1;data.last=today;}
+  localStorage.setItem(key,JSON.stringify(data));
+  const b=document.getElementById('streakBadge'); if(b){ document.getElementById('streakDays').textContent=data.days; b.style.display=data.days>=2?'flex':'none'; }
+}
+
+// ── PWA ──
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredPrompt=e; if(!localStorage.getItem('curg_install_dismissed')) document.getElementById('installBanner').style.display='flex'; });
+window.installPWA=async()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); deferredPrompt=null; document.getElementById('installBanner').style.display='none'; };
+window.dismissInstall=()=>{ localStorage.setItem('curg_install_dismissed','1'); document.getElementById('installBanner').style.display='none'; };
+if('serviceWorker'in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+
+// ── NOTIFICATIONS ──
+const NOTIF_SCHED={wake:{times:['05:00'],msg:'Buenos días — registra tu hora de levantada'},water:{times:['08:00','10:00','12:00','14:00','16:00','18:00'],msg:'Recuerda registrar lo que bebes'},miction:{times:['09:00','12:00','15:00','18:00'],msg:'Momento de registrar tu micción'},sleep:{times:['18:00'],msg:'Recuerda registrar tu hora de dormir'}};
+let notifSettings=JSON.parse(localStorage.getItem('curg_notifs')||'{"wake":false,"water":false,"miction":false,"sleep":false}');
+function renderNotifToggles(){ Object.keys(notifSettings).forEach(k=>{ const id='tog'+k.charAt(0).toUpperCase()+k.slice(1); const el=document.getElementById(id); if(el) el.classList.toggle('on',notifSettings[k]); }); }
+window.toggleNotif=async(key)=>{
+  if(!('Notification'in window)){ document.getElementById('notifStatus').textContent='Tu navegador no soporta notificaciones'; return; }
+  if(notifSettings[key]){ notifSettings[key]=false; localStorage.setItem('curg_notifs',JSON.stringify(notifSettings)); renderNotifToggles(); return; }
+  const perm=await Notification.requestPermission();
+  if(perm!=='granted'){ document.getElementById('notifStatus').textContent='⚠️ Debes permitir notificaciones'; return; }
+  notifSettings[key]=true; localStorage.setItem('curg_notifs',JSON.stringify(notifSettings)); renderNotifToggles();
+  document.getElementById('notifStatus').textContent='✓ Recordatorio activado';
+  scheduleNotifs();
+};
+function scheduleNotifs(){ if(window._ni) clearInterval(window._ni); window._ni=setInterval(checkNotifTime,60000); }
+function checkNotifTime(){
+  if(!('Notification'in window)||Notification.permission!=='granted') return;
+  const now=new Date(); const hm=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  const fired=JSON.parse(sessionStorage.getItem('curg_fired')||'{}');
+  Object.entries(NOTIF_SCHED).forEach(([key,s])=>{ if(!notifSettings[key]) return; s.times.forEach(t=>{ const fk=key+'_'+t+'_'+todayKey(); if(hm===t&&!fired[fk]){ new Notification('Diario Miccional',{body:s.msg,tag:fk}); fired[fk]=true; sessionStorage.setItem('curg_fired',JSON.stringify(fired)); } }); });
+}
+
 // ── RECORDS ──
+function todayRecs(){
+  if(!patient?.id) return [];
+  return [];
+}
 function subscribeRecords(){
   if(!patient?.id) return;
   const q=query(collection(db,'patients',patient.id,'records'),orderBy('timestamp','desc'));
@@ -877,256 +922,42 @@ function subscribeRecords(){
 
 function renderRecords(recs){
   const list=document.getElementById('recordsList'); if(!list) return;
-  if(!recs?.length){ list.innerHTML='<div class="empty-state"><div class="ei">📋</div><p>Sin registros hoy. ¡Empieza registrando!</p></div>'; return; }
+  if(!recs?.length){ list.innerHTML='<div class="empty-state"><i class="ti ti-clipboard"></i><p>Sin registros hoy. Empieza registrando.</p></div>'; return; }
   list.innerHTML=[...recs].sort((a,b)=>a.hora.localeCompare(b.hora)).map(r=>{
     if(r.type==='miction'){
       const chips=[];
-      if(r.vol) chips.push(`<span class="chip chip-blue">💧 ${r.vol}ml</span>`);
-      if(r.dur) chips.push(`<span class="chip chip-gray">⏱ ${r.dur}s</span>`);
-      if(r.flow) chips.push(`<span class="chip chip-green">⚡ ${r.flow}ml/s</span>`);
+      if(r.vol) chips.push(`<span class="chip chip-blue"><i class="ti ti-droplets"></i>${r.vol}ml</span>`);
+      if(r.dur) chips.push(`<span class="chip chip-gray"><i class="ti ti-clock"></i>${r.dur}s</span>`);
+      if(r.flow) chips.push(`<span class="chip chip-green"><i class="ti ti-activity"></i>${r.flow}ml/s</span>`);
       if(r.urgency!=null) chips.push(`<span class="chip chip-amber">U${r.urgency}</span>`);
-      if(r.pos) chips.push(`<span class="chip chip-gray">${r.pos==='sentado'?'🪑':'🧍'}</span>`);
-      if(r.acoustics?.classification){ const ac=r.acoustics; const colors={weak:'chip-red',low:'chip-amber',normal:'chip-green',strong:'chip-blue'}; chips.push(`<span class="chip ${colors[ac.classification]||'chip-gray'}">🎙 ${ac.classification}</span>`); }
-      return `<div class="record-card"><div class="record-icon-wrap" style="background:var(--accent-light)">🚽</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-title">Micción</div><div class="record-chips">${chips.join('')}</div></div><button class="delete-btn" onclick="delRec('${r.id}')">✕</button></div>`;
+      if(r.pos) chips.push(`<span class="chip chip-gray"><i class="ti ti-${r.pos==='sentado'?'armchair':'man'}"></i>${r.pos}</span>`);
+      if(r.acoustics?.classification){ const c={weak:'chip-red',low:'chip-amber',normal:'chip-green',strong:'chip-blue'}[r.acoustics.classification]||'chip-gray'; chips.push(`<span class="chip ${c}"><i class="ti ti-microphone"></i>${r.acoustics.classification}</span>`); }
+      return `<div class="record-card"><div class="record-icon-wrap ri-mic"><i class="ti ti-droplets"></i></div><div class="record-body"><div class="record-time"><i class="ti ti-clock"></i>${r.hora}</div><div class="record-title">${lang==='es'?'Micción':'Voiding'}</div><div class="record-chips">${chips.join('')}</div></div><button class="record-del" onclick="delRec('${r.id}')"><i class="ti ti-x"></i></button></div>`;
     }
-    if(r.type==='drink') return `<div class="record-card"><div class="record-icon-wrap" style="background:var(--green-light)">💧</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-title">${r.tipo||'Bebida'}</div><div class="record-chips"><span class="chip chip-green">${r.vol||0}ml</span></div></div><button class="delete-btn" onclick="delRec('${r.id}')">✕</button></div>`;
-    if(r.type==='leak') return `<div class="record-card"><div class="record-icon-wrap" style="background:var(--amber-light)">⚠️</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-title">Fuga — ${r.tipo}</div>${r.muda?'<div class="record-chips"><span class="chip chip-amber">👕 Muda</span></div>':''}</div><button class="delete-btn" onclick="delRec('${r.id}')">✕</button></div>`;
+    if(r.type==='drink') return `<div class="record-card"><div class="record-icon-wrap ri-drink"><i class="ti ti-droplet"></i></div><div class="record-body"><div class="record-time"><i class="ti ti-clock"></i>${r.hora}</div><div class="record-title">${r.tipo||'Bebida'}</div><div class="record-chips"><span class="chip chip-green"><i class="ti ti-droplet"></i>${r.vol||0}ml</span></div></div><button class="record-del" onclick="delRec('${r.id}')"><i class="ti ti-x"></i></button></div>`;
+    if(r.type==='leak') return `<div class="record-card"><div class="record-icon-wrap ri-leak"><i class="ti ti-alert-triangle"></i></div><div class="record-body"><div class="record-time"><i class="ti ti-clock"></i>${r.hora}</div><div class="record-title">${lang==='es'?'Fuga':'Leak'} — ${r.tipo}</div>${r.muda?`<div class="record-chips"><span class="chip chip-amber"><i class="ti ti-shirt"></i>${lang==='es'?'Muda':'Changed'}</span></div>`:''}</div><button class="record-del" onclick="delRec('${r.id}')"><i class="ti ti-x"></i></button></div>`;
     return '';
   }).join('');
 }
-
 window.delRec=async(id)=>{ await deleteDoc(doc(db,'patients',patient.id,'records',id)); };
 
-// ── ANALYSIS ──
-window.setPeriod=(p,el)=>{ analysisPeriod=p; document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); renderAnalysis(); };
-
-// ── PDF GENERATION ──
-window.generatePDF=async()=>{
-  if(!patient?.id){ alert('Debes estar conectado para generar el informe'); return; }
-  const snap=await getDocs(query(collection(db,'patients',patient.id,'records'),orderBy('timestamp','desc')));
-  const allRecs=snap.docs.map(d=>({id:d.id,...d.data()}));
-  const from=analysisPeriod==='today'?todayKey():(()=>{ const d=new Date(); d.setDate(d.getDate()-6); return d.toISOString().slice(0,10); })();
-  const recs=allRecs.filter(r=>r.date>=from);
-  const mics=recs.filter(r=>r.type==='miction');
-  const drks=recs.filter(r=>r.type==='drink');
-  const leaks=recs.filter(r=>r.type==='leak');
-  const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0);
-  const avgVol=mics.length?Math.round(totalVol/mics.length):0;
-  const totalDrink=drks.reduce((a,r)=>a+(r.vol||0),0);
-  const days=[...new Set(mics.map(r=>r.date))].length||1;
-  const urgCounts=[0,0,0,0,0]; mics.forEach(r=>{ if(r.urgency!=null) urgCounts[r.urgency]++; });
-  const acousticRecs=mics.filter(r=>r.acoustics);
-  const flowDist={weak:0,low:0,normal:0,strong:0}; acousticRecs.forEach(r=>{ if(r.acoustics?.classification) flowDist[r.acoustics.classification]++; });
-  const sleepData=await getSleepData(todayKey());
-  const periodLabel=analysisPeriod==='today'?'Hoy ('+todayKey()+')':'Últimos 7 días';
-  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe CURG</title>
-  <style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:2rem;color:#1a2236;font-size:13px;}
-  .header{background:#1565c0;color:#fff;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;}
-  .header h1{margin:0 0 4px;font-size:1.3rem;}.header p{margin:0;opacity:0.85;font-size:12px;}
-  .section{margin-bottom:1.5rem;border:1px solid #dde3ee;border-radius:8px;overflow:hidden;}
-  .section-title{background:#f0f4f8;padding:10px 14px;font-weight:700;font-size:13px;border-bottom:1px solid #dde3ee;}
-  .section-body{padding:14px;}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .stat{background:#f8fafc;border:1px solid #e0e7ef;border-radius:6px;padding:10px;}
-  .stat-l{font-size:11px;color:#5a6a85;font-weight:600;text-transform:uppercase;}
-  .stat-v{font-size:1.2rem;font-weight:700;margin-top:2px;}.stat-r{font-size:10px;color:#9aaac0;margin-top:2px;}
-  table{width:100%;border-collapse:collapse;font-size:12px;}th{background:#f0f4f8;padding:6px 8px;text-align:left;font-weight:600;}
-  td{padding:6px 8px;border-top:1px solid #eee;}.tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin:1px;}
-  .tag-g{background:#e8f5e9;color:#2e7d32;}.tag-r{background:#ffebee;color:#c62828;}
-  .tag-a{background:#fff3e0;color:#e65100;}.tag-b{background:#e3f2fd;color:#1565c0;}
-  .footer{margin-top:2rem;padding:1rem;background:#f8fafc;border-radius:8px;font-size:11px;color:#9aaac0;text-align:center;}
-  .warn{background:#fff3e0;border:1px solid #e65100;border-radius:6px;padding:10px 12px;font-size:12px;color:#e65100;margin-bottom:1rem;}
-  </style></head><body>
-  <div class="header"><h1>🏥 CURG Diario Miccional — Informe Clínico</h1>
-  <p>Paciente: <strong>${patient.nombre||'—'}</strong> · Período: ${periodLabel} · Generado: ${new Date().toLocaleString('es')}</p>
-  ${patient.diagnostico?`<p>Diagnóstico: ${patient.diagnostico}</p>`:''}
-  ${patient.medicoTratante?`<p>Médico tratante: ${patient.medicoTratante}</p>`:''}
-  ${sleepData?`<p>Horario: Despertar ${sleepData.wake||'—'} · Dormir ${sleepData.sleep||'—'}</p>`:''}
-  </div>
-  <div class="warn">⚠️ Este informe es un complemento clínico. No constituye un diagnóstico médico.</div>
-  <div class="section"><div class="section-title">📊 Resumen</div><div class="section-body"><div class="grid2">
-  <div class="stat"><div class="stat-l">Total micciones</div><div class="stat-v">${mics.length}</div><div class="stat-r">Normal: 4–7/día</div></div>
-  <div class="stat"><div class="stat-l">Vol. promedio</div><div class="stat-v">${avgVol} ml</div><div class="stat-r">Normal: 250–400 ml</div></div>
-  <div class="stat"><div class="stat-l">Vol. total orina</div><div class="stat-v">${totalVol} ml</div><div class="stat-r">Normal: 800–2000 ml/24h</div></div>
-  <div class="stat"><div class="stat-l">Líquido ingerido</div><div class="stat-v">${totalDrink} ml</div><div class="stat-r">Recomendado: 1500–2000 ml</div></div>
-  <div class="stat"><div class="stat-l">Fugas</div><div class="stat-v">${leaks.length}</div><div class="stat-r">Normal: 0</div></div>
-  <div class="stat"><div class="stat-l">Días con datos</div><div class="stat-v">${days}</div></div>
-  </div></div></div>
-  <div class="section"><div class="section-title">🚨 Urgencia</div><div class="section-body">
-  <table><tr><th>Nivel</th><th>Descripción</th><th>Nº</th></tr>
-  <tr><td>U0</td><td>Sin urgencia</td><td>${urgCounts[0]}</td></tr>
-  <tr><td>U1</td><td>Leve</td><td>${urgCounts[1]}</td></tr>
-  <tr><td>U2</td><td>Moderada</td><td>${urgCounts[2]}</td></tr>
-  <tr><td>U3</td><td>Severa</td><td>${urgCounts[3]}</td></tr>
-  <tr><td>U4</td><td>Incontinencia</td><td>${urgCounts[4]}</td></tr>
-  </table></div></div>
-  ${acousticRecs.length?`<div class="section"><div class="section-title">🎙 Análisis acústico</div><div class="section-body">
-  <div class="grid2">
-  <div class="stat"><div class="stat-l">🔴 Débil</div><div class="stat-v">${flowDist.weak}</div></div>
-  <div class="stat"><div class="stat-l">🟡 Bajo</div><div class="stat-v">${flowDist.low}</div></div>
-  <div class="stat"><div class="stat-l">🟢 Normal</div><div class="stat-v">${flowDist.normal}</div></div>
-  <div class="stat"><div class="stat-l">🔵 Fuerte</div><div class="stat-v">${flowDist.strong}</div></div>
-  </div></div></div>`:''}
-  <div class="section"><div class="section-title">📋 Micciones</div><div class="section-body">
-  <table><tr><th>Fecha</th><th>Hora</th><th>Vol</th><th>Dur</th><th>Flujo</th><th>Urgencia</th><th>Posición</th></tr>
-  ${mics.sort((a,b)=>a.date.localeCompare(b.date)||a.hora.localeCompare(b.hora)).map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.vol||'—'}</td><td>${r.dur||'—'}s</td><td>${r.flow?r.flow+' ml/s':'—'}</td><td>U${r.urgency??'—'}</td><td>${r.pos||'—'}</td></tr>`).join('')}
-  </table></div></div>
-  <div class="section"><div class="section-title">💧 Bebidas</div><div class="section-body">
-  <table><tr><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Vol</th></tr>
-  ${drks.sort((a,b)=>a.date.localeCompare(b.date)||a.hora.localeCompare(b.hora)).map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.tipo}</td><td>${r.vol||0} ml</td></tr>`).join('')}
-  </table></div></div>
-  <div class="footer">CURG Diario Miccional v2.0 · ${new Date().toLocaleString('es')} · ICS 2019, EAU 2023</div>
-  </body></html>`;
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
-  a.download=`CURG_${patient.nombre?.replace(/ /g,'_')}_${todayKey()}.html`;
-  a.click();
-};
-
-// ── ACOUSTIC ENGINE ──
-const FLOW_THRESHOLDS={weak:{min:2,max:12},low:{min:12,max:22},normal:{min:22,max:35},strong:{min:35,max:99}};
-const CALIBRATION_MS=2000;
-let aCtx=null,analyserNode=null,stream=null,waveAnimFrame=null;
-let micActive=false,acousticSamples=[],calibrationSamples=[],ambientBaseline=0,sampleInterval=null;
-
-async function startMicAndChrono(){
-  try{
-    stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
-    aCtx=new(window.AudioContext||window.webkitAudioContext)();
-    analyserNode=aCtx.createAnalyser(); analyserNode.fftSize=2048; analyserNode.smoothingTimeConstant=0.3;
-    aCtx.createMediaStreamSource(stream).connect(analyserNode);
-    micActive=true;
-    document.getElementById('micBanner').style.display='none';
-  } catch(e){
-    micActive=false;
-    document.getElementById('micBanner').style.display='flex';
-    startChronoTimer(); return;
-  }
-  calibrationSamples=[]; acousticSamples=[];
-  const wrap=document.getElementById('chronoWrap');
-  wrap.classList.add('calibrating');
-  document.getElementById('chronoLabel').textContent='CALIBRANDO...';
-  document.getElementById('chronoState').textContent='Midiendo ruido ambiente (2 seg)...';
-  startWaveAnim();
-  const calInt=setInterval(()=>calibrationSamples.push(getCurrentDB()),100);
-  setTimeout(()=>{
-    clearInterval(calInt);
-    ambientBaseline=calibrationSamples.reduce((a,b)=>a+b,0)/calibrationSamples.length;
-    wrap.classList.remove('calibrating'); wrap.classList.add('recording');
-    document.getElementById('chronoLabel').textContent='MIDIENDO';
-    document.getElementById('chronoState').textContent='Análisis acústico activo 🎙';
-    startChronoTimer();
-    const t0=Date.now();
-    sampleInterval=setInterval(()=>{ acousticSamples.push({t:Date.now()-t0,db:Math.max(0,getCurrentDB()-ambientBaseline)}); },100);
-  },CALIBRATION_MS);
-}
-
-function getCurrentDB(){
-  if(!analyserNode) return 0;
-  const data=new Uint8Array(analyserNode.frequencyBinCount);
-  analyserNode.getByteFrequencyData(data);
-  return 20*Math.log10(Math.max(1,data.reduce((a,b)=>a+b,0)/data.length));
-}
-
-function startWaveAnim(){
-  const bars=document.getElementById('waveformBar').querySelectorAll('.bar');
-  function tick(){
-    if(!micActive){ bars.forEach(b=>b.style.height='3px'); return; }
-    const db=getCurrentDB(); const norm=Math.min(1,Math.max(0,db-ambientBaseline)/40);
-    bars.forEach(b=>{ b.style.height=Math.max(3,norm*36*(0.3+Math.random()*0.7))+'px'; });
-    waveAnimFrame=requestAnimationFrame(tick);
-  }
-  tick();
-}
-
-function stopMic(){
-  if(sampleInterval){ clearInterval(sampleInterval); sampleInterval=null; }
-  cancelAnimationFrame(waveAnimFrame);
-  if(stream) stream.getTracks().forEach(t=>t.stop());
-  if(aCtx) aCtx.close().catch(()=>{});
-  micActive=false;
-  document.getElementById('waveformBar').querySelectorAll('.bar').forEach(b=>b.style.height='3px');
-}
-
-function analyzeAcoustics(){
-  if(!acousticSamples.length) return null;
-  const active=acousticSamples.filter(s=>s.db>2);
-  if(active.length<3) return null;
-  const dbVals=active.map(s=>s.db);
-  const peakDB=Math.max(...dbVals);
-  const avgDB=dbVals.reduce((a,b)=>a+b,0)/dbVals.length;
-  let classification='weak';
-  if(avgDB>=FLOW_THRESHOLDS.strong.min) classification='strong';
-  else if(avgDB>=FLOW_THRESHOLDS.normal.min) classification='normal';
-  else if(avgDB>=FLOW_THRESHOLDS.low.min) classification='low';
-  const step=Math.max(1,Math.floor(acousticSamples.length/20));
-  const curve=[];
-  for(let i=0;i<acousticSamples.length;i+=step) curve.push({t:+(acousticSamples[i].t/1000).toFixed(1),db:+acousticSamples[i].db.toFixed(1)});
-  let inGap=false,gapStart=0,gaps=[];
-  acousticSamples.forEach(s=>{ if(s.db<2&&!inGap){inGap=true;gapStart=s.t;}else if(s.db>=2&&inGap){gaps.push(s.t-gapStart);inGap=false;} });
-  return {peakDB:+peakDB.toFixed(1),avgDB:+avgDB.toFixed(1),ambientDB:+ambientBaseline.toFixed(1),classification,pattern:gaps.filter(g=>g>500).length>1?'intermittent':'continuous',durationSec:+(acousticSamples[acousticSamples.length-1].t/1000).toFixed(1),curve,samplesCount:acousticSamples.length};
-}
-
-// ── CHRONOMETER ──
-let cRunning=false,cStart=0,cElapsed=0,cInterval=null;
-
-window.chronoStart=async()=>{
-  document.getElementById('btnStart').style.display='none';
-  document.getElementById('btnReset').style.display='';
-  await startMicAndChrono();
-};
-
-function startChronoTimer(){
-  cRunning=true; cStart=Date.now()-cElapsed*1000;
-  document.getElementById('btnStop').style.display='';
-  cInterval=setInterval(()=>{
-    cElapsed=(Date.now()-cStart)/1000;
-    const m=Math.floor(cElapsed/60).toString().padStart(2,'0');
-    const s=Math.floor(cElapsed%60).toString().padStart(2,'0');
-    const f=(cElapsed%1).toFixed(1).slice(1);
-    document.getElementById('chronoDisplay').textContent=m+':'+s+f;
-  },100);
-}
-
-window.chronoStop=()=>{
-  clearInterval(cInterval); cRunning=false; stopMic();
-  document.getElementById('btnStop').style.display='none';
-  document.getElementById('micDur').value=Math.round(cElapsed);
-  document.getElementById('chronoState').textContent='Completado: '+Math.round(cElapsed)+'s';
-  document.getElementById('chronoWrap').classList.remove('recording','calibrating');
-  document.getElementById('chronoLabel').textContent='CRONÓMETRO';
-};
-
-window.chronoReset=()=>{
-  clearInterval(cInterval); cRunning=false; cElapsed=0; stopMic(); acousticSamples=[];
-  document.getElementById('chronoDisplay').textContent='00:00.0';
-  document.getElementById('chronoState').textContent='Presiona Iniciar — activa el micrófono automáticamente';
-  document.getElementById('btnStart').style.display='';
-  document.getElementById('btnStop').style.display='none';
-  document.getElementById('btnReset').style.display='none';
-  document.getElementById('chronoWrap').classList.remove('recording','calibrating');
-  document.getElementById('chronoLabel').textContent='CRONÓMETRO';
-  document.getElementById('micDur').value='';
-};
-
 // ── MODALS ──
-window.openModal=(type)=>{
+window.openM=(type)=>{
   const now=nowTime();
   if(type==='miction'){
-    document.getElementById('micHora').value=now;
-    document.getElementById('micVol').value=''; document.getElementById('micNotes').value='';
-    selectedUrg=null; selectedPos=null;
-    document.querySelectorAll('.urgency-btn').forEach(b=>b.classList.remove('selected'));
+    document.getElementById('micHora').value=now; document.getElementById('micVol').value=''; document.getElementById('micNotes').value='';
+    selUrg=null; selPos=null;
+    document.querySelectorAll('.urg-btn').forEach(b=>b.classList.remove('selected'));
     document.querySelectorAll('.pos-btn').forEach(b=>b.classList.remove('selected'));
+    document.getElementById('micErrors').innerHTML='';
     chronoReset();
-    clearMictionErrors();
     if(patient?.genero){ document.getElementById('micGenero').value=patient.genero; togglePos(); }
     document.getElementById('modalMiction').classList.add('open');
-  } else if(type==='drink'){
+  }else if(type==='drink'){
     document.getElementById('drkHora').value=now; document.getElementById('drkVol').value=''; document.getElementById('drkNotes').value='';
-    document.querySelectorAll('#modalDrink .field-err').forEach(e=>e.remove());
-    ['drkHora','drkVol'].forEach(id=>{ const el=document.getElementById(id); if(el){el.style.borderColor='';el.style.background='';} });
+    document.getElementById('drkErrors').innerHTML='';
     document.getElementById('modalDrink').classList.add('open');
-  } else if(type==='leak'){
+  }else if(type==='leak'){
     document.getElementById('leakHora').value=now; document.getElementById('leakMuda').checked=false; document.getElementById('leakNotes').value='';
     document.getElementById('modalLeak').classList.add('open');
   }
@@ -1134,395 +965,231 @@ window.openModal=(type)=>{
 window.closeM=(name)=>{ document.getElementById('modal'+name).classList.remove('open'); if(cRunning) chronoStop(); stopMic(); };
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m){ m.classList.remove('open'); if(cRunning) chronoStop(); stopMic(); } }));
 
-// ── VALIDATION HELPERS ──
-function showFieldError(id, msg){
-  const el=document.getElementById(id);
-  if(el){
-    el.style.borderColor='var(--red)';
-    el.style.background='var(--red-light)';
-    // Add error message below
-    const err=document.createElement('div');
-    err.className='field-err';
-    err.style.cssText='color:var(--red);font-size:11px;font-weight:600;margin-top:3px';
-    err.textContent=msg;
-    el.parentNode.insertBefore(err,el.nextSibling);
-  } else {
-    // It's a virtual error slot (urgency, pos, dur)
-    let slot=document.getElementById(id);
-    if(!slot){ slot=document.createElement('div'); slot.id=id; }
-    slot.className='field-err';
-    slot.style.cssText='color:var(--red);font-size:11px;font-weight:600;margin-top:3px;text-align:center';
-    slot.textContent=msg;
-    // Find parent section and append
-    const targets={'micUrgErr':'urgencySection','micPosErr':'posSection','micDurErr':'durSection'};
-    const parent=document.getElementById(targets[id]);
-    if(parent&&!parent.querySelector('#'+id)) parent.appendChild(slot);
-  }
-}
-function showFieldSuccess(id, msg){
-  const el=document.getElementById(id);
-  if(el){ el.style.color='var(--green)'; el.textContent=msg; setTimeout(()=>{ if(el) el.textContent=''; },3000); }
-}
-function clearMictionErrors(){
-  document.querySelectorAll('#modalMiction .field-err').forEach(e=>e.remove());
-  ['micHora','micVol','micDur'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el){ el.style.borderColor=''; el.style.background=''; }
-  });
-  ['micUrgErr','micPosErr','micDurErr'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.remove();
-  });
+// ── URGENCY / POS ──
+window.setUrg=(n)=>{ selUrg=n; document.querySelectorAll('.urg-btn').forEach((b,i)=>b.classList.toggle('selected',i===n)); };
+window.togglePos=()=>{ document.getElementById('posSection').style.display=document.getElementById('micGenero').value==='m'?'block':'none'; };
+window.setPos=(p)=>{ selPos=p; document.getElementById('posSit').classList.toggle('selected',p==='sentado'); document.getElementById('posStand').classList.toggle('selected',p==='parado'); };
+
+// ── ACOUSTIC ENGINE ──
+const THRESH={weak:{min:2,max:12},low:{min:12,max:22},normal:{min:22,max:35},strong:{min:35,max:99}};
+let aCtx=null,analyserNode=null,stream=null,waveAnimFrame=null;
+let micActive=false,acousticSamples=[],calibSamples=[],baseline=0,sampleInt=null;
+
+async function startMicAndChrono(){
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    aCtx=new(window.AudioContext||window.webkitAudioContext)();
+    analyserNode=aCtx.createAnalyser(); analyserNode.fftSize=2048; analyserNode.smoothingTimeConstant=0.3;
+    aCtx.createMediaStreamSource(stream).connect(analyserNode);
+    micActive=true; document.getElementById('micBanner').style.display='none';
+  }catch(e){ micActive=false; document.getElementById('micBanner').style.display='flex'; startChronoTimer(); return; }
+  calibSamples=[]; acousticSamples=[];
+  const wrap=document.getElementById('chronoWrap');
+  wrap.classList.add('calibrating');
+  document.getElementById('chronoLabel').textContent='CALIBRANDO...';
+  document.getElementById('chronoLabelIcon').className='ti ti-loader-2';
+  document.getElementById('chronoState').textContent='Midiendo ruido ambiente (2 seg)...';
+  startWaveAnim();
+  const ci=setInterval(()=>calibSamples.push(getDB()),100);
+  setTimeout(()=>{
+    clearInterval(ci);
+    baseline=calibSamples.reduce((a,b)=>a+b,0)/calibSamples.length;
+    wrap.classList.remove('calibrating'); wrap.classList.add('recording');
+    document.getElementById('chronoLabel').textContent='MIDIENDO';
+    document.getElementById('chronoLabelIcon').className='ti ti-microphone';
+    document.getElementById('chronoState').textContent='Análisis acústico activo';
+    startChronoTimer();
+    const t0=Date.now();
+    sampleInt=setInterval(()=>{ acousticSamples.push({t:Date.now()-t0,db:Math.max(0,getDB()-baseline)}); },100);
+  },2000);
 }
 
-// ── URGENCY / POS ──
-let selectedUrg=null,selectedPos=null;
-window.setUrg=(n)=>{ selectedUrg=n; document.querySelectorAll('.urgency-btn').forEach((b,i)=>b.classList.toggle('selected',i===n)); };
-window.togglePos=()=>{ document.getElementById('posSection').style.display=document.getElementById('micGenero').value==='m'?'block':'none'; };
-window.setPos=(p)=>{ selectedPos=p; document.getElementById('posSentado').classList.toggle('selected',p==='sentado'); document.getElementById('posParado').classList.toggle('selected',p==='parado'); };
+function getDB(){ if(!analyserNode) return 0; const d=new Uint8Array(analyserNode.frequencyBinCount); analyserNode.getByteFrequencyData(d); return 20*Math.log10(Math.max(1,d.reduce((a,b)=>a+b,0)/d.length)); }
+
+function startWaveAnim(){
+  const bars=document.getElementById('waveform').querySelectorAll('.wbar');
+  function tick(){
+    if(!micActive){ bars.forEach(b=>b.style.height='3px'); return; }
+    const db=getDB(); const norm=Math.min(1,Math.max(0,db-baseline)/40);
+    bars.forEach(b=>{ b.style.height=Math.max(3,norm*32*(0.3+Math.random()*0.7))+'px'; });
+    waveAnimFrame=requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+function stopMic(){
+  if(sampleInt){clearInterval(sampleInt);sampleInt=null;}
+  cancelAnimationFrame(waveAnimFrame);
+  if(stream) stream.getTracks().forEach(t=>t.stop());
+  if(aCtx) aCtx.close().catch(()=>{});
+  micActive=false;
+  document.getElementById('waveform').querySelectorAll('.wbar').forEach(b=>b.style.height='3px');
+}
+
+function analyzeAcoustics(){
+  if(!acousticSamples.length) return null;
+  const active=acousticSamples.filter(s=>s.db>2);
+  if(active.length<3) return null;
+  const dbVals=active.map(s=>s.db);
+  const peakDB=Math.max(...dbVals); const avgDB=dbVals.reduce((a,b)=>a+b,0)/dbVals.length;
+  let classification='weak';
+  if(avgDB>=THRESH.strong.min) classification='strong';
+  else if(avgDB>=THRESH.normal.min) classification='normal';
+  else if(avgDB>=THRESH.low.min) classification='low';
+  const step=Math.max(1,Math.floor(acousticSamples.length/20));
+  const curve=[]; for(let i=0;i<acousticSamples.length;i+=step) curve.push({t:+(acousticSamples[i].t/1000).toFixed(1),db:+acousticSamples[i].db.toFixed(1)});
+  let inGap=false,gs=0,gaps=[];
+  acousticSamples.forEach(s=>{ if(s.db<2&&!inGap){inGap=true;gs=s.t;}else if(s.db>=2&&inGap){gaps.push(s.t-gs);inGap=false;} });
+  return {peakDB:+peakDB.toFixed(1),avgDB:+avgDB.toFixed(1),ambientDB:+baseline.toFixed(1),classification,pattern:gaps.filter(g=>g>500).length>1?'intermittent':'continuous',durationSec:+(acousticSamples[acousticSamples.length-1].t/1000).toFixed(1),curve,samplesCount:acousticSamples.length};
+}
+
+// ── CHRONOMETER ──
+let cRunning=false,cStart=0,cElapsed=0,cInterval=null;
+window.chronoStart=async()=>{ document.getElementById('btnStart').style.display='none'; document.getElementById('btnReset').style.display=''; await startMicAndChrono(); };
+function startChronoTimer(){ cRunning=true; cStart=Date.now()-cElapsed*1000; document.getElementById('btnStop').style.display=''; cInterval=setInterval(()=>{ cElapsed=(Date.now()-cStart)/1000; const m=Math.floor(cElapsed/60).toString().padStart(2,'0'); const s=Math.floor(cElapsed%60).toString().padStart(2,'0'); const f=(cElapsed%1).toFixed(1).slice(1); document.getElementById('chronoDisplay').textContent=m+':'+s+f; },100); }
+window.chronoStop=()=>{ clearInterval(cInterval); cRunning=false; stopMic(); document.getElementById('btnStop').style.display='none'; document.getElementById('micDur').value=Math.round(cElapsed); document.getElementById('chronoState').textContent='Completado: '+Math.round(cElapsed)+'s'; document.getElementById('chronoWrap').classList.remove('recording','calibrating'); document.getElementById('chronoLabel').textContent='CRONÓMETRO'; document.getElementById('chronoLabelIcon').className='ti ti-clock'; };
+window.chronoReset=()=>{ clearInterval(cInterval); cRunning=false; cElapsed=0; stopMic(); acousticSamples=[]; document.getElementById('chronoDisplay').textContent='00:00.0'; document.getElementById('chronoState').textContent='Presiona Iniciar — activa el micrófono automáticamente'; document.getElementById('btnStart').style.display=''; document.getElementById('btnStop').style.display='none'; document.getElementById('btnReset').style.display='none'; document.getElementById('chronoWrap').classList.remove('recording','calibrating'); document.getElementById('chronoLabel').textContent='CRONÓMETRO'; document.getElementById('chronoLabelIcon').className='ti ti-clock'; document.getElementById('micDur').value=''; };
 
 // ── SAVE ──
-async function addRecord(data){
-  if(!patient?.id) return;
-  await addDoc(collection(db,'patients',patient.id,'records'),{...data,timestamp:serverTimestamp()});
-  await updateDoc(doc(db,'patients',patient.id),{lastRecord:Date.now()});
-}
+async function addRecord(data){ if(!patient?.id) return; await addDoc(collection(db,'patients',patient.id,'records'),{...data,timestamp:serverTimestamp()}); await updateDoc(doc(db,'patients',patient.id),{lastRecord:Date.now()}); }
 
 window.saveMiction=async()=>{
-  const hora=document.getElementById('micHora').value;
-  const vol=parseFloat(document.getElementById('micVol').value)||null;
-  const dur=parseFloat(document.getElementById('micDur').value)||null;
-  const genero=document.getElementById('micGenero').value;
-  // Validation
-  const errs=[];
-  if(!hora) errs.push(['micHora','Hora obligatoria']);
-  if(!vol) errs.push(['micVol','Volumen obligatorio — usa una jarra medidora']);
-  if(!dur) errs.push(['micDurErr','Duración obligatoria — usa el cronómetro']);
-  if(selectedUrg===null) errs.push(['micUrgErr','Selecciona nivel de urgencia']);
-  if(genero==='m' && !selectedPos) errs.push(['micPosErr','Selecciona posición']);
-  if(errs.length){
-    clearMictionErrors();
-    errs.forEach(([id,msg])=>showFieldError(id,msg));
-    return;
-  }
-  clearMictionErrors();
+  const hora=document.getElementById('micHora').value; const vol=parseFloat(document.getElementById('micVol').value)||null; const dur=parseFloat(document.getElementById('micDur').value)||null; const genero=document.getElementById('micGenero').value;
+  const errs=[]; const errEl=document.getElementById('micErrors'); errEl.innerHTML='';
+  if(!hora) errs.push('Hora obligatoria');
+  if(!vol) errs.push('Volumen obligatorio — usa una jarra medidora');
+  if(!dur) errs.push('Duración obligatoria — usa el cronómetro');
+  if(selUrg===null) errs.push('Selecciona nivel de urgencia');
+  if(genero==='m'&&!selPos) errs.push('Selecciona posición');
+  if(errs.length){ errEl.innerHTML=errs.map(e=>`<div class="msg-error"><i class="ti ti-alert-circle"></i><span>${e}</span></div>`).join(''); return; }
   const acoustics=analyzeAcoustics();
-  await addRecord({type:'miction',date:todayKey(),hora,vol,dur,flow:(vol&&dur)?+(vol/dur).toFixed(2):null,genero,urgency:selectedUrg,pos:selectedPos,notas:document.getElementById('micNotes').value,acoustics:acoustics||null});
+  await addRecord({type:'miction',date:todayKey(),hora,vol,dur,flow:(vol&&dur)?+(vol/dur).toFixed(2):null,genero,urgency:selUrg,pos:selPos,notas:document.getElementById('micNotes').value,acoustics:acoustics||null});
   closeM('Miction');
 };
+
 window.saveDrink=async()=>{
-  const hora=document.getElementById('drkHora').value;
-  const vol=parseFloat(document.getElementById('drkVol').value)||null;
+  const hora=document.getElementById('drkHora').value; const vol=parseFloat(document.getElementById('drkVol').value)||null;
+  const errEl=document.getElementById('drkErrors'); errEl.innerHTML='';
   const errs=[];
-  if(!hora) errs.push(['drkHora','Hora obligatoria']);
-  if(!vol) errs.push(['drkVol','Volumen obligatorio']);
-  if(errs.length){ errs.forEach(([id,msg])=>showFieldError(id,msg)); return; }
-  document.querySelectorAll('#modalDrink .field-err').forEach(e=>e.remove());
+  if(!hora) errs.push('Hora obligatoria');
+  if(!vol) errs.push('Volumen obligatorio');
+  if(errs.length){ errEl.innerHTML=errs.map(e=>`<div class="msg-error"><i class="ti ti-alert-circle"></i><span>${e}</span></div>`).join(''); return; }
   await addRecord({type:'drink',date:todayKey(),hora,vol,tipo:document.getElementById('drkTipo').value,notas:document.getElementById('drkNotes').value});
   closeM('Drink');
 };
+
 window.saveLeak=async()=>{
   const hora=document.getElementById('leakHora').value; if(!hora) return;
   await addRecord({type:'leak',date:todayKey(),hora,tipo:document.getElementById('leakTipo').value,muda:document.getElementById('leakMuda').checked,notas:document.getElementById('leakNotes').value});
   closeM('Leak');
 };
 
-// ── PWA INSTALL ──
-let deferredPrompt = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault(); deferredPrompt = e;
-  if (!localStorage.getItem('curg_install_dismissed')) {
-    document.getElementById('installBanner').style.display = 'flex';
-  }
-});
-window.installPWA = async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  document.getElementById('installBanner').style.display = 'none';
-};
-window.dismissInstall = () => {
-  localStorage.setItem('curg_install_dismissed','1');
-  document.getElementById('installBanner').style.display = 'none';
-};
+// ── ANALYSIS ──
+window.setPeriod=(p,el)=>{ analysisPeriod=p; document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); renderAnalysis(); };
 
-// Register service worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').then(reg => {
-    console.log('SW registered');
-  }).catch(e => console.log('SW error:', e));
+async function renderAnalysis(){
+  if(!patient?.id) return;
+  const snap=await getDocs(query(collection(db,'patients',patient.id,'records'),orderBy('timestamp','desc')));
+  const all=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const from=analysisPeriod==='today'?todayKey():(()=>{ const d=new Date(); d.setDate(d.getDate()-6); return d.toISOString().slice(0,10); })();
+  const recs=all.filter(r=>r.date>=from);
+  const sleepData=await getSleepData(todayKey());
+  await renderAnalysisContent(recs,sleepData);
 }
 
-// ── STREAK ──
-function updateStreak() {
-  if (!patient?.id) return;
-  const key = 'curg_streak_' + patient.id;
-  const data = JSON.parse(localStorage.getItem(key) || '{"days":0,"last":""}');
-  const today = todayKey();
-  const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
-  const yKey = yesterday.toISOString().slice(0,10);
-  if (data.last === today) {
-    // Already counted today
-  } else if (data.last === yKey) {
-    data.days++; data.last = today;
-  } else if (data.last !== today) {
-    data.days = 1; data.last = today;
-  }
-  localStorage.setItem(key, JSON.stringify(data));
-  const badge = document.getElementById('streakBadge');
-  const days = document.getElementById('streakDays');
-  if (badge && days) {
-    days.textContent = data.days;
-    badge.style.display = data.days >= 2 ? 'flex' : 'none';
-  }
+async function getSleepData(dateKey){
+  try{ const snap=await getDoc(doc(db,'patients',patient.id,'sleep',dateKey)); if(snap.exists()) return snap.data(); }catch(e){}
+  const local=JSON.parse(localStorage.getItem('dm_sleep_'+patient?.id)||'{}');
+  return local[dateKey]||null;
 }
 
-// ── WELLBEING ──
-let selectedWellbeing = null, selectedPain = null;
+function isNocturnal(hora,wake,sleep){ if(!wake||!sleep) return false; const toMin=t=>{ const[h,m]=t.split(':').map(Number); return h*60+m; }; const r=toMin(hora),w=toMin(wake),s=toMin(sleep); return s>w?(r>=s||r<w):(r>=s&&r<w); }
 
-window.setWellbeing = (val) => {
-  selectedWellbeing = val;
-  document.querySelectorAll('.wb-btn').forEach(b => b.classList.remove('selected'));
-  const map = {'great':0,'ok':1,'bad':2};
-  document.querySelectorAll('.wb-btn')[map[val]]?.classList.add('selected');
-  saveWellbeing();
-};
-window.setPain = (val) => {
-  selectedPain = val;
-  document.querySelectorAll('.pain-btn').forEach((b,i) => b.classList.toggle('selected', i===val));
-  saveWellbeing();
-};
+async function renderAnalysisContent(recs,sleepData){
+  const mics=recs.filter(r=>r.type==='miction'); const drks=recs.filter(r=>r.type==='drink'); const leaks=recs.filter(r=>r.type==='leak');
+  const wake=sleepData?.wake||null; const sleep=sleepData?.sleep||null;
+  const nightMics=wake&&sleep?mics.filter(r=>isNocturnal(r.hora,wake,sleep)):[];
+  const dayMics=mics.filter(r=>!nightMics.includes(r));
+  const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0); const avgVol=mics.length?Math.round(totalVol/mics.length):0;
+  const days=[...new Set(mics.map(r=>r.date))].length||1; const micPerDay=+(mics.length/days).toFixed(1);
+  const totalDrink=drks.reduce((a,r)=>a+(r.vol||0),0); const nicturia=nightMics.length;
+  const sf=micPerDay<=7&&micPerDay>=4?'green':micPerDay>8?'red':'amber';
+  const sv=avgVol>=250&&avgVol<=400?'green':avgVol>400?'amber':'red';
+  const sl2=leaks.length===0?'green':leaks.length<=2?'amber':'red';
+  const sn=nicturia===0?'green':nicturia===1?'amber':'red';
 
-async function saveWellbeing() {
-  if (!patient?.id || selectedWellbeing === null) return;
-  const data = { date: todayKey(), wellbeing: selectedWellbeing, pain: selectedPain, timestamp: serverTimestamp() };
-  try {
-    await setDoc(doc(db,'patients',patient.id,'wellbeing',todayKey()), data, {merge:true});
-    document.getElementById('wellbeingStatus').textContent = '✓ Guardado';
-    setTimeout(() => { const el = document.getElementById('wellbeingStatus'); if(el) el.textContent=''; }, 2000);
-  } catch(e) { console.log('Wellbeing save error:', e); }
-}
-
-async function loadWellbeing() {
-  if (!patient?.id) return;
-  try {
-    const snap = await getDoc(doc(db,'patients',patient.id,'wellbeing',todayKey()));
-    if (snap.exists()) {
-      const d = snap.data();
-      if (d.wellbeing) { selectedWellbeing = d.wellbeing; const map={'great':0,'ok':1,'bad':2}; document.querySelectorAll('.wb-btn')[map[d.wellbeing]]?.classList.add('selected'); }
-      if (d.pain !== null && d.pain !== undefined) { selectedPain = d.pain; document.querySelectorAll('.pain-btn').forEach((b,i)=>b.classList.toggle('selected',i===d.pain)); }
-    }
-  } catch(e) {}
-}
-
-// ── NOTIFICATIONS ──
-const NOTIF_SCHEDULES = {
-  wake:    { label:'Hora de despertar', times:['05:00'], msg:'🌅 Buenos días — no olvides registrar tu hora de levantada' },
-  water:   { label:'Toma de agua', times:['08:00','10:00','12:00','14:00','16:00','18:00'], msg:'💧 Recuerda registrar lo que bebes' },
-  miction: { label:'Micción', times:['09:00','12:00','15:00','18:00'], msg:'🚽 Momento de registrar tu micción' },
-  sleep:   { label:'Hora de acostarse', times:['18:00'], msg:'🌙 Recuerda registrar tu hora de dormir antes de acostarte' }
-};
-
-let notifSettings = JSON.parse(localStorage.getItem('curg_notifs') || '{"wake":false,"water":false,"miction":false,"sleep":false}');
-
-function renderNotifToggles() {
-  Object.keys(notifSettings).forEach(k => {
-    const el = document.getElementById('tog' + k.charAt(0).toUpperCase() + k.slice(1));
-    if (el) el.classList.toggle('on', notifSettings[k]);
-  });
-}
-
-window.toggleNotif = async (key) => {
-  if (!('Notification' in window)) {
-    document.getElementById('notifStatus').textContent = 'Tu navegador no soporta notificaciones';
-    return;
-  }
-  if (notifSettings[key]) {
-    notifSettings[key] = false;
-    localStorage.setItem('curg_notifs', JSON.stringify(notifSettings));
-    renderNotifToggles();
-    document.getElementById('notifStatus').textContent = '🔕 Recordatorio desactivado';
-    return;
-  }
-  const perm = await Notification.requestPermission();
-  if (perm !== 'granted') {
-    document.getElementById('notifStatus').textContent = '⚠️ Debes permitir notificaciones en tu navegador';
-    return;
-  }
-  notifSettings[key] = true;
-  localStorage.setItem('curg_notifs', JSON.stringify(notifSettings));
-  renderNotifToggles();
-  document.getElementById('notifStatus').textContent = '✓ Recordatorio activado — mantén la app instalada';
-  scheduleNotifications();
-};
-
-function scheduleNotifications() {
-  // Use setInterval to check time every minute
-  if (window._notifInterval) clearInterval(window._notifInterval);
-  window._notifInterval = setInterval(checkNotifTime, 60000);
-  checkNotifTime(); // check immediately
-}
-
-function checkNotifTime() {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  const now = new Date();
-  const hm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-  const fired = JSON.parse(sessionStorage.getItem('curg_fired') || '{}');
-  Object.entries(NOTIF_SCHEDULES).forEach(([key, sched]) => {
-    if (!notifSettings[key]) return;
-    sched.times.forEach(t => {
-      const fkey = key + '_' + t + '_' + todayKey();
-      if (hm === t && !fired[fkey]) {
-        new Notification('CURG Diario Miccional', { body: sched.msg, icon: '/manifest.json', tag: fkey });
-        fired[fkey] = true;
-        sessionStorage.setItem('curg_fired', JSON.stringify(fired));
-      }
-    });
-  });
-}
-
-// ── SLEEP IN ANALYSIS — with day/night split ──
-async function getSleepData(dateKey) {
-  // Try Firebase first, fallback to local
-  try {
-    const snap = await getDoc(doc(db,'patients',patient.id,'sleep',dateKey));
-    if (snap.exists()) return snap.data();
-  } catch(e) {}
-  const local = JSON.parse(localStorage.getItem('dm_sleep_'+patient?.id)||'{}');
-  return local[dateKey] || null;
-}
-
-function isNocturnal(hora, wake, sleep) {
-  if (!wake || !sleep) return false;
-  // Nocturnal = after sleep time OR before wake time
-  const toMin = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
-  const recMin = toMin(hora);
-  const wakeMin = toMin(wake);
-  const sleepMin = toMin(sleep);
-  if (sleepMin > wakeMin) {
-    return recMin >= sleepMin || recMin < wakeMin;
-  }
-  return recMin >= sleepMin && recMin < wakeMin;
-}
-
-// ── UPDATED renderAnalysis with sleep + nicturia ──
-async function renderAnalysisWithSleep(recs, sleepData) {
-  const mics = recs.filter(r=>r.type==='miction');
-  const drks = recs.filter(r=>r.type==='drink');
-  const leaks = recs.filter(r=>r.type==='leak');
-
-  // Day/night split
-  const wake = sleepData?.wake || null;
-  const sleep = sleepData?.sleep || null;
-  const nightMics = wake && sleep ? mics.filter(r => isNocturnal(r.hora, wake, sleep)) : [];
-  const dayMics = mics.filter(r => !nightMics.includes(r));
-
-  const totalVol = mics.reduce((a,r)=>a+(r.vol||0),0);
-  const avgVol = mics.length ? Math.round(totalVol/mics.length) : 0;
-  const days = [...new Set(mics.map(r=>r.date))].length||1;
-  const micPerDay = +(mics.length/days).toFixed(1);
-  const totalDrink = drks.reduce((a,r)=>a+(r.vol||0),0);
-  const nicturia = nightMics.length;
-
-  const semFreq = micPerDay<=7&&micPerDay>=4?'green':micPerDay>8?'red':'amber';
-  const semVol = avgVol>=250&&avgVol<=400?'green':avgVol>400?'amber':'red';
-  const semLeaks = leaks.length===0?'green':leaks.length<=2?'amber':'red';
-  const semNic = nicturia===0?'green':nicturia===1?'amber':'red';
-  const sem = (icon,label,val,cls) => `<div class="sem-item sem-${cls}"><div class="sem-icon">${icon}</div><div class="sem-label">${label}</div><div class="sem-val">${val}</div></div>`;
-
-  let sleepHTML = '';
-  if (wake && sleep) {
-    sleepHTML = `<div class="night-section">
-      <h4>🌙 Período nocturno</h4>
-      <p>Dormiste de <strong>${sleep}</strong> a <strong>${wake}</strong> · Micciones nocturnas (nicturia): <strong style="color:${nicturia>1?'var(--red)':nicturia===1?'var(--amber)':'var(--green)'}">${nicturia}</strong> · Normal: 0–1</p>
-      ${nicturia > 1 ? '<p style="color:var(--red);font-weight:600;margin-top:4px">⚠️ Nicturia elevada — comenta con tu médico</p>' : ''}
-    </div>`;
-  } else {
-    sleepHTML = `<div class="night-section"><h4>🌙 Sin horario de sueño</h4><p>Registra tu hora de despertar y acostarse para ver el análisis de nicturia.</p></div>`;
-  }
-
-  document.getElementById('analysisContent').innerHTML = `
-    ${sleepHTML}
-    <div class="semaphore">
-      ${sem('🚽','Frec/día',micPerDay+'/día',semFreq)}
-      ${sem('📏','Vol. prom',avgVol+'ml',semVol)}
-      ${sem('⚠️','Fugas',leaks.length,semLeaks)}
-      ${sem('🌙','Nicturia',nicturia,semNic)}
+  document.getElementById('analysisContent').innerHTML=`
+    ${sleepData?`<div class="night-sec"><h4><i class="ti ti-moon"></i>Período nocturno</h4><p>Dormiste de <strong>${sleepData.sleep||'—'}</strong> a <strong>${sleepData.wake||'—'}</strong> · Micciones nocturnas: <strong style="color:${nicturia>1?'var(--red)':nicturia===1?'var(--amber)':'var(--green)'}">${nicturia}</strong> de ${mics.length} total · Normal: 0–1</p>${nicturia>1?'<p style="color:var(--red);font-weight:600;margin-top:4px">Nicturia elevada — comenta con tu médico</p>':''}</div>`:'<div class="night-sec"><h4><i class="ti ti-moon"></i>Sin horario de sueño</h4><p>Registra tu hora de despertar y acostarse para ver nicturia.</p></div>'}
+    <div class="sem-grid">
+      <div class="sem-item sem-${sf}"><i class="ti ti-droplets"></i><div class="sem-lbl">Frec/día</div><div class="sem-val">${micPerDay}/día</div></div>
+      <div class="sem-item sem-${sv}"><i class="ti ti-ruler"></i><div class="sem-lbl">Vol. prom</div><div class="sem-val">${avgVol}ml</div></div>
+      <div class="sem-item sem-${sl2}"><i class="ti ti-alert-triangle"></i><div class="sem-lbl">Fugas</div><div class="sem-val">${leaks.length}</div></div>
+      <div class="sem-item sem-${sn}"><i class="ti ti-moon"></i><div class="sem-lbl">Nicturia</div><div class="sem-val">${nicturia}</div></div>
     </div>
     <div class="stat-grid">
-      <div class="stat-card"><div class="stat-label">Micciones diurnas</div><div class="stat-val">${dayMics.length}</div><div class="stat-ref">Normal: 4–7/día</div></div>
-      <div class="stat-card"><div class="stat-label">Micciones nocturnas</div><div class="stat-val" style="color:${nicturia>1?'var(--red)':'var(--text)'}">${nicturia}</div><div class="stat-ref">Normal: 0–1/noche</div></div>
-      <div class="stat-card"><div class="stat-label">Vol. total orina</div><div class="stat-val">${totalVol}<span class="stat-unit">ml</span></div><div class="stat-ref">Normal: 800–2000ml</div></div>
-      <div class="stat-card"><div class="stat-label">Líquido ingerido</div><div class="stat-val">${totalDrink}<span class="stat-unit">ml</span></div><div class="stat-ref">Recomendado: 1.5–2L</div></div>
+      <div class="stat-card"><div class="stat-lbl">Micciones diurnas</div><div class="stat-val">${dayMics.length}</div><div class="stat-ref">Normal: 4–7/día</div></div>
+      <div class="stat-card"><div class="stat-lbl">Micciones nocturnas</div><div class="stat-val" style="color:${nicturia>1?'var(--red)':'var(--text)'}">${nicturia}</div><div class="stat-ref">Normal: 0–1/noche</div></div>
+      <div class="stat-card"><div class="stat-lbl">Vol. total orina</div><div class="stat-val">${totalVol}<span class="stat-unit">ml</span></div><div class="stat-ref">Normal: 800–2000ml</div></div>
+      <div class="stat-card"><div class="stat-lbl">Líquido ingerido</div><div class="stat-val">${totalDrink}<span class="stat-unit">ml</span></div><div class="stat-ref">Recomend.: 1.5–2L</div></div>
     </div>
-    <div class="chart-section">
-      <div class="chart-title">Micciones por hora (🌞 diurna / 🌙 nocturna)</div>
-      <div class="chart-wrap"><canvas id="chartHours"></canvas></div>
-      <div class="normal-range">ℹ️ Patrón normal: actividad entre 8h–22h, sin nicturia frecuente</div>
-    </div>
-    <div class="chart-section">
-      <div class="chart-title">Volumen por micción (ml)</div>
-      <div class="chart-wrap"><canvas id="chartVols"></canvas></div>
-      <div class="normal-range">ℹ️ Rango normal: 250–400 ml por micción (ICS 2019)</div>
-    </div>
+    <div class="chart-sec"><div class="chart-lbl"><i class="ti ti-chart-bar"></i>Micciones por hora</div><div class="chart-wrap"><canvas id="chHours"></canvas></div><div class="ref-note"><i class="ti ti-info-circle"></i>Patrón normal: actividad entre 8h–22h</div></div>
+    <div class="chart-sec"><div class="chart-lbl"><i class="ti ti-chart-dots"></i>Volumen por micción (ml)</div><div class="chart-wrap"><canvas id="chVols"></canvas></div><div class="ref-note"><i class="ti ti-info-circle"></i>Rango normal: 250–400 ml (ICS 2019)</div></div>
   `;
 
-  setTimeout(() => {
-    const hourDay = Array(24).fill(0);
-    const hourNight = Array(24).fill(0);
-    dayMics.forEach(r => { const h=parseInt((r.hora||'0').split(':')[0]); hourDay[h]++; });
-    nightMics.forEach(r => { const h=parseInt((r.hora||'0').split(':')[0]); hourNight[h]++; });
-    const ctx1 = document.getElementById('chartHours');
-    if (ctx1) {
-      new Chart(ctx1, { type:'bar', data:{ labels:Array.from({length:24},(_,i)=>i+'h'), datasets:[
-        { label:'Diurna', data:hourDay, backgroundColor:'#1976d299', borderRadius:4 },
-        { label:'Nocturna', data:hourNight, backgroundColor:'#6a1b9a99', borderRadius:4 }
-      ]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{x:{stacked:true},y:{stacked:true,ticks:{stepSize:1}}}}});
-    }
-    const ctx2 = document.getElementById('chartVols');
-    if (ctx2) {
-      const volData = mics.filter(r=>r.vol).map(r=>({x:r.hora,y:r.vol}));
-      new Chart(ctx2, { type:'scatter', data:{ datasets:[
-        {label:'ml', data:volData, backgroundColor:'#2e7d3299', pointRadius:7},
-        {data:[{x:'00:00',y:250},{x:'23:59',y:250}],type:'line',borderColor:'#2e7d3244',borderDash:[4,4],pointRadius:0},
-        {data:[{x:'00:00',y:400},{x:'23:59',y:400}],type:'line',borderColor:'#e6510044',borderDash:[4,4],pointRadius:0}
-      ]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{type:'category'},y:{min:0,title:{display:true,text:'ml'}}}}});
-    }
-  }, 100);
+  setTimeout(()=>{
+    const OPTS={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'var(--text2)',font:{size:11}}}},scales:{x:{ticks:{color:'var(--text2)'},grid:{color:'var(--border)'}},y:{ticks:{color:'var(--text2)'},grid:{color:'var(--border)'}}}};
+    const c1=document.getElementById('chHours');
+    if(c1){ const hd=Array(24).fill(0),hn=Array(24).fill(0); dayMics.forEach(r=>{hd[parseInt((r.hora||'0').split(':')[0])]++;}); nightMics.forEach(r=>{hn[parseInt((r.hora||'0').split(':')[0])]++;}); new Chart(c1,{type:'bar',data:{labels:Array.from({length:24},(_,i)=>i+'h'),datasets:[{label:'Diurna',data:hd,backgroundColor:'#378ADD99',borderRadius:3},{label:'Nocturna',data:hn,backgroundColor:'rgba(106,27,154,.5)',borderRadius:3}]},options:{...OPTS,scales:{x:{...OPTS.scales.x,stacked:true},y:{...OPTS.scales.y,stacked:true,ticks:{stepSize:1,color:'var(--text2)'}}},plugins:{legend:{position:'top',labels:{color:'var(--text2)',font:{size:11}}}}}}); }
+    const c2=document.getElementById('chVols');
+    if(c2){ const vd=mics.filter(r=>r.vol).map(r=>({x:r.hora,y:r.vol})); new Chart(c2,{type:'scatter',data:{datasets:[{label:'ml',data:vd,backgroundColor:'#378ADD88',pointRadius:7},{data:[{x:'00:00',y:250},{x:'23:59',y:250}],type:'line',borderColor:'#3B6D1144',borderDash:[4,4],pointRadius:0},{data:[{x:'00:00',y:400},{x:'23:59',y:400}],type:'line',borderColor:'#854F0B44',borderDash:[4,4],pointRadius:0}]},options:{...OPTS,scales:{x:{type:'category',ticks:{color:'var(--text2)'},grid:{color:'var(--border)'}},y:{min:0,title:{display:true,text:'ml',color:'var(--text2)'},ticks:{color:'var(--text2)'},grid:{color:'var(--border)'}}},plugins:{legend:{display:false}}}}); }
+  },100);
 }
 
-// ── OVERRIDE renderAnalysis to include sleep ──
-async function renderAnalysis() {
-  if (!patient?.id) return;
-  const snap = await getDocs(query(collection(db,'patients',patient.id,'records'),orderBy('timestamp','desc')));
-  const allRecs = snap.docs.map(d=>({id:d.id,...d.data()}));
-  const from = analysisPeriod==='today' ? todayKey() : (()=>{ const d=new Date(); d.setDate(d.getDate()-6); return d.toISOString().slice(0,10); })();
-  const recs = allRecs.filter(r=>r.date>=from);
-  // Get sleep data for today (or last available)
-  const sleepData = await getSleepData(todayKey());
-  await renderAnalysisWithSleep(recs, sleepData);
-}
+// ── PDF ──
+window.genPDF=async()=>{
+  if(!patient?.id){ alert('Debes estar conectado'); return; }
+  const snap=await getDocs(query(collection(db,'patients',patient.id,'records'),orderBy('timestamp','desc')));
+  const all=snap.docs.map(d=>({id:d.id,...d.data()}));
+  const from=analysisPeriod==='today'?todayKey():(()=>{ const d=new Date(); d.setDate(d.getDate()-6); return d.toISOString().slice(0,10); })();
+  const recs=all.filter(r=>r.date>=from);
+  const mics=recs.filter(r=>r.type==='miction'); const drks=recs.filter(r=>r.type==='drink'); const leaks=recs.filter(r=>r.type==='leak');
+  const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0); const avgVol=mics.length?Math.round(totalVol/mics.length):0;
+  const totalDrink=drks.reduce((a,r)=>a+(r.vol||0),0); const urgC=[0,0,0,0,0]; mics.forEach(r=>{ if(r.urgency!=null) urgC[r.urgency]++; });
+  const acRecs=mics.filter(r=>r.acoustics); const fD={weak:0,low:0,normal:0,strong:0}; acRecs.forEach(r=>{ if(r.acoustics?.classification) fD[r.acoustics.classification]++; });
+  const sleepData=await getSleepData(todayKey());
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe CURG</title><style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:2rem;color:#1e2a3a;font-size:12px;}.header{background:#042C53;color:#fff;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;}.header h1{margin:0 0 4px;font-size:1.2rem;}.header p{margin:2px 0;opacity:.85;font-size:11px;}.innoia{color:#D85A30;font-weight:700;}.curg{color:#4fc3f7;font-weight:700;}.warn{background:#fff3e0;border:1px solid #e65100;border-radius:6px;padding:10px 12px;color:#e65100;margin-bottom:1rem;font-size:11px;}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;}.stat{background:#f4f6f9;border:1px solid #e2e8f0;border-radius:6px;padding:8px;}.stat-l{font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;}.stat-v{font-size:1.1rem;font-weight:700;margin-top:2px;}.stat-r{font-size:10px;color:#94a3b8;margin-top:2px;}h2{font-size:13px;color:#042C53;margin:1.5rem 0 .5rem;border-bottom:1px solid #e2e8f0;padding-bottom:4px;}table{width:100%;border-collapse:collapse;margin-bottom:1rem;}th{background:#f4f6f9;padding:5px 8px;text-align:left;font-weight:600;border:1px solid #e2e8f0;}td{padding:5px 8px;border:1px solid #eee;}.footer{margin-top:2rem;padding:1rem;background:#f4f6f9;border-radius:6px;font-size:10px;color:#94a3b8;text-align:center;}</style></head><body>
+  <div class="header"><h1>Diario Miccional — Informe Clínico</h1><p>Paciente: <strong>${patient.nombre||'—'}</strong> · Período: ${analysisPeriod==='today'?'Hoy ('+todayKey()+')':'Últimos 7 días'} · Generado: ${new Date().toLocaleString('es')}</p><p>Desarrollado por <span class="innoia">InnoIA</span> · Verificado por <span class="curg">CURG</span> (Colombian Urology Research Group)</p></div>
+  <div class="warn">⚠️ Este informe es un complemento clínico. No constituye diagnóstico médico. Debe ser interpretado por un profesional de salud.</div>
+  <h2>Resumen</h2><div class="grid"><div class="stat"><div class="stat-l">Micciones</div><div class="stat-v">${mics.length}</div><div class="stat-r">Normal: 4–7/día</div></div><div class="stat"><div class="stat-l">Vol. promedio</div><div class="stat-v">${avgVol}ml</div><div class="stat-r">Normal: 250–400ml</div></div><div class="stat"><div class="stat-l">Vol. total</div><div class="stat-v">${totalVol}ml</div></div><div class="stat"><div class="stat-l">Ingerido</div><div class="stat-v">${totalDrink}ml</div></div></div>
+  ${sleepData?`<h2>Horario de sueño</h2><p>Despertar: ${sleepData.wake||'—'} · Dormir: ${sleepData.sleep||'—'}</p>`:''} 
+  <h2>Urgencia</h2><table><tr><th>Nivel</th><th>Descripción</th><th>Nº</th></tr><tr><td>U0</td><td>Sin urgencia</td><td>${urgC[0]}</td></tr><tr><td>U1</td><td>Leve</td><td>${urgC[1]}</td></tr><tr><td>U2</td><td>Moderada</td><td>${urgC[2]}</td></tr><tr><td>U3</td><td>Severa</td><td>${urgC[3]}</td></tr><tr><td>U4</td><td>Incontinencia</td><td>${urgC[4]}</td></tr></table>
+  ${acRecs.length?`<h2>Análisis acústico</h2><div class="grid"><div class="stat"><div class="stat-l">🔴 Débil</div><div class="stat-v">${fD.weak}</div></div><div class="stat"><div class="stat-l">🟡 Bajo</div><div class="stat-v">${fD.low}</div></div><div class="stat"><div class="stat-l">🟢 Normal</div><div class="stat-v">${fD.normal}</div></div><div class="stat"><div class="stat-l">🔵 Fuerte</div><div class="stat-v">${fD.strong}</div></div></div>`:''} 
+  <h2>Micciones</h2><table><tr><th>Fecha</th><th>Hora</th><th>Vol</th><th>Dur</th><th>Flujo</th><th>Urgencia</th><th>Posición</th></tr>${mics.sort((a,b)=>a.date.localeCompare(b.date)||a.hora.localeCompare(b.hora)).map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.vol||'—'}</td><td>${r.dur?r.dur+'s':'—'}</td><td>${r.flow?r.flow+' ml/s':'—'}</td><td>U${r.urgency??'—'}</td><td>${r.pos||'—'}</td></tr>`).join('')}</table>
+  <h2>Bebidas</h2><table><tr><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Volumen</th></tr>${drks.sort((a,b)=>a.date.localeCompare(b.date)).map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.tipo}</td><td>${r.vol||0}ml</td></tr>`).join('')}</table>
+  <div class="footer">Diario Miccional v2.0 · by InnoIA · verificado CURG · ${new Date().toLocaleString('es')} · ICS 2019, EAU Guidelines 2023, Tsui et al. 2006 · Ley 1581/2012 Colombia</div></body></html>`;
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'})); a.download=`DiarioMiccional_${patient.nombre?.replace(/ /g,'_')}_${todayKey()}.html`; a.click();
+};
 
 // ── PROFILE ──
 function renderProfile(){
   if(!patient) return;
   const gLabel=patient.genero==='m'?'Masculino':patient.genero==='f'?'Femenino':'—';
+  const initials=(patient.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   document.getElementById('profileView').innerHTML=`
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:1.25rem">
-      <div style="width:56px;height:56px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--accent)">${(patient.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div>
+      <div class="profile-avatar">${initials}</div>
       <div>
-        <div style="font-size:1.1rem;font-weight:700">${patient.nombre||'—'}</div>
+        <div style="font-size:1rem;font-weight:600">${patient.nombre||'—'}</div>
         <div style="font-size:12px;color:var(--text2)">${patient.diagnostico||''}</div>
-        ${patient.accessCode?`<div style="font-size:11px;color:var(--text3);margin-top:2px">Código: <span style="font-family:'JetBrains Mono';font-weight:700;color:var(--accent)">${patient.accessCode}</span></div>`:(patient.status==='pending'?`<div style="font-size:11px;color:var(--amber);margin-top:2px">⏳ Pendiente de validación médica</div>`:'')}
+        ${patient.accessCode?`<div style="font-size:11px;color:var(--text3);margin-top:2px;font-family:'Inter',monospace;font-weight:600;color:var(--blue-act)">${patient.accessCode}</div>`:(patient.status==='pending'?`<div style="font-size:11px;color:var(--amber);margin-top:2px;display:flex;align-items:center;gap:4px"><i class="ti ti-clock"></i>Pendiente de validación médica</div>`:'')}
       </div>
     </div>
-    ${[['Fecha de nac.',patient.fechaNac],['Género',gLabel],['Teléfono',patient.telefono],['Email',patient.email],['Médico',patient.medicoTratante],['Desde',patient.fechaInicio]].filter(([,v])=>v).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px"><span style="color:var(--text2)">${k}</span><span style="font-weight:600">${v}</span></div>`).join('')}
-    <div style="margin-top:12px;padding:10px;background:var(--bg);border-radius:8px;font-size:11px;color:var(--text3)">
-      🔒 Consentimiento otorgado: ${JSON.parse(localStorage.getItem('curg_consent')||'{}').date?.slice(0,10)||'—'} ·
-      <span style="text-decoration:underline;cursor:pointer" onclick="revokeConsent()">Revocar</span>
-    </div>
-  `;
+    ${[['Fecha de nac.',patient.fechaNac],['Género',gLabel],['Teléfono',patient.telefono],['Email',patient.email],['Médico',patient.medicoTratante],['Desde',patient.fechaInicio]].filter(([,v])=>v).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--text2)">${k}</span><span style="font-weight:500">${v}</span></div>`).join('')}
+    <div style="margin-top:12px;padding:10px;background:var(--bg);border-radius:8px;font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px">
+      <i class="ti ti-lock" style="font-size:13px"></i>
+      Consentimiento: ${JSON.parse(localStorage.getItem('curg_consent')||'{}').date?.slice(0,10)||'—'} ·
+      <span style="text-decoration:underline;cursor:pointer;color:var(--coral)" onclick="revokeConsent()">Revocar</span>
+    </div>`;
 }
 </script>
 </body>
