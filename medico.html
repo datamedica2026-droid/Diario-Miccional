@@ -3,16 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CURG — Panel Médico</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Diario Miccional — Panel Médico · InnoIA</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
 :root{
-  --bg:#0f1117;--surface:#181c27;--card:#1e2235;--card2:#252a3d;
-  --border:#2d3350;--border2:#3d4468;
-  --text:#e8eaf6;--text2:#8892b0;--text3:#4a5380;
-  --accent:#4fc3f7;--accent2:#0288d1;--accent-dim:#0d2137;
+  --bg:#0d1420;--surface:#111827;--card:#1a2235;--card2:#212d42;
+  --border:#253048;--border2:#2d3f5c;
+  --text:#e2e8f0;--text2:#8896b3;--text3:#4a5675;
+  --blue-deep:#042C53;--blue-mid:#185FA5;--blue-act:#378ADD;--blue-light:#0d2137;
+  --coral:#D85A30;--coral-light:#2e1208;--coral-dark:#f5a87a;
   --green:#43d98c;--green-dim:#0a2e1e;
   --amber:#ffb74d;--amber-dim:#2e1f00;
   --red:#ef5350;--red-dim:#2e0a0a;
@@ -20,66 +22,99 @@
   --radius:10px;--radius-lg:16px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
 
 /* ── AUTH ── */
-.auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;}
-.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.5rem;width:100%;max-width:420px;}
-.auth-logo{display:flex;align-items:center;gap:12px;margin-bottom:2rem;}
-.auth-logo-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;}
-.auth-title{font-size:1.3rem;font-weight:700;margin-bottom:0.25rem;}
+.auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(ellipse at top,#0d2137 0%,var(--bg) 60%);}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.5rem;width:100%;max-width:440px;}
+.auth-brand{display:flex;align-items:center;gap:14px;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.auth-brand-icon{width:44px;height:44px;background:var(--blue-deep);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.auth-brand-icon i{font-size:22px;color:var(--blue-act);}
+.auth-brand-text h1{font-size:15px;font-weight:600;color:var(--text);}
+.auth-brand-text p{font-size:11px;color:var(--text3);margin-top:2px;}
+.auth-brand-badges{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+.badge-innoia{font-size:10px;font-weight:700;color:var(--coral);background:var(--coral-light);border-radius:10px;padding:2px 8px;}
+.badge-curg{font-size:10px;font-weight:600;color:var(--blue-act);background:var(--blue-light);border-radius:10px;padding:2px 8px;}
+.auth-title{font-size:1.2rem;font-weight:600;margin-bottom:.25rem;}
 .auth-sub{font-size:13px;color:var(--text2);margin-bottom:1.5rem;}
+
+/* CONSENT MODAL */
+.consent-modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;display:none;align-items:center;justify-content:center;padding:1rem;}
+.consent-modal.open{display:flex;}
+.consent-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;}
+.consent-box h2{font-size:1rem;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;}
+.consent-box h2 i{font-size:18px;color:var(--blue-act);}
+.consent-block{background:var(--card2);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;}
+.consent-block h3{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.consent-block h3 i{font-size:14px;color:var(--blue-act);}
+.consent-block p,.consent-block li{font-size:12px;color:var(--text3);line-height:1.65;}
+.consent-block ul{padding-left:1.25rem;margin-top:4px;}
+.consent-check{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;cursor:pointer;}
+.consent-check input{width:16px;height:16px;flex-shrink:0;margin-top:2px;accent-color:var(--blue-act);}
+.consent-check span{font-size:12px;color:var(--text2);line-height:1.5;}
+.btn-consent{width:100%;padding:12px;border-radius:var(--radius);border:none;background:var(--blue-mid);color:#fff;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;opacity:.4;pointer-events:none;font-family:inherit;}
+.btn-consent.ready{opacity:1;pointer-events:all;background:var(--blue-act);}
+.consent-legal{font-size:10px;color:var(--text3);text-align:center;margin-top:8px;}
 
 /* ── FORMS ── */
 .form-group{margin-bottom:14px;}
-.form-group label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px;letter-spacing:0.04em;}
+.form-group label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase;}
 .form-group input,.form-group select,.form-group textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);font-family:inherit;transition:border-color .15s;}
-.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--accent2);}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--blue-act);}
 .form-group select option{background:var(--card);}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.form-row-3{grid-template-columns:1fr 1fr 1fr;}
+.msg-err{color:var(--red);font-size:12px;margin-top:8px;display:flex;align-items:center;gap:4px;}
+.msg-err i{font-size:13px;}
 
 /* ── BUTTONS ── */
-.btn{padding:9px 18px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s;font-weight:500;}
+.btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;cursor:pointer;font-family:inherit;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:5px;}
 .btn:hover{background:var(--card2);color:var(--text);}
-.btn-primary{background:var(--accent2);border-color:var(--accent2);color:#fff;}
-.btn-primary:hover{background:var(--accent);border-color:var(--accent);}
-.btn-success{background:var(--green-dim);border-color:var(--green);color:var(--green);}
+.btn i{font-size:14px;}
+.btn-primary{background:var(--blue-act);border-color:var(--blue-act);color:#fff;}
+.btn-primary:hover{background:var(--blue-mid);}
+.btn-coral{background:var(--coral);border-color:var(--coral);color:#fff;}
 .btn-amber{background:var(--amber-dim);border-color:var(--amber);color:var(--amber);}
-.btn-full{width:100%;padding:12px;font-size:14px;}
-.btn-sm{padding:5px 12px;font-size:12px;border-radius:6px;}
-.btn-icon{width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:7px;font-size:13px;}
+.btn-green{background:var(--green-dim);border-color:var(--green);color:var(--green);}
+.btn-danger{color:var(--red);border-color:var(--red);background:var(--red-dim);}
+.btn-full{width:100%;justify-content:center;padding:12px;}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:6px;}
 
-/* ── LAYOUT ── */
-.app{display:none;min-height:100vh;flex-direction:column;}
+/* ── APP LAYOUT ── */
+.app{display:none;flex-direction:column;min-height:100vh;}
 .app.visible{display:flex;}
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;padding:0 1.5rem;gap:1rem;position:sticky;top:0;z-index:100;}
-.topbar-logo{font-size:14px;font-weight:700;color:var(--accent);letter-spacing:0.06em;}
+.topbar{background:var(--blue-deep);height:52px;display:flex;align-items:center;padding:0 1.25rem;gap:10px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(55,138,221,.2);}
+.topbar-dot{width:8px;height:8px;border-radius:50%;background:var(--coral);}
+.topbar-line{width:2px;height:20px;background:rgba(216,90,48,.2);margin-left:3px;}
+.topbar-title{font-size:13px;font-weight:600;color:#fff;margin-left:4px;}
+.topbar-sub{font-size:10px;color:#B5D4F4;}
 .topbar-spacer{flex:1;}
-.doctor-badge{display:flex;align-items:center;gap:8px;}
-.doctor-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--accent);}
+.btn-lang{background:rgba(255,255,255,.1);border:none;color:#fff;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
+.doctor-chip{display:flex;align-items:center;gap:8px;margin-left:8px;}
+.doctor-av{width:28px;height:28px;border-radius:50%;background:var(--blue-light);border:1px solid var(--blue-act);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--blue-act);}
+.doctor-name{font-size:12px;font-weight:500;color:#fff;}
 
-/* ── TABS ── */
-.top-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.5rem;gap:0;overflow-x:auto;}
-.top-tab{padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text2);white-space:nowrap;transition:all .15s;}
-.top-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+/* ── TOP TABS ── */
+.top-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.25rem;overflow-x:auto;}
+.ttab{padding:10px 14px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text2);white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:5px;}
+.ttab i{font-size:14px;}
+.ttab.active{color:var(--blue-act);border-bottom-color:var(--blue-act);}
 
 /* ── MAIN LAYOUT ── */
 .main-layout{display:flex;flex:1;overflow:hidden;height:calc(100vh - 104px);}
-.sidebar{width:280px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;}
-.sidebar-header{padding:1rem;border-bottom:1px solid var(--border);}
-.sidebar-filters{padding:0.75rem 1rem;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px;}
-.sidebar-filters select{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:12px;color:var(--text2);width:100%;font-family:inherit;}
-.sidebar-list{flex:1;overflow-y:auto;padding:0.75rem;}
+.sidebar{width:275px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+.sidebar-top{padding:1rem;border-bottom:1px solid var(--border);}
+.sidebar-filters{padding:.75rem 1rem;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px;}
+.sidebar-filters select,.sidebar-filters input{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:7px 9px;font-size:12px;color:var(--text2);width:100%;font-family:inherit;}
+.sidebar-list{flex:1;overflow-y:auto;padding:.75rem;}
 .content{flex:1;overflow-y:auto;padding:1.5rem;background:var(--bg);}
 
 /* ── PATIENT LIST ── */
-.patient-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;transition:background .15s;margin-bottom:2px;}
-.patient-item:hover{background:var(--card);}
-.patient-item.active{background:var(--accent-dim);border:1px solid var(--accent2);}
-.patient-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;}
-.patient-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.patient-meta{font-size:11px;color:var(--text2);}
+.pat-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;transition:background .15s;}
+.pat-item:hover{background:var(--card);}
+.pat-item.active{background:var(--blue-light);border:1px solid var(--blue-act);}
+.pat-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;}
+.pat-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pat-meta{font-size:11px;color:var(--text3);}
 .status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 .dot-green{background:var(--green);}
 .dot-amber{background:var(--amber);}
@@ -88,170 +123,220 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* ── TAGS ── */
 .tag{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;}
+.tag i{font-size:11px;}
 .tag-green{background:var(--green-dim);color:var(--green);}
 .tag-amber{background:var(--amber-dim);color:var(--amber);}
 .tag-red{background:var(--red-dim);color:var(--red);}
-.tag-blue{background:var(--accent-dim);color:var(--accent);}
+.tag-blue{background:var(--blue-light);color:var(--blue-act);}
 .tag-gray{background:var(--card2);color:var(--text2);border:1px solid var(--border);}
 .tag-purple{background:var(--purple-dim);color:var(--purple);}
+.tag-coral{background:var(--coral-light);color:var(--coral-dark);}
 
 /* ── CARDS ── */
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
-.card-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1rem;}
+.card-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem;display:flex;align-items:center;gap:5px;}
+.card-label i{font-size:13px;color:var(--blue-act);}
 
 /* ── STATS ── */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1rem;}
-.stat-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;}
-.stat-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;}
-.stat-val{font-size:1.4rem;font-weight:700;color:var(--text);margin-top:4px;font-family:'JetBrains Mono',monospace;}
-.stat-unit{font-size:12px;color:var(--text2);font-weight:400;}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:1rem;}
+.stat-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:.875rem;}
+.stat-lbl{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+.stat-val{font-size:1.3rem;font-weight:500;color:var(--text);margin-top:4px;}
+.stat-unit{font-size:11px;color:var(--text2);font-weight:400;}
 .stat-ref{font-size:10px;color:var(--text3);margin-top:2px;}
 
+/* ── PROFILE HERO ── */
+.profile-hero{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;display:flex;align-items:flex-start;gap:1.25rem;flex-wrap:wrap;}
+.profile-av{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;flex-shrink:0;}
+.profile-name{font-size:1.1rem;font-weight:600;margin-bottom:4px;}
+.profile-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.profile-info{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--text2);}
+.profile-info span{display:flex;align-items:center;gap:4px;}
+.profile-info i{font-size:13px;}
+.code-box{background:var(--card2);border:1px dashed var(--border2);border-radius:8px;padding:6px 12px;margin-top:10px;display:inline-flex;align-items:center;gap:8px;}
+.code-val{font-family:'Inter',monospace;font-size:.95rem;font-weight:700;color:var(--blue-act);letter-spacing:.15em;}
+.hero-actions{display:flex;flex-direction:column;gap:6px;margin-left:auto;}
+
+/* ── ALERTS ── */
+.alert{padding:9px 12px;border-radius:8px;font-size:12px;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.alert i{font-size:14px;flex-shrink:0;}
+.alert-red{background:var(--red-dim);border:1px solid var(--red);color:var(--red);}
+.alert-amber{background:var(--amber-dim);border:1px solid var(--amber);color:var(--amber);}
+.alert-green{background:var(--green-dim);border:1px solid var(--green);color:var(--green);}
+
+/* ── PATIENT TABS ── */
+.ptabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1rem;overflow-x:auto;}
+.ptab{padding:8px 13px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text2);white-space:nowrap;display:flex;align-items:center;gap:4px;}
+.ptab i{font-size:13px;}
+.ptab.active{color:var(--blue-act);border-bottom-color:var(--blue-act);}
+
 /* ── RECORDS ── */
-.record-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
-.record-item:last-child{border-bottom:none;}
-.record-icon{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
-.record-body{flex:1;}
-.record-time{font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
-.record-main{font-size:13px;font-weight:500;margin-top:2px;}
-.record-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;}
+.rec-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.rec-item:last-child{border-bottom:none;}
+.rec-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.ri-m{background:var(--blue-light);}
+.ri-m i{color:var(--blue-act);}
+.ri-d{background:var(--green-dim);}
+.ri-d i{color:var(--green);}
+.ri-l{background:var(--amber-dim);}
+.ri-l i{color:var(--amber);}
+.rec-body{flex:1;}
+.rec-time{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:3px;}
+.rec-time i{font-size:12px;}
+.rec-title{font-size:13px;font-weight:500;margin-top:2px;}
+.rec-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;}
 
-/* ── ACOUSTIC DISPLAY ── */
-.acoustic-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:8px;}
-.acoustic-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
-.acoustic-stat{font-size:11px;color:var(--text2);}
-.acoustic-stat strong{color:var(--text);font-family:'JetBrains Mono',monospace;}
-.flow-badge{padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;}
-.flow-weak{background:var(--red-dim);color:var(--red);border:1px solid var(--red);}
-.flow-low{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber);}
-.flow-normal{background:var(--green-dim);color:var(--green);border:1px solid var(--green);}
-.flow-strong{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent);}
-.flow-curve{height:48px;display:flex;align-items:flex-end;gap:1px;background:var(--card);border-radius:6px;padding:4px;overflow:hidden;}
-.flow-bar{flex:1;background:var(--accent2);border-radius:1px;min-height:2px;transition:height .1s;}
+/* ── ACOUSTIC ── */
+.ac-block{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-top:6px;}
+.ac-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:5px;}
+.ac-stat{font-size:11px;color:var(--text2);}
+.ac-stat strong{color:var(--text);font-family:'Inter',monospace;}
+.flow-badge{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.fb-weak{background:var(--red-dim);color:var(--red);border:1px solid var(--red);}
+.fb-low{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber);}
+.fb-normal{background:var(--green-dim);color:var(--green);border:1px solid var(--green);}
+.fb-strong{background:var(--blue-light);color:var(--blue-act);border:1px solid var(--blue-act);}
+.flow-curve{height:40px;display:flex;align-items:flex-end;gap:1px;background:var(--card2);border-radius:5px;padding:3px;overflow:hidden;}
+.fc-bar{flex:1;border-radius:1px;min-height:2px;}
 
-/* ── WELLBEING DISPLAY ── */
-.wellbeing-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;}
-.wb-great{background:#1b5e2022;color:#43d98c;border:1px solid var(--green);}
+/* ── SLEEP / WB ── */
+.sleep-block{background:var(--purple-dim);border:1px solid var(--purple);border-radius:7px;padding:7px 10px;margin-bottom:7px;font-size:11px;color:var(--purple);display:flex;align-items:center;gap:6px;}
+.sleep-block i{font-size:13px;}
+.wb-block{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.wb-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
+.wb-great{background:var(--green-dim);color:var(--green);border:1px solid var(--green);}
 .wb-ok{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber);}
 .wb-bad{background:var(--red-dim);color:var(--red);border:1px solid var(--red);}
 
-/* ── SLEEP BLOCK ── */
-.sleep-block{background:var(--purple-dim);border:1px solid var(--purple);border-radius:8px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--purple);}
-
-/* ── PROFILE HERO ── */
-.profile-hero{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1rem;display:flex;align-items:flex-start;gap:1.5rem;flex-wrap:wrap;}
-.profile-hero-avatar{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;}
-.profile-hero-name{font-size:1.1rem;font-weight:700;margin-bottom:4px;}
-.profile-hero-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
-.access-code-box{background:var(--card2);border:1px dashed var(--border2);border-radius:8px;padding:6px 12px;margin-top:10px;display:inline-flex;align-items:center;gap:8px;}
-.access-code-val{font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--accent);letter-spacing:0.15em;}
-
-/* ── PATIENT TABS ── */
-.ptabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1rem;overflow-x:auto;}
-.ptab{padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text2);white-space:nowrap;}
-.ptab.active{color:var(--accent);border-bottom-color:var(--accent);}
-
-/* ── ALERTS ── */
-.alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
-.alert-amber{background:var(--amber-dim);border:1px solid var(--amber);color:var(--amber);}
-.alert-red{background:var(--red-dim);border:1px solid var(--red);color:var(--red);}
-.alert-green{background:var(--green-dim);border:1px solid var(--green);color:var(--green);}
-
 /* ── CHARTS ── */
-.chart-wrap{position:relative;height:200px;margin-top:8px;}
+.chart-wrap{height:200px;position:relative;margin-top:8px;}
 
 /* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem;}
 .modal-overlay.open{display:flex;}
 .modal{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;}
-.modal-title{font-size:1rem;font-weight:700;margin-bottom:1.25rem;}
+.modal-title{font-size:1rem;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;}
+.modal-title i{font-size:18px;color:var(--blue-act);}
 .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border);}
-.msg-error{color:var(--red);font-size:12px;margin-top:8px;text-align:center;}
 
-/* ── PATIENT CARD PRINT ── */
-@media print {
-  body * { visibility: hidden; }
-  #printArea, #printArea * { visibility: visible; }
-  #printArea { position: fixed; inset: 0; padding: 2rem; }
-}
-.print-card{background:#fff;color:#1a2236;border:2px solid #1565c0;border-radius:12px;padding:1.5rem;font-family:'Inter',sans-serif;}
-.print-card-header{display:flex;align-items:center;gap:12px;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #dde3ee;}
-.print-card-title{font-size:14px;font-weight:700;color:#1565c0;}
-.print-card-sub{font-size:11px;color:#5a6a85;}
-.print-patient-name{font-size:1.2rem;font-weight:700;color:#1a2236;margin-bottom:4px;}
-.print-code{font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;color:#1565c0;letter-spacing:0.15em;background:#e3f2fd;border:2px dashed #1565c0;border-radius:8px;padding:8px 20px;display:inline-block;margin:8px 0;}
-.print-instructions{font-size:11px;color:#5a6a85;margin-top:12px;line-height:1.6;}
-.print-instructions strong{color:#1a2236;}
-
-/* ── SCIENCE TAB ── */
+/* ── SCIENCE ── */
 .sci-section{margin-bottom:1.5rem;}
-.sci-h2{font-size:14px;font-weight:700;margin-bottom:0.75rem;display:flex;align-items:center;gap:8px;color:var(--text);}
-.sci-p{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px;}
-.sci-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
-.sci-table th{background:var(--card2);padding:6px 8px;text-align:left;font-weight:600;color:var(--text2);}
-.sci-table td{padding:6px 8px;border-top:1px solid var(--border);color:var(--text2);}
-.ref-item{padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2);line-height:1.6;}
+.sci-h2{font-size:13px;font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:7px;color:var(--text);}
+.sci-h2 i{font-size:16px;color:var(--blue-act);}
+.sci-p{font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:8px;}
+.sci-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;}
+.sci-table th{background:var(--card2);padding:5px 8px;text-align:left;font-weight:600;color:var(--text2);}
+.sci-table td{padding:5px 8px;border-top:1px solid var(--border);color:var(--text2);}
+.ref-item{padding:7px 0;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);line-height:1.6;}
 .ref-item:last-child{border-bottom:none;}
-.ref-num{font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;margin-right:6px;}
+.ref-num{font-weight:700;color:var(--blue-act);margin-right:5px;}
 
 /* ── COLLEAGUES ── */
 .colleague-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
 .colleague-item:last-child{border-bottom:none;}
-.colleague-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);}
+.coll-av{width:32px;height:32px;border-radius:50%;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--blue-act);}
 
-/* ── EMPTY ── */
+/* ── PRINT ── */
+@media print{body *{visibility:hidden;}#printArea,#printArea *{visibility:visible;}#printArea{position:fixed;inset:0;padding:2rem;background:#fff;}}
+.print-card{background:#fff;color:#1e2a3a;border:2px solid #042C53;border-radius:12px;padding:1.5rem;font-family:'Inter',sans-serif;max-width:380px;margin:0 auto;}
+.print-header{display:flex;align-items:center;gap:12px;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #e2e8f0;}
+.print-logo-dot{width:10px;height:10px;border-radius:50%;background:#D85A30;}
+.print-logo-line{width:2px;height:24px;background:#D85A3030;margin-left:4px;}
+.print-header-text h2{font-size:14px;font-weight:700;color:#042C53;}
+.print-header-text p{font-size:11px;color:#64748b;}
+.print-badge{margin-left:auto;display:flex;flex-direction:column;gap:3px;align-items:flex-end;}
+.print-badge span{font-size:9px;font-weight:700;padding:1px 7px;border-radius:10px;}
+.pb-innoia{background:#fff3e0;color:#D85A30;}
+.pb-curg{background:#e3f2fd;color:#185FA5;}
+.print-patient{font-size:1.1rem;font-weight:700;color:#1e2a3a;margin-bottom:4px;}
+.print-diag{font-size:12px;color:#64748b;margin-bottom:10px;}
+.print-code-label{font-size:11px;font-weight:600;color:#64748b;margin-bottom:4px;}
+.print-code{font-family:'Inter',monospace;font-size:2rem;font-weight:700;color:#042C53;letter-spacing:.2em;background:#e3f2fd;border:2px dashed #185FA5;border-radius:8px;padding:8px 20px;display:inline-block;margin-bottom:10px;}
+.print-instr{font-size:11px;color:#64748b;line-height:1.65;margin-top:10px;}
+.print-instr strong{color:#1e2a3a;}
+.print-footer{margin-top:12px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;display:flex;justify-content:space-between;}
+
+/* ── BRAND FOOTER ── */
+.brand-footer{padding:12px 1.5rem;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border);background:var(--surface);}
+.brand-footer-text{font-size:11px;color:var(--text3);}
+.innoia-text{color:var(--coral);font-weight:600;}
+.curg-text{color:var(--blue-act);font-weight:600;}
+
 .empty{text-align:center;padding:3rem 1rem;color:var(--text3);}
-.empty-icon{font-size:2.5rem;margin-bottom:0.75rem;}
+.empty i{font-size:2.5rem;display:block;margin-bottom:.75rem;}
 
-/* ── LANG TOGGLE ── */
-.lang-btn{background:var(--card2);border:1px solid var(--border2);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);font-family:inherit;}
-
-@media(max-width:800px){
-  .main-layout{flex-direction:column;height:auto;}
-  .sidebar{width:100%;height:auto;border-right:none;border-bottom:1px solid var(--border);}
-  .profile-hero{flex-direction:column;}
-}
+@media(max-width:800px){.main-layout{flex-direction:column;height:auto;}.sidebar{width:100%;height:auto;border-right:none;border-bottom:1px solid var(--border);}.profile-hero{flex-direction:column;}.hero-actions{margin-left:0;flex-direction:row;flex-wrap:wrap;}}
 </style>
 </head>
 <body>
 
+<!-- CONSENT MODAL FOR DOCTOR -->
+<div class="consent-modal" id="doctorConsentModal">
+  <div class="consent-box">
+    <h2><i class="ti ti-shield-check"></i>Política de privacidad — Panel Médico</h2>
+    <div class="consent-block">
+      <h3><i class="ti ti-lock"></i>Datos que tratamos</h3>
+      <ul>
+        <li>Datos de salud de pacientes vinculados a tu cuenta médica</li>
+        <li>Tu perfil profesional: nombre, especialidad, clínica, email</li>
+        <li>Accesos y actividad en el panel para auditoría de seguridad</li>
+      </ul>
+    </div>
+    <div class="consent-block">
+      <h3><i class="ti ti-scale"></i>Base legal y responsabilidad</h3>
+      <p>Como profesional de salud, eres corresponsable del tratamiento de datos de tus pacientes. Debes contar con el consentimiento explícito de cada paciente. Cumplimiento: Ley 1581/2012 (Colombia) y equivalentes LATAM.</p>
+    </div>
+    <div class="consent-block">
+      <h3><i class="ti ti-alert-triangle"></i>Uso ético</h3>
+      <ul>
+        <li>Solo accederás a datos de tus propios pacientes</li>
+        <li>No compartirás credenciales de acceso con terceros</li>
+        <li>Usarás los informes exclusivamente para fines clínicos</li>
+        <li>El análisis acústico es orientativo y no reemplaza urodinamia</li>
+      </ul>
+    </div>
+    <label class="consent-check"><input type="checkbox" id="dck1" onchange="checkDocConsent()"><span>Acepto la política de privacidad y me comprometo al uso ético de los datos de mis pacientes.</span></label>
+    <label class="consent-check"><input type="checkbox" id="dck2" onchange="checkDocConsent()"><span>Entiendo que soy corresponsable del tratamiento de datos de salud conforme a la normativa aplicable.</span></label>
+    <button class="btn-consent" id="btnDocConsent" onclick="acceptDocConsent()">Aceptar y continuar</button>
+    <div class="consent-legal">Panel Médico v2.0 · by InnoIA · verificado CURG · Política junio 2026</div>
+  </div>
+</div>
+
 <!-- AUTH -->
 <div class="auth-screen" id="authScreen">
   <div class="auth-card">
-    <div class="auth-logo">
-      <div class="auth-logo-icon">🏥</div>
-      <div>
-        <div style="font-size:14px;font-weight:700">CURG Diario Miccional</div>
-        <div style="font-size:12px;color:var(--text2)">Panel Médico</div>
+    <div class="auth-brand">
+      <div class="auth-brand-icon"><i class="ti ti-stethoscope"></i></div>
+      <div class="auth-brand-text">
+        <h1>Diario Miccional</h1>
+        <p>Panel Médico · Acceso profesional</p>
+      </div>
+      <div class="auth-brand-badges">
+        <span class="badge-innoia">by InnoIA</span>
+        <span class="badge-curg">verificado CURG</span>
       </div>
     </div>
     <div id="loginForm">
       <div class="auth-title">Iniciar sesión</div>
-      <div class="auth-sub">Acceso exclusivo para profesionales médicos</div>
+      <div class="auth-sub">Acceso exclusivo para profesionales de salud</div>
       <div class="form-group"><label>Correo electrónico</label><input type="email" id="loginEmail" placeholder="doctor@clinica.com"></div>
-      <div class="form-group"><label>Contraseña</label><input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <button class="btn btn-primary btn-full" onclick="doLogin()">Entrar</button>
-      <div id="loginError" class="msg-error"></div>
-      <div style="text-align:center;margin-top:1rem">
-        <span style="font-size:13px;color:var(--text2)">¿Primera vez? </span>
-        <button class="btn btn-sm" onclick="showReg()">Crear cuenta médico</button>
-      </div>
+      <div class="form-group"><label>Contraseña</label><input type="password" id="loginPass" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn btn-primary btn-full" onclick="doLogin()"><i class="ti ti-login"></i>Entrar</button>
+      <div id="loginErr" class="msg-err" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
+      <div style="text-align:center;margin-top:1rem"><span style="font-size:12px;color:var(--text2)">¿Primera vez? </span><button class="btn btn-sm" onclick="showReg()">Crear cuenta médico</button></div>
     </div>
     <div id="regForm" style="display:none">
       <div class="auth-title">Crear cuenta médico</div>
       <div class="form-row">
-        <div class="form-group"><label>Nombre completo *</label><input type="text" id="rNombre" placeholder="Dr. Juan García"></div>
-        <div class="form-group"><label>Especialidad</label><input type="text" id="rEspec" placeholder="Urología"></div>
+        <div class="form-group"><label>Nombre completo *</label><input type="text" id="rN" placeholder="Dr. Juan García"></div>
+        <div class="form-group"><label>Especialidad</label><input type="text" id="rE" placeholder="Urología"></div>
       </div>
-      <div class="form-group"><label>Clínicas / Instituciones (separadas por coma)</label><input type="text" id="rClinicas" placeholder="Clínica A, Hospital B"></div>
-      <div class="form-group"><label>Correo *</label><input type="email" id="rEmail"></div>
-      <div class="form-group"><label>Contraseña * (mín. 6 caracteres)</label><input type="password" id="rPass"></div>
-      <div class="form-group"><label>Idioma preferido</label>
-        <select id="rLang"><option value="es">Español</option><option value="en">English</option></select>
-      </div>
-      <button class="btn btn-primary btn-full" onclick="doRegister()">Crear cuenta</button>
-      <div id="regError" class="msg-error"></div>
-      <div style="text-align:center;margin-top:1rem"><button class="btn btn-sm" onclick="showLogin()">← Volver</button></div>
+      <div class="form-group"><label>Clínicas / Instituciones (separadas por coma)</label><input type="text" id="rC" placeholder="Clínica A, Hospital B"></div>
+      <div class="form-group"><label>Correo *</label><input type="email" id="rEM"></div>
+      <div class="form-group"><label>Contraseña * (mín. 6 caracteres)</label><input type="password" id="rP"></div>
+      <button class="btn btn-primary btn-full" onclick="doRegister()"><i class="ti ti-user-plus"></i>Crear cuenta</button>
+      <div id="regErr" class="msg-err" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
+      <div style="text-align:center;margin-top:1rem"><button class="btn btn-sm" onclick="showLogin()"><i class="ti ti-arrow-left"></i>Volver</button></div>
     </div>
   </div>
 </div>
@@ -259,141 +344,123 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <!-- MAIN APP -->
 <div class="app" id="mainApp">
   <div class="topbar">
-    <span class="topbar-logo">CURG</span>
-    <span style="font-size:12px;color:var(--text2)">Panel Médico</span>
+    <div class="topbar-dot"></div>
+    <div class="topbar-line"></div>
+    <span class="topbar-title">Diario Miccional</span>
+    <span class="topbar-sub">Panel Médico</span>
     <div class="topbar-spacer"></div>
-    <button class="lang-btn" id="langBtn" onclick="toggleLang()">EN</button>
-    <div class="doctor-badge" style="margin-left:8px">
-      <div class="doctor-avatar" id="docInitials">DR</div>
-      <span style="font-size:13px;font-weight:500" id="docName">...</span>
-      <button class="btn btn-sm" style="margin-left:8px;color:var(--red);border-color:var(--red)" onclick="doLogout()">Salir</button>
+    <button class="btn-lang" id="langBtn" onclick="toggleLang()">EN</button>
+    <div class="doctor-chip">
+      <div class="doctor-av" id="docAv">DR</div>
+      <span class="doctor-name" id="docName">...</span>
+      <button class="btn btn-sm btn-danger" style="margin-left:6px" onclick="doLogout()"><i class="ti ti-logout"></i>Salir</button>
     </div>
   </div>
 
   <div class="top-tabs">
-    <div class="top-tab active" onclick="showTopTab('patients',this)" id="tab-patients">🧑‍⚕️ Pacientes</div>
-    <div class="top-tab" onclick="showTopTab('colleagues',this)" id="tab-colleagues">👥 Colegas</div>
-    <div class="top-tab" onclick="showTopTab('science',this)" id="tab-science">🔬 Base científica</div>
-    <div class="top-tab" onclick="showTopTab('guide',this)" id="tab-guide">📖 Guía de uso</div>
+    <div class="ttab active" onclick="showTTab('patients',this)"><i class="ti ti-users"></i>Pacientes</div>
+    <div class="ttab" onclick="showTTab('colleagues',this)"><i class="ti ti-user-heart"></i>Colegas</div>
+    <div class="ttab" onclick="showTTab('science',this)"><i class="ti ti-flask"></i>Base científica</div>
+    <div class="ttab" onclick="showTTab('guide',this)"><i class="ti ti-book"></i>Guía de uso</div>
   </div>
 
   <!-- PATIENTS TAB -->
   <div id="ttab-patients" class="main-layout">
     <div class="sidebar">
-      <div class="sidebar-header">
-        <button class="btn btn-primary btn-full" onclick="openNewPatient()">+ Nuevo paciente</button>
+      <div class="sidebar-top">
+        <button class="btn btn-primary btn-full" onclick="openNewPat()"><i class="ti ti-user-plus"></i>Nuevo paciente</button>
       </div>
       <div class="sidebar-filters">
-        <select id="filterClinica" onchange="filterPatients()">
-          <option value="">Todas las clínicas</option>
-        </select>
-        <select id="filterYear" onchange="filterPatients()">
-          <option value="">Todos los años</option>
-        </select>
-        <input type="text" id="filterSearch" placeholder="🔍 Buscar paciente..." oninput="filterPatients()"
-          style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:12px;color:var(--text);width:100%;font-family:inherit;">
+        <select id="fClinica" onchange="filterPats()"><option value="">Todas las clínicas</option></select>
+        <select id="fYear" onchange="filterPats()"><option value="">Todos los años</option></select>
+        <input type="text" id="fSearch" placeholder="Buscar paciente..." oninput="filterPats()">
       </div>
-      <div class="sidebar-list" id="patientList">
-        <div class="empty"><div class="empty-icon">👤</div><p style="font-size:12px">Sin pacientes</p></div>
+      <div class="sidebar-list" id="patList">
+        <div class="empty"><i class="ti ti-user-circle"></i><p style="font-size:12px">Sin pacientes</p></div>
       </div>
     </div>
-    <div class="content" id="patientContent">
+    <div class="content" id="patContent">
       <div class="empty" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center">
-        <div style="font-size:3rem;margin-bottom:1rem">🏥</div>
-        <div style="font-size:1rem;font-weight:600;color:var(--text)">Selecciona un paciente</div>
-        <div style="font-size:13px;color:var(--text2);margin-top:4px">Usa los filtros de la izquierda para encontrar y seleccionar</div>
+        <i class="ti ti-hospital" style="font-size:3rem;color:var(--text3);margin-bottom:1rem"></i>
+        <div style="font-size:1rem;font-weight:600">Selecciona un paciente</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:4px">Usa los filtros para encontrar y seleccionar</div>
       </div>
     </div>
   </div>
 
   <!-- COLLEAGUES TAB -->
   <div id="ttab-colleagues" style="display:none;padding:1.5rem;max-width:700px;margin:0 auto">
-    <div class="card">
-      <div class="card-title">👥 Colegas en tus clínicas</div>
-      <div id="colleaguesList"><div style="font-size:13px;color:var(--text2)">Cargando...</div></div>
-    </div>
+    <div class="card"><div class="card-label"><i class="ti ti-user-heart"></i>Colegas en tus clínicas</div>
+    <div id="colleaguesList"><div style="font-size:12px;color:var(--text2)">Cargando...</div></div></div>
   </div>
 
   <!-- SCIENCE TAB -->
   <div id="ttab-science" style="display:none;padding:1.5rem;max-width:800px;margin:0 auto">
     <div class="card">
       <div class="sci-section">
-        <div class="sci-h2">📋 El diario miccional como herramienta clínica</div>
-        <p class="sci-p">El diario miccional (voiding diary) es el estándar de oro no invasivo para la evaluación de disfunciones del tracto urinario inferior según la Sociedad Internacional de Continencia (ICS). Un diario de 3 días tiene sensibilidad del 85% para detectar vejiga hiperactiva, con correlación r=0.78 con urodinamia formal (EAU Guidelines 2023).</p>
+        <div class="sci-h2"><i class="ti ti-clipboard-list"></i>El diario miccional como herramienta clínica</div>
+        <p class="sci-p">El diario miccional es el estándar de oro no invasivo para evaluación de disfunciones del tracto urinario inferior (ICS). Un diario de 3 días tiene sensibilidad del 85% para vejiga hiperactiva y correlación r=0.78 con urodinamia formal (EAU Guidelines 2023).</p>
       </div>
       <div class="sci-section">
-        <div class="sci-h2">🎙 Análisis acústico — Metodología</div>
-        <p class="sci-p">CURG captura la amplitud de la señal de audio durante la micción usando la Web Audio API. El proceso tiene 3 fases:</p>
-        <p class="sci-p"><strong>1. Calibración (2s):</strong> Mide el ruido ambiente del baño para establecer baseline en dB.<br>
-        <strong>2. Muestreo (100ms):</strong> Captura dB cada 100ms durante toda la micción.<br>
-        <strong>3. Análisis:</strong> Calcula dB promedio por encima del baseline, pico, duración, patrón (continuo/intermitente) y curva de flujo.</p>
+        <div class="sci-h2"><i class="ti ti-microphone"></i>Análisis acústico — metodología CURG</div>
+        <p class="sci-p">Captura de amplitud de señal de audio durante la micción via Web Audio API. Tres fases: calibración ambiente (2s) → muestreo 100ms → clasificación por dB relativo al baseline.</p>
         <table class="sci-table">
-          <tr><th>Clasificación</th><th>dB sobre baseline</th><th>Flujo estimado</th><th>Significado clínico</th></tr>
-          <tr><td>🔴 Débil</td><td>2–12 dB</td><td>&lt;8 ml/s</td><td>Posible obstrucción / hipoactividad detrusor</td></tr>
-          <tr><td>🟡 Bajo</td><td>12–22 dB</td><td>8–15 ml/s</td><td>Flujo por debajo del rango normal</td></tr>
-          <tr><td>🟢 Normal</td><td>22–35 dB</td><td>15–25 ml/s</td><td>Rango normal adulto</td></tr>
-          <tr><td>🔵 Fuerte</td><td>&gt;35 dB</td><td>&gt;25 ml/s</td><td>Flujo vigoroso</td></tr>
+          <tr><th>Clasificación</th><th>dB sobre baseline</th><th>Flujo estimado</th><th>Interpretación</th></tr>
+          <tr><td style="color:var(--red)">Débil</td><td>2–12 dB</td><td>&lt;8 ml/s</td><td>Posible obstrucción / hipoactividad detrusor</td></tr>
+          <tr><td style="color:var(--amber)">Bajo</td><td>12–22 dB</td><td>8–15 ml/s</td><td>Flujo por debajo del rango normal</td></tr>
+          <tr><td style="color:var(--green)">Normal</td><td>22–35 dB</td><td>15–25 ml/s</td><td>Rango normal adulto</td></tr>
+          <tr><td style="color:var(--blue-act)">Fuerte</td><td>&gt;35 dB</td><td>&gt;25 ml/s</td><td>Flujo vigoroso</td></tr>
         </table>
-        <p class="sci-p" style="margin-top:10px;font-size:11px;color:var(--text3)">⚠️ El análisis acústico es orientativo. La distancia del dispositivo al inodoro, el tipo de inodoro y el ángulo afectan la lectura. No reemplaza flujometría urodinámica formal.</p>
+        <p class="sci-p" style="margin-top:8px;font-size:11px;color:var(--text3)">⚠️ El análisis acústico es orientativo. Distancia del dispositivo, tipo de inodoro y ángulo afectan la lectura. No reemplaza flujometría urodinámica formal.</p>
       </div>
       <div class="sci-section">
-        <div class="sci-h2">📊 Rangos normales de referencia</div>
+        <div class="sci-h2"><i class="ti ti-table"></i>Rangos normales de referencia</div>
         <table class="sci-table">
-          <tr><th>Parámetro</th><th>Rango normal</th><th>Alerta</th><th>Fuente</th></tr>
-          <tr><td>Frecuencia diurna</td><td>4–7 micciones/día</td><td>&gt;8 = polaquiuria</td><td>ICS 2019</td></tr>
+          <tr><th>Parámetro</th><th>Rango normal</th><th>Alerta clínica</th><th>Fuente</th></tr>
+          <tr><td>Frecuencia diurna</td><td>4–7/día</td><td>&gt;8 = polaquiuria</td><td>ICS 2019</td></tr>
           <tr><td>Nicturia</td><td>0–1/noche</td><td>≥2 = nicturia patológica</td><td>EAU 2023</td></tr>
-          <tr><td>Volumen/micción</td><td>250–400 ml</td><td>&lt;150 = capacidad reducida</td><td>ICS 2019</td></tr>
+          <tr><td>Volumen/micción</td><td>250–400 ml</td><td>&lt;150 = cap. reducida</td><td>ICS 2019</td></tr>
           <tr><td>Volumen 24h</td><td>800–2000 ml</td><td>&gt;2800 = poliuria</td><td>ICS 2019</td></tr>
           <tr><td>Qmax ♀</td><td>&gt;15 ml/s</td><td>&lt;12 = flujo reducido</td><td>EAU 2023</td></tr>
           <tr><td>Qmax ♂</td><td>&gt;12 ml/s</td><td>&lt;10 = obstrucción probable</td><td>EAU 2023</td></tr>
-          <tr><td>Cap. vesical funcional</td><td>300–500 ml</td><td>&lt;200 = hiperactividad vesical</td><td>ICS 2019</td></tr>
+          <tr><td>Cap. vesical funcional</td><td>300–500 ml</td><td>&lt;200 = hiperactividad</td><td>ICS 2019</td></tr>
         </table>
       </div>
       <div class="sci-section">
-        <div class="sci-h2">😊 Bienestar subjetivo</div>
-        <p class="sci-p">El registro diario de estado general y dolor pélvico permite correlacionar síntomas subjetivos con patrones miccionales objetivos. La escala de dolor 0–5 correlaciona con la Escala Visual Analógica (EVA) adaptada a contexto urinario (Kelleher et al., 2004).</p>
-      </div>
-      <div class="sci-section">
-        <div class="sci-h2">📚 Bibliografía</div>
+        <div class="sci-h2"><i class="ti ti-books"></i>Bibliografía</div>
         <div class="ref-item"><span class="ref-num">[1]</span>Abrams P, et al. "Standardisation of terminology of lower urinary tract function." <em>Neurourol Urodynam</em> 21:167-178, 2002.</div>
         <div class="ref-item"><span class="ref-num">[2]</span>EAU Guidelines on Urinary Incontinence. European Association of Urology, 2023.</div>
         <div class="ref-item"><span class="ref-num">[3]</span>Tsui BC, et al. "Acoustic characteristics of urinary flow." <em>J Urology</em>, 2006.</div>
-        <div class="ref-item"><span class="ref-num">[4]</span>Chapple CR, et al. "Terminology report from ICS Working Group on Underactive Bladder." <em>Neurourol Urodynam</em> 37:2928-2931, 2018.</div>
-        <div class="ref-item"><span class="ref-num">[5]</span>Kelleher CJ, et al. "A new questionnaire to assess the quality of life of urinary incontinent women." <em>BJOG</em> 104:1374-1379, 1997.</div>
-        <div class="ref-item"><span class="ref-num">[6]</span>Nambiar AK, et al. "EAU Guidelines on Assessment and Nonsurgical Management of Urinary Incontinence." <em>Eur Urol</em> 75(5):799-820, 2018.</div>
+        <div class="ref-item"><span class="ref-num">[4]</span>Chapple CR, et al. "ICS Working Group on Underactive Bladder." <em>Neurourol Urodynam</em> 37:2928-2931, 2018.</div>
+        <div class="ref-item"><span class="ref-num">[5]</span>Nambiar AK, et al. "EAU Guidelines on Nonsurgical Management of Urinary Incontinence." <em>Eur Urol</em> 75:799-820, 2018.</div>
+        <div class="ref-item"><span class="ref-num">[6]</span>Ley 1581 de 2012. Régimen General de Protección de Datos. Colombia.</div>
       </div>
     </div>
+    <div class="brand-footer"><span class="brand-footer-text">Desarrollado por <span class="innoia-text">InnoIA</span> · Verificado por <span class="curg-text">CURG</span> · Colombian Urology Research Group · v2.0 · 2026</span></div>
   </div>
 
   <!-- GUIDE TAB -->
   <div id="ttab-guide" style="display:none;padding:1.5rem;max-width:800px;margin:0 auto">
     <div class="card">
       <div class="sci-section">
-        <div class="sci-h2">🚀 Primeros pasos</div>
-        <p class="sci-p">1. Crea el perfil del paciente con <strong>+ Nuevo paciente</strong>.<br>
-        2. Se genera automáticamente un código de acceso tipo <code>XXXX-XXXX</code>.<br>
-        3. Imprime la ficha del paciente (botón 🖨️) y entrégasela. Incluye QR y código.<br>
-        4. El paciente entra a <strong>paciente.html</strong>, ingresa el código y queda vinculado.<br>
-        5. Sus registros aparecen en tiempo real en tu panel.</p>
+        <div class="sci-h2"><i class="ti ti-rocket"></i>Primeros pasos</div>
+        <p class="sci-p">1. Clic en <strong>Nuevo paciente</strong> — completa nombre, clínica y año de inicio.<br>2. Se genera un código <strong>XXXX-XXXX</strong> automáticamente.<br>3. Clic en <strong>Imprimir ficha</strong> — entrega al paciente con QR e instrucciones.<br>4. El paciente escanea el QR o ingresa el código en la app.<br>5. Sus registros aparecen en tiempo real en tu panel.</p>
       </div>
       <div class="sci-section">
-        <div class="sci-h2">🔍 Filtros y organización</div>
-        <p class="sci-p">Usa los filtros del panel izquierdo para navegar por <strong>clínica</strong>, <strong>año de inicio</strong> y <strong>nombre</strong>. Cada paciente queda organizado en la clínica y año que asignaste al crearlo.</p>
+        <div class="sci-h2"><i class="ti ti-filter"></i>Filtros y organización</div>
+        <p class="sci-p">Filtra por <strong>clínica</strong>, <strong>año de inicio de seguimiento</strong> y <strong>nombre</strong>. Cada paciente queda organizado en la clínica y año que asignaste al crearlo.</p>
       </div>
       <div class="sci-section">
-        <div class="sci-h2">📊 Pestañas del paciente</div>
-        <p class="sci-p"><strong>Diario:</strong> todos los registros organizados por fecha con chips de urgencia, posición, flujo y análisis acústico.<br>
-        <strong>Análisis:</strong> gráficas de frecuencia por hora, volumen, bienestar y curvas acústicas.<br>
-        <strong>Notas clínicas:</strong> agrega observaciones que quedan vinculadas al paciente.<br>
-        <strong>Perfil:</strong> datos completos del paciente y código de acceso.</p>
+        <div class="sci-h2"><i class="ti ti-layout-dashboard"></i>Pestañas del paciente</div>
+        <p class="sci-p"><strong>Diario:</strong> todos los registros con chips de urgencia, posición, flujo y análisis acústico con curva mini.<br><strong>Gráficas:</strong> frecuencia por hora (diurna/nocturna), volumen, balance, urgencia y bienestar.<br><strong>Análisis acústico:</strong> tabla completa con dB promedio, pico, baseline, patrón y curva por micción.<br><strong>Notas clínicas:</strong> agrega observaciones vinculadas al paciente.<br><strong>Perfil:</strong> datos completos y código de acceso.</p>
       </div>
       <div class="sci-section">
-        <div class="sci-h2">🎙 Cómo interpretar el análisis acústico</div>
-        <p class="sci-p">Cada micción muestra la curva de flujo acústico, dB promedio, dB pico, baseline del ambiente y clasificación. El patrón <strong>intermitente</strong> (pausas &gt;500ms detectadas) puede indicar contracción vesical no sostenida o disinergia esfinteriana.</p>
+        <div class="sci-h2"><i class="ti ti-bell"></i>Alertas automáticas</div>
+        <p class="sci-p">El panel genera alertas cuando detecta: &gt;8 micciones/día, volumen &gt;2800ml (poliuria), fugas registradas, nicturia &gt;1, o inactividad por más de 2 días.</p>
       </div>
       <div class="sci-section">
-        <div class="sci-h2">⚠️ Alertas automáticas</div>
-        <p class="sci-p">El sistema genera alertas cuando detecta: &gt;8 micciones en un día, volumen total &gt;2800ml (poliuria), fugas registradas, nicturia &gt;1, o inactividad del paciente por más de 2 días.</p>
+        <div class="sci-h2"><i class="ti ti-microphone"></i>Cómo interpretar el análisis acústico</div>
+        <p class="sci-p">Cada micción muestra la curva de flujo acústico, dB promedio, pico, baseline calibrado y clasificación. El patrón <strong>intermitente</strong> (pausas &gt;500ms) puede indicar contracción vesical no sostenida o disinergia esfinteriana.</p>
       </div>
     </div>
   </div>
@@ -402,45 +469,39 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <!-- MODAL NUEVO PACIENTE -->
 <div class="modal-overlay" id="modalNewPat">
   <div class="modal">
-    <div class="modal-title">👤 Nuevo paciente</div>
+    <div class="modal-title"><i class="ti ti-user-plus"></i>Nuevo paciente</div>
     <div class="form-row">
-      <div class="form-group"><label>Nombre completo *</label><input type="text" id="npNombre" placeholder="María López"></div>
-      <div class="form-group"><label>Fecha de nacimiento</label><input type="date" id="npFechaNac"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Género</label>
-        <select id="npGenero"><option value="">—</option><option value="f">Femenino</option><option value="m">Masculino</option><option value="o">Otro</option></select>
-      </div>
-      <div class="form-group"><label>Año de inicio seguimiento *</label><input type="number" id="npYear" placeholder="2024" min="2020" max="2099"></div>
-    </div>
-    <div class="form-group">
-      <label>Clínica / Institución *</label>
-      <select id="npClinica"><option value="">Selecciona clínica...</option></select>
+      <div class="form-group"><label>Nombre completo *</label><input type="text" id="npN" placeholder="María López"></div>
+      <div class="form-group"><label>Fecha de nacimiento</label><input type="date" id="npFN"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Teléfono</label><input type="tel" id="npTel" placeholder="+57 300 000 0000"></div>
-      <div class="form-group"><label>Email del paciente</label><input type="email" id="npEmail"></div>
+      <div class="form-group"><label>Género</label><select id="npG"><option value="">—</option><option value="f">Femenino</option><option value="m">Masculino</option><option value="o">Otro</option></select></div>
+      <div class="form-group"><label>Año inicio seguimiento *</label><input type="number" id="npY" min="2020" max="2099"></div>
     </div>
-    <div class="form-group"><label>Diagnóstico principal</label><input type="text" id="npDiag" placeholder="Vejiga hiperactiva, Incontinencia..."></div>
-    <div class="form-group"><label>Médico tratante</label><input type="text" id="npMedico"></div>
-    <div class="form-group"><label>Notas iniciales</label><textarea id="npNotas" rows="2" placeholder="Antecedentes relevantes..."></textarea></div>
-    <div id="npError" class="msg-error"></div>
+    <div class="form-group"><label>Clínica / Institución *</label><select id="npC"><option value="">Selecciona clínica...</option></select></div>
+    <div class="form-row">
+      <div class="form-group"><label>Teléfono</label><input type="tel" id="npT" placeholder="+57 300 000 0000"></div>
+      <div class="form-group"><label>Email del paciente</label><input type="email" id="npE"></div>
+    </div>
+    <div class="form-group"><label>Diagnóstico principal</label><input type="text" id="npD" placeholder="Vejiga hiperactiva..."></div>
+    <div class="form-group"><label>Médico tratante</label><input type="text" id="npM"></div>
+    <div class="form-group"><label>Notas iniciales</label><textarea id="npNo" rows="2" placeholder="Antecedentes relevantes..."></textarea></div>
+    <div id="npErr" class="msg-err" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeM('NewPat')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveNewPatient()">Crear paciente</button>
+      <button class="btn" onclick="closeM('NewPat')"><i class="ti ti-x"></i>Cancelar</button>
+      <button class="btn btn-primary" onclick="saveNewPat()"><i class="ti ti-device-floppy"></i>Crear paciente</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL NOTA CLÍNICA -->
+<!-- MODAL NOTA -->
 <div class="modal-overlay" id="modalNote">
   <div class="modal">
-    <div class="modal-title">📝 Nota clínica</div>
+    <div class="modal-title"><i class="ti ti-notes"></i>Nota clínica</div>
     <div class="form-group"><label>Nota</label><textarea id="noteText" rows="5" placeholder="Observaciones, medicación, instrucciones..."></textarea></div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeM('Note')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveNote()">Guardar</button>
+      <button class="btn" onclick="closeM('Note')"><i class="ti ti-x"></i>Cancelar</button>
+      <button class="btn btn-primary" onclick="saveNote()"><i class="ti ti-device-floppy"></i>Guardar</button>
     </div>
   </div>
 </div>
@@ -451,773 +512,381 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyANR_4lIz4Z6At3FMykRIzRPyMCE2U4454",
-  authDomain: "diario-miccional-26954.firebaseapp.com",
-  projectId: "diario-miccional-26954",
-  storageBucket: "diario-miccional-26954.firebasestorage.app",
-  messagingSenderId: "403511441490",
-  appId: "1:403511441490:web:4b4ccc666036588a50078b"
-};
-const fbApp = initializeApp(firebaseConfig);
-const auth = getAuth(fbApp);
-const db = getFirestore(fbApp);
+const fb = initializeApp({
+  apiKey:"AIzaSyANR_4lIz4Z6At3FMykRIzRPyMCE2U4454",
+  authDomain:"diario-miccional-26954.firebaseapp.com",
+  projectId:"diario-miccional-26954",
+  storageBucket:"diario-miccional-26954.firebasestorage.app",
+  messagingSenderId:"403511441490",
+  appId:"1:403511441490:web:4b4ccc666036588a50078b"
+});
+const auth = getAuth(fb);
+const db = getFirestore(fb);
 
-let currentDoctor = null, currentDoctorData = null;
-let patientsCache = {}, selectedPatientId = null;
-let chartsMap = {}; // store Chart instances by id
-let currentLang = 'es';
-let noteTargetId = null;
+let curDoc=null, curDocData=null;
+let patsCache={}, selPatId=null;
+let chartsMap={};
+let noteTargetId=null;
+let lang='es';
+
+// ── CONSENT ──
+window.checkDocConsent=()=>{ const ok=document.getElementById('dck1').checked&&document.getElementById('dck2').checked; document.getElementById('btnDocConsent').classList.toggle('ready',ok); };
+window.acceptDocConsent=()=>{ localStorage.setItem('curg_doc_consent',JSON.stringify({date:new Date().toISOString(),v:'2.0'})); document.getElementById('doctorConsentModal').classList.remove('open'); };
+function checkDoctorConsent(){ if(!localStorage.getItem('curg_doc_consent')) document.getElementById('doctorConsentModal').classList.add('open'); }
 
 // ── LANG ──
-const T = {
-  es: { mictions:'Micciones', avgVol:'Vol. promedio', flow:'Flujo prom.', leaks:'Fugas', drinks:'Bebidas ingeridas', nicturia:'Nicturia', dayMic:'Micciones diurnas', nightMic:'Micciones nocturnas', totalVol:'Vol. total' },
-  en: { mictions:'Voidings', avgVol:'Avg volume', flow:'Avg flow', leaks:'Leaks', drinks:'Fluid intake', nicturia:'Nocturia', dayMic:'Daytime voidings', nightMic:'Nighttime voidings', totalVol:'Total volume' }
-};
-function t(k){ return T[currentLang][k] || k; }
-window.toggleLang = () => { currentLang = currentLang==='es'?'en':'es'; document.getElementById('langBtn').textContent = currentLang==='es'?'EN':'ES'; if(selectedPatientId) selectPatient(selectedPatientId); };
+window.toggleLang=()=>{ lang=lang==='es'?'en':'es'; document.getElementById('langBtn').textContent=lang==='es'?'EN':'ES'; if(selPatId) selectPat(selPatId); };
 
 // ── AUTH ──
-window.showReg = () => { document.getElementById('loginForm').style.display='none'; document.getElementById('regForm').style.display='block'; };
-window.showLogin = () => { document.getElementById('regForm').style.display='none'; document.getElementById('loginForm').style.display='block'; };
+window.showReg=()=>{ document.getElementById('loginForm').style.display='none'; document.getElementById('regForm').style.display='block'; };
+window.showLogin=()=>{ document.getElementById('regForm').style.display='none'; document.getElementById('loginForm').style.display='block'; };
 
-window.doLogin = async () => {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  document.getElementById('loginError').textContent = '';
-  try { await signInWithEmailAndPassword(auth, email, pass); }
-  catch(e) { document.getElementById('loginError').textContent = 'Credenciales incorrectas.'; }
+window.doLogin=async()=>{
+  const email=document.getElementById('loginEmail').value.trim(); const pass=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginErr'); err.style.display='none';
+  try{ await signInWithEmailAndPassword(auth,email,pass); }
+  catch(e){ err.querySelector('span').textContent='Credenciales incorrectas.'; err.style.display='flex'; }
 };
 
-window.doRegister = async () => {
-  const nombre = document.getElementById('rNombre').value.trim();
-  const email = document.getElementById('rEmail').value.trim();
-  const pass = document.getElementById('rPass').value;
-  document.getElementById('regError').textContent = '';
-  if (!nombre || !email || !pass) { document.getElementById('regError').textContent = 'Completa nombre, email y contraseña.'; return; }
-  try {
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    const clinicasRaw = document.getElementById('rClinicas').value;
-    const clinicas = clinicasRaw.split(',').map(c=>c.trim()).filter(Boolean);
-    await setDoc(doc(db,'doctors',cred.user.uid), {
-      nombre, especialidad: document.getElementById('rEspec').value.trim(),
-      clinicas, email, lang: document.getElementById('rLang').value, createdAt: serverTimestamp()
-    });
-  } catch(e) { document.getElementById('regError').textContent = e.message; }
+window.doRegister=async()=>{
+  const nombre=document.getElementById('rN').value.trim(); const email=document.getElementById('rEM').value.trim(); const pass=document.getElementById('rP').value;
+  const err=document.getElementById('regErr'); err.style.display='none';
+  if(!nombre||!email||!pass){ err.querySelector('span').textContent='Completa nombre, email y contraseña.'; err.style.display='flex'; return; }
+  try{
+    const cred=await createUserWithEmailAndPassword(auth,email,pass);
+    const clinicas=document.getElementById('rC').value.split(',').map(c=>c.trim()).filter(Boolean);
+    await setDoc(doc(db,'doctors',cred.user.uid),{nombre,especialidad:document.getElementById('rE').value.trim(),clinicas,email,createdAt:serverTimestamp()});
+  }catch(e){ err.querySelector('span').textContent=e.message; err.style.display='flex'; }
 };
 
-window.doLogout = () => signOut(auth);
+window.doLogout=()=>signOut(auth);
 
-onAuthStateChanged(auth, async user => {
-  if (user) {
-    currentDoctor = user;
-    const snap = await getDoc(doc(db,'doctors',user.uid));
-    currentDoctorData = snap.exists() ? snap.data() : { nombre: user.email, clinicas: [] };
-    const initials = (currentDoctorData.nombre||'DR').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    document.getElementById('docInitials').textContent = initials;
-    document.getElementById('docName').textContent = currentDoctorData.nombre || user.email;
-    document.getElementById('authScreen').style.display = 'none';
+onAuthStateChanged(auth,async user=>{
+  if(user){
+    curDoc=user;
+    const snap=await getDoc(doc(db,'doctors',user.uid));
+    curDocData=snap.exists()?snap.data():{nombre:user.email,clinicas:[]};
+    const initials=(curDocData.nombre||'DR').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('docAv').textContent=initials;
+    document.getElementById('docName').textContent=curDocData.nombre||user.email;
+    document.getElementById('authScreen').style.display='none';
     document.getElementById('mainApp').classList.add('visible');
+    checkDoctorConsent();
     populateFilters();
-    loadPatients();
+    loadPats();
     loadColleagues();
-  } else {
-    document.getElementById('authScreen').style.display = 'flex';
+  }else{
+    document.getElementById('authScreen').style.display='flex';
     document.getElementById('mainApp').classList.remove('visible');
   }
 });
 
 // ── TABS ──
-window.showTopTab = (name, el) => {
-  document.querySelectorAll('.top-tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  ['patients','colleagues','science','guide'].forEach(n => {
-    const el2 = document.getElementById('ttab-'+n);
-    if(el2) el2.style.display = n===name ? (n==='patients'?'flex':'block') : 'none';
-  });
-  if (name==='colleagues') loadColleagues();
+window.showTTab=(name,el)=>{
+  document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
+  ['patients','colleagues','science','guide'].forEach(n=>{ const e=document.getElementById('ttab-'+n); if(e) e.style.display=n===name?(n==='patients'?'flex':'block'):'none'; });
+  if(name==='colleagues') loadColleagues();
 };
 
 // ── FILTERS ──
-function populateFilters() {
-  const clinicas = currentDoctorData?.clinicas || [];
-  const sel = document.getElementById('filterClinica');
-  sel.innerHTML = '<option value="">Todas las clínicas</option>';
-  clinicas.forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
-  // Also populate new patient clinic select
-  const npSel = document.getElementById('npClinica');
-  npSel.innerHTML = '<option value="">Selecciona clínica...</option>';
-  clinicas.forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; npSel.appendChild(o); });
-  // Year filter - last 5 years
-  const ySel = document.getElementById('filterYear');
-  ySel.innerHTML = '<option value="">Todos los años</option>';
-  const thisYear = new Date().getFullYear();
-  for(let y=thisYear; y>=thisYear-4; y--) { const o=document.createElement('option'); o.value=y; o.textContent=y; ySel.appendChild(o); }
-  // Also set default year in new patient form
-  document.getElementById('npYear').value = thisYear;
+function populateFilters(){
+  const clinicas=curDocData?.clinicas||[];
+  const fC=document.getElementById('fClinica'); fC.innerHTML='<option value="">Todas las clínicas</option>'; clinicas.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; fC.appendChild(o); });
+  const npC=document.getElementById('npC'); npC.innerHTML='<option value="">Selecciona clínica...</option>'; clinicas.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; npC.appendChild(o); });
+  const fY=document.getElementById('fYear'); fY.innerHTML='<option value="">Todos los años</option>';
+  const y=new Date().getFullYear(); for(let i=y;i>=y-4;i--){ const o=document.createElement('option'); o.value=i; o.textContent=i; fY.appendChild(o); }
+  document.getElementById('npY').value=y;
 }
 
 // ── PATIENTS ──
-function loadPatients() {
-  const q = query(collection(db,'patients'), where('doctorId','==',currentDoctor.uid));
-  onSnapshot(q, snap => {
-    patientsCache = {};
-    snap.forEach(d => { patientsCache[d.id] = {id:d.id,...d.data()}; });
-    filterPatients();
-  });
+function loadPats(){
+  const q=query(collection(db,'patients'),where('doctorId','==',curDoc.uid));
+  onSnapshot(q,snap=>{ patsCache={}; snap.forEach(d=>{ patsCache[d.id]={id:d.id,...d.data()}; }); filterPats(); });
 }
-
-window.filterPatients = () => {
-  const clinica = document.getElementById('filterClinica').value;
-  const year = document.getElementById('filterYear').value;
-  const search = document.getElementById('filterSearch').value.toLowerCase();
-  let patients = Object.values(patientsCache);
-  if (clinica) patients = patients.filter(p => p.clinica === clinica);
-  if (year) patients = patients.filter(p => String(p.yearInicio) === String(year));
-  if (search) patients = patients.filter(p => (p.nombre||'').toLowerCase().includes(search));
-  patients.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
-  renderPatientList(patients);
+window.filterPats=()=>{
+  const cl=document.getElementById('fClinica').value; const yr=document.getElementById('fYear').value; const s=document.getElementById('fSearch').value.toLowerCase();
+  let pats=Object.values(patsCache);
+  if(cl) pats=pats.filter(p=>p.clinica===cl);
+  if(yr) pats=pats.filter(p=>String(p.yearInicio)===String(yr));
+  if(s) pats=pats.filter(p=>(p.nombre||'').toLowerCase().includes(s));
+  pats.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
+  renderPatList(pats);
 };
 
-function renderPatientList(patients) {
-  const list = document.getElementById('patientList');
-  if (!patients.length) { list.innerHTML='<div style="font-size:12px;color:var(--text3);text-align:center;padding:1rem">Sin resultados</div>'; return; }
-  const colors = ['#4fc3f7','#43d98c','#ffb74d','#ce93d8','#ef9a9a','#80cbc4'];
-  list.innerHTML = patients.map((p,i) => {
-    const color = colors[i%colors.length];
-    const initials = (p.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const status = getStatus(p);
-    return `<div class="patient-item ${p.id===selectedPatientId?'active':''}" onclick="selectPatient('${p.id}')">
-      <div class="patient-avatar" style="background:${color}22;color:${color};border:1px solid ${color}44">${initials}</div>
-      <div style="flex:1;min-width:0">
-        <div class="patient-name">${p.nombre||'—'}</div>
-        <div class="patient-meta">${p.clinica||''} · ${p.yearInicio||''}</div>
-      </div>
-      <div class="status-dot ${status.dot}"></div>
+function renderPatList(pats){
+  const list=document.getElementById('patList');
+  if(!pats.length){ list.innerHTML='<div class="empty"><i class="ti ti-search" style="font-size:1.5rem"></i><p style="font-size:12px">Sin resultados</p></div>'; return; }
+  const colors=['#378ADD','#43d98c','#ffb74d','#ce93d8','#ef9a9a','#80cbc4'];
+  list.innerHTML=pats.map((p,i)=>{
+    const c=colors[i%colors.length]; const ini=(p.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const st=getStatus(p);
+    return `<div class="pat-item ${p.id===selPatId?'active':''}" onclick="selectPat('${p.id}')">
+      <div class="pat-av" style="background:${c}22;color:${c};border:1px solid ${c}44">${ini}</div>
+      <div style="flex:1;min-width:0"><div class="pat-name">${p.nombre||'—'}</div><div class="pat-meta">${p.clinica||''} · ${p.yearInicio||''}</div></div>
+      <div class="status-dot ${st}"></div>
     </div>`;
   }).join('');
 }
 
-function getStatus(p) {
-  if (!p.lastRecord) return {dot:'dot-gray'};
-  const d = (Date.now()-p.lastRecord)/86400000;
-  return d<1?{dot:'dot-green'}:d<3?{dot:'dot-amber'}:{dot:'dot-red'};
-}
+function getStatus(p){ if(!p.lastRecord) return 'dot-gray'; const d=(Date.now()-p.lastRecord)/86400000; return d<1?'dot-green':d<3?'dot-amber':'dot-red'; }
 
 // ── SELECT PATIENT ──
-window.selectPatient = async (id) => {
-  selectedPatientId = id;
-  filterPatients();
-  const p = patientsCache[id];
-  if (!p) return;
-  // Load all sub-collections
-  const [recsSnap, sleepSnap, wbSnap] = await Promise.all([
-    getDocs(query(collection(db,'patients',id,'records'), orderBy('timestamp','desc'))),
+window.selectPat=async(id)=>{
+  selPatId=id; filterPats();
+  const p=patsCache[id]; if(!p) return;
+  const [rSnap,slSnap,wbSnap]=await Promise.all([
+    getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc'))),
     getDocs(collection(db,'patients',id,'sleep')),
     getDocs(collection(db,'patients',id,'wellbeing'))
   ]);
-  const recs = recsSnap.docs.map(d=>({id:d.id,...d.data()}));
-  const sleepMap = {}; sleepSnap.docs.forEach(d=>{ sleepMap[d.id]=d.data(); });
-  const wbMap = {}; wbSnap.docs.forEach(d=>{ wbMap[d.id]=d.data(); });
-  renderPatientView(p, recs, sleepMap, wbMap);
+  const recs=rSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const sleepMap={}; slSnap.docs.forEach(d=>{sleepMap[d.id]=d.data();});
+  const wbMap={}; wbSnap.docs.forEach(d=>{wbMap[d.id]=d.data();});
+  renderPatView(p,recs,sleepMap,wbMap);
 };
 
-function renderPatientView(p, recs, sleepMap, wbMap) {
-  destroyAllCharts();
-  const colors = ['#4fc3f7','#43d98c','#ffb74d','#ce93d8'];
-  const color = colors[0];
-  const initials = (p.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const age = p.fechaNac ? Math.floor((Date.now()-new Date(p.fechaNac))/(365.25*86400000)) : null;
-  const mics = recs.filter(r=>r.type==='miction');
-  const drks = recs.filter(r=>r.type==='drink');
-  const leaks = recs.filter(r=>r.type==='leak');
-  const totalVol = mics.reduce((a,r)=>a+(r.vol||0),0);
-  const avgVol = mics.length ? Math.round(totalVol/mics.length) : 0;
-  const avgFlow = mics.filter(r=>r.flow).length ? (mics.filter(r=>r.flow).reduce((a,r)=>a+r.flow,0)/mics.filter(r=>r.flow).length).toFixed(1) : '—';
-  // Acoustic summary
-  const acousticRecs = mics.filter(r=>r.acoustics);
-  const flowDist = {weak:0,low:0,normal:0,strong:0};
-  const allDBs = [];
-  acousticRecs.forEach(r=>{ if(r.acoustics?.classification) flowDist[r.acoustics.classification]++; if(r.acoustics?.avgDB) allDBs.push(r.acoustics.avgDB); });
-  const avgDB = allDBs.length ? (allDBs.reduce((a,b)=>a+b,0)/allDBs.length).toFixed(1) : '—';
-  // Nicturia from sleep
-  const today = new Date().toISOString().slice(0,10);
-  const todaySleep = sleepMap[today];
-  const todayWb = wbMap[today];
-  // Alerts
-  const todayMics = mics.filter(r=>r.date===today);
-  const alerts = [];
-  if (todayMics.length > 8) alerts.push({type:'red',msg:`🚨 ${todayMics.length} micciones hoy — polaquiuria`});
-  if (totalVol > 2800) alerts.push({type:'red',msg:`🚨 Volumen ${totalVol}ml — posible poliuria`});
-  if (leaks.length > 0) alerts.push({type:'amber',msg:`⚠️ ${leaks.length} fuga(s) registrada(s)`});
-  if (p.lastRecord && (Date.now()-p.lastRecord)/86400000 > 2) alerts.push({type:'amber',msg:`⚠️ Sin registros hace más de 2 días`});
+function renderPatView(p,recs,sleepMap,wbMap){
+  destroyCharts();
+  const colors=['#378ADD','#43d98c','#ffb74d','#ce93d8'];
+  const c=colors[0]; const ini=(p.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const age=p.fechaNac?Math.floor((Date.now()-new Date(p.fechaNac))/(365.25*86400000)):null;
+  const mics=recs.filter(r=>r.type==='miction'); const drks=recs.filter(r=>r.type==='drink'); const leaks=recs.filter(r=>r.type==='leak');
+  const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0); const avgVol=mics.length?Math.round(totalVol/mics.length):0;
+  const avgFlow=mics.filter(r=>r.flow).length?(mics.filter(r=>r.flow).reduce((a,r)=>a+r.flow,0)/mics.filter(r=>r.flow).length).toFixed(1):'—';
+  const acRecs=mics.filter(r=>r.acoustics); const fD={weak:0,low:0,normal:0,strong:0}; const allDB=[];
+  acRecs.forEach(r=>{ if(r.acoustics?.classification) fD[r.acoustics.classification]++; if(r.acoustics?.avgDB) allDB.push(r.acoustics.avgDB); });
+  const avgDB=allDB.length?(allDB.reduce((a,b)=>a+b,0)/allDB.length).toFixed(1):'—';
+  const today=new Date().toISOString().slice(0,10); const todaySleep=sleepMap[today]; const todayWb=wbMap[today];
+  const alerts=[];
+  if(mics.filter(r=>r.date===today).length>8) alerts.push({t:'red',i:'ti-alert-octagon',m:`${mics.filter(r=>r.date===today).length} micciones hoy — polaquiuria`});
+  if(totalVol>2800) alerts.push({t:'red',i:'ti-droplets',m:`Volumen ${totalVol}ml — posible poliuria`});
+  if(leaks.length>0) alerts.push({t:'amber',i:'ti-alert-triangle',m:`${leaks.length} fuga(s) registrada(s)`});
+  if(p.lastRecord&&(Date.now()-p.lastRecord)/86400000>2) alerts.push({t:'amber',i:'ti-clock',m:'Sin registros hace más de 2 días'});
 
-  document.getElementById('patientContent').innerHTML = `
+  document.getElementById('patContent').innerHTML=`
     <div class="profile-hero">
-      <div class="profile-hero-avatar" style="background:${color}22;color:${color};border:2px solid ${color}44">${initials}</div>
+      <div class="profile-av" style="background:${c}22;color:${c};border:2px solid ${c}44">${ini}</div>
       <div style="flex:1">
-        <div class="profile-hero-name">${p.nombre||'—'}</div>
-        <div class="profile-hero-meta">
+        <div class="profile-name">${p.nombre||'—'}</div>
+        <div class="profile-tags">
           ${age?`<span class="tag tag-gray">${age} años</span>`:''}
-          ${p.genero==='m'?'<span class="tag tag-blue">♂</span>':p.genero==='f'?'<span class="tag tag-blue">♀</span>':''}
-          ${p.diagnostico?`<span class="tag tag-purple">${p.diagnostico}</span>`:''}
-          ${p.clinica?`<span class="tag tag-gray">🏥 ${p.clinica}</span>`:''}
-          ${p.yearInicio?`<span class="tag tag-gray">📅 ${p.yearInicio}</span>`:''}
+          ${p.genero==='m'?'<span class="tag tag-blue"><i class="ti ti-gender-male"></i>Masculino</span>':p.genero==='f'?'<span class="tag tag-blue"><i class="ti ti-gender-female"></i>Femenino</span>':''}
+          ${p.diagnostico?`<span class="tag tag-purple"><i class="ti ti-stethoscope"></i>${p.diagnostico}</span>`:''}
+          ${p.clinica?`<span class="tag tag-gray"><i class="ti ti-building-hospital"></i>${p.clinica}</span>`:''}
+          ${p.yearInicio?`<span class="tag tag-gray"><i class="ti ti-calendar"></i>${p.yearInicio}</span>`:''}
         </div>
-        <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;font-size:12px;color:var(--text2)">
-          ${p.telefono?`<span>📞 ${p.telefono}</span>`:''}
-          ${p.email?`<span>✉️ ${p.email}</span>`:''}
+        <div class="profile-info">
+          ${p.telefono?`<span><i class="ti ti-phone"></i>${p.telefono}</span>`:''}
+          ${p.email?`<span><i class="ti ti-mail"></i>${p.email}</span>`:''}
         </div>
-        <div class="access-code-box">
+        <div class="code-box">
+          <i class="ti ti-key" style="font-size:13px;color:var(--text3)"></i>
           <span style="font-size:11px;color:var(--text2)">Código:</span>
-          <span class="access-code-val">${p.accessCode||'—'}</span>
-          <button class="btn btn-sm" onclick="copyCode('${p.accessCode}')">Copiar</button>
-          <button class="btn btn-sm btn-amber" onclick="printPatientCard('${p.id}')">🖨️ Imprimir ficha</button>
+          <span class="code-val">${p.accessCode||'—'}</span>
+          <button class="btn btn-sm" onclick="copyCode('${p.accessCode||''}')"><i class="ti ti-copy"></i></button>
+          <button class="btn btn-sm btn-amber" onclick="printCard('${p.id}')"><i class="ti ti-printer"></i>Ficha</button>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        <button class="btn btn-sm btn-success" onclick="openNoteModal('${p.id}')">+ Nota clínica</button>
-        <button class="btn btn-sm" onclick="exportCSV('${p.id}')">⬇ CSV</button>
-        <button class="btn btn-sm btn-primary" onclick="generateFullReport('${p.id}')">📄 Informe técnico</button>
+      <div class="hero-actions">
+        <button class="btn btn-sm btn-green" onclick="openNoteModal('${p.id}')"><i class="ti ti-notes"></i>Nota</button>
+        <button class="btn btn-sm" onclick="exportCSV('${p.id}')"><i class="ti ti-table-export"></i>CSV</button>
+        <button class="btn btn-sm btn-primary" onclick="genFullReport('${p.id}')"><i class="ti ti-file-report"></i>Informe</button>
       </div>
     </div>
 
-    ${alerts.map(a=>`<div class="alert alert-${a.type}">${a.msg}</div>`).join('')}
-
-    ${todaySleep?`<div class="sleep-block">🌙 Hoy: Despertó ${todaySleep.wake||'—'} · Se acuesta ${todaySleep.sleep||'—'}</div>`:''}
-    ${todayWb?`<div style="margin-bottom:8px;display:flex;gap:8px;align-items:center"><span style="font-size:12px;color:var(--text2)">Hoy:</span>
-      <span class="wellbeing-badge wb-${todayWb.wellbeing||'ok'}">${todayWb.wellbeing==='great'?'😊 Muy bien':todayWb.wellbeing==='bad'?'😔 Mal':'😐 Regular'}</span>
-      ${todayWb.pain!=null?`<span class="tag tag-gray">Dolor: ${todayWb.pain}/5</span>`:''}</div>`:''}
+    ${alerts.map(a=>`<div class="alert alert-${a.t}"><i class="ti ${a.i}"></i>${a.m}</div>`).join('')}
+    ${todaySleep?`<div class="sleep-block"><i class="ti ti-moon"></i>Hoy: Despertó <strong>${todaySleep.wake||'—'}</strong> · Se acuesta <strong>${todaySleep.sleep||'—'}</strong></div>`:''}
+    ${todayWb?`<div class="wb-block"><span style="font-size:11px;color:var(--text2)">Hoy:</span><span class="wb-badge wb-${todayWb.wellbeing||'ok'}"><i class="ti ti-${todayWb.wellbeing==='great'?'mood-happy':todayWb.wellbeing==='bad'?'mood-sad':'mood-neutral'}"></i>${todayWb.wellbeing==='great'?'Muy bien':todayWb.wellbeing==='bad'?'Mal':'Regular'}</span>${todayWb.pain!=null?`<span class="tag tag-gray"><i class="ti ti-heart-rate-monitor"></i>Dolor: ${todayWb.pain}/5</span>`:''}</div>`:''}
 
     <div class="stat-grid">
-      <div class="stat-card"><div class="stat-label">${t('mictions')}</div><div class="stat-val">${mics.length}</div><div class="stat-ref">Normal: 4–7/día</div></div>
-      <div class="stat-card"><div class="stat-label">${t('avgVol')}</div><div class="stat-val">${avgVol}<span class="stat-unit">ml</span></div><div class="stat-ref">Normal: 250–400ml</div></div>
-      <div class="stat-card"><div class="stat-label">${t('flow')}</div><div class="stat-val">${avgFlow}<span class="stat-unit">ml/s</span></div><div class="stat-ref">Normal: ♀&gt;15 ♂&gt;12</div></div>
-      <div class="stat-card"><div class="stat-label">${t('leaks')}</div><div class="stat-val" style="color:${leaks.length>0?'var(--amber)':'var(--text)'}">${leaks.length}</div></div>
-      <div class="stat-card"><div class="stat-label">🎙 dB promedio</div><div class="stat-val">${avgDB}<span class="stat-unit">dB</span></div><div class="stat-ref">Sobre baseline</div></div>
-      <div class="stat-card"><div class="stat-label">${t('drinks')}</div><div class="stat-val">${drks.reduce((a,r)=>a+(r.vol||0),0)}<span class="stat-unit">ml</span></div></div>
+      <div class="stat-card"><div class="stat-lbl">Micciones</div><div class="stat-val">${mics.length}</div><div class="stat-ref">Normal: 4–7/día</div></div>
+      <div class="stat-card"><div class="stat-lbl">Vol. promedio</div><div class="stat-val">${avgVol}<span class="stat-unit">ml</span></div><div class="stat-ref">Normal: 250–400ml</div></div>
+      <div class="stat-card"><div class="stat-lbl">Flujo prom.</div><div class="stat-val">${avgFlow}<span class="stat-unit">ml/s</span></div><div class="stat-ref">♀&gt;15 ♂&gt;12</div></div>
+      <div class="stat-card"><div class="stat-lbl">Fugas</div><div class="stat-val" style="color:${leaks.length>0?'var(--amber)':'var(--text)'}">${leaks.length}</div></div>
+      <div class="stat-card"><div class="stat-lbl">dB promedio</div><div class="stat-val">${avgDB}<span class="stat-unit">dB</span></div><div class="stat-ref">Sobre baseline</div></div>
+      <div class="stat-card"><div class="stat-lbl">Bebidas</div><div class="stat-val">${drks.reduce((a,r)=>a+(r.vol||0),0)}<span class="stat-unit">ml</span></div></div>
     </div>
 
     <div class="ptabs">
-      <div class="ptab active" onclick="ptab(this,'pd-diary')">Diario</div>
-      <div class="ptab" onclick="ptab(this,'pd-charts')">Gráficas</div>
-      <div class="ptab" onclick="ptab(this,'pd-acoustic')">Análisis acústico</div>
-      <div class="ptab" onclick="ptab(this,'pd-notes')">Notas clínicas</div>
-      <div class="ptab" onclick="ptab(this,'pd-profile')">Perfil completo</div>
+      <div class="ptab active" onclick="ptab(this,'pd-diary')"><i class="ti ti-list"></i>Diario</div>
+      <div class="ptab" onclick="ptab(this,'pd-charts')"><i class="ti ti-chart-bar"></i>Gráficas</div>
+      <div class="ptab" onclick="ptab(this,'pd-acoustic')"><i class="ti ti-microphone"></i>Análisis acústico</div>
+      <div class="ptab" onclick="ptab(this,'pd-notes')"><i class="ti ti-notes"></i>Notas</div>
+      <div class="ptab" onclick="ptab(this,'pd-profile')"><i class="ti ti-user-circle"></i>Perfil</div>
     </div>
 
-    <div id="pd-diary">${renderDiary(recs, sleepMap, wbMap)}</div>
-
+    <div id="pd-diary">${renderDiary(recs,sleepMap,wbMap)}</div>
     <div id="pd-charts" style="display:none">
-      <div class="card"><div class="card-title">Micciones por hora (diurna vs nocturna)</div><div class="chart-wrap"><canvas id="ch-hours"></canvas></div></div>
-      <div class="card"><div class="card-title">Volumen por micción (ml)</div><div class="chart-wrap"><canvas id="ch-vol"></canvas></div></div>
-      <div class="card"><div class="card-title">Balance líquido ingerido vs orina (ml/día)</div><div class="chart-wrap"><canvas id="ch-balance"></canvas></div></div>
-      <div class="card"><div class="card-title">Distribución de urgencia</div><div class="chart-wrap" style="height:160px"><canvas id="ch-urgency"></canvas></div></div>
-      <div class="card"><div class="card-title">Bienestar diario (escala 0=mal, 2=muy bien)</div><div class="chart-wrap"><canvas id="ch-wellbeing"></canvas></div></div>
+      <div class="card"><div class="card-label"><i class="ti ti-chart-bar"></i>Micciones por hora (diurna / nocturna)</div><div class="chart-wrap"><canvas id="ch-hours"></canvas></div></div>
+      <div class="card"><div class="card-label"><i class="ti ti-chart-dots"></i>Volumen por micción (ml)</div><div class="chart-wrap"><canvas id="ch-vol"></canvas></div></div>
+      <div class="card"><div class="card-label"><i class="ti ti-chart-arrows-vertical"></i>Balance líquido vs orina (ml/día)</div><div class="chart-wrap"><canvas id="ch-bal"></canvas></div></div>
+      <div class="card"><div class="card-label"><i class="ti ti-chart-pie"></i>Distribución urgencia</div><div class="chart-wrap" style="height:160px"><canvas id="ch-urg"></canvas></div></div>
+      <div class="card"><div class="card-label"><i class="ti ti-heart-rate-monitor"></i>Bienestar y dolor (escala)</div><div class="chart-wrap"><canvas id="ch-wb"></canvas></div></div>
     </div>
-
-    <div id="pd-acoustic" style="display:none">${renderAcousticTab(acousticRecs, flowDist)}</div>
-
+    <div id="pd-acoustic" style="display:none">${renderAcousticTab(acRecs,fD)}</div>
     <div id="pd-notes" style="display:none">
-      ${(p.notes||[]).length ? p.notes.map(n=>`
-        <div class="card" style="margin-bottom:8px">
-          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">${n.date} · ${n.doctor||''}</div>
-          <div style="font-size:14px">${n.text}</div>
-        </div>`).join('') : '<div class="empty"><div class="empty-icon">📝</div><p>Sin notas</p></div>'}
+      <button class="btn btn-green" style="margin-bottom:12px" onclick="openNoteModal('${p.id}')"><i class="ti ti-plus"></i>Agregar nota</button>
+      ${(p.notes||[]).length?(p.notes||[]).map(n=>`<div class="card" style="margin-bottom:8px"><div style="font-size:11px;color:var(--text3);margin-bottom:4px;display:flex;align-items:center;gap:5px"><i class="ti ti-calendar" style="font-size:12px"></i>${n.date} · ${n.doctor||''}</div><div style="font-size:13px">${n.text}</div></div>`).join(''):'<div class="empty"><i class="ti ti-notes"></i><p>Sin notas clínicas</p></div>'}
     </div>
-
     <div id="pd-profile" style="display:none">
-      <div class="card">
-        <table style="width:100%;font-size:13px;border-collapse:collapse">
-          ${[['Nombre',p.nombre],['Fecha nac.',p.fechaNac],['Género',p.genero==='m'?'Masculino':p.genero==='f'?'Femenino':p.genero||'—'],['Edad',age?age+' años':'—'],['Teléfono',p.telefono],['Email',p.email],['Diagnóstico',p.diagnostico],['Médico tratante',p.medicoTratante],['Clínica',p.clinica],['Año inicio',p.yearInicio],['Código acceso',p.accessCode],['Notas iniciales',p.notasIniciales]].map(([k,v])=>`
-          <tr><td style="padding:8px 0;color:var(--text2);width:40%">${k}</td><td style="padding:8px 0;font-weight:500;font-family:'JetBrains Mono',monospace;font-size:12px">${v||'—'}</td></tr>`).join('')}
-        </table>
-      </div>
+      <div class="card"><table style="width:100%;font-size:12px;border-collapse:collapse">
+        ${[['Nombre',p.nombre],['Fecha nac.',p.fechaNac],['Género',p.genero==='m'?'Masculino':p.genero==='f'?'Femenino':p.genero||'—'],['Edad',age?age+' años':'—'],['Teléfono',p.telefono],['Email',p.email],['Diagnóstico',p.diagnostico],['Médico',p.medicoTratante],['Clínica',p.clinica],['Año inicio',p.yearInicio],['Código acceso',p.accessCode],['Notas iniciales',p.notasIniciales]].map(([k,v])=>`<tr><td style="padding:8px 0;color:var(--text2);width:40%;display:flex;align-items:center;gap:5px">${k}</td><td style="padding:8px 0;font-weight:500;font-family:'Inter',monospace;font-size:11px">${v||'—'}</td></tr>`).join('')}
+      </table></div>
     </div>
   `;
-
-  // Build charts after a tick
-  setTimeout(()=>buildCharts(mics, drks, wbMap, sleepMap), 150);
+  setTimeout(()=>buildCharts(mics,drks,wbMap,sleepMap),150);
 }
 
-// ── DIARY RENDER ──
-function renderDiary(recs, sleepMap, wbMap) {
-  if (!recs.length) return '<div class="empty"><div class="empty-icon">📋</div><p>Sin registros</p></div>';
-  const byDate = {};
+// ── DIARY ──
+function renderDiary(recs,sleepMap,wbMap){
+  if(!recs.length) return '<div class="empty"><i class="ti ti-clipboard"></i><p>Sin registros</p></div>';
+  const byDate={};
   recs.forEach(r=>{ if(!byDate[r.date]) byDate[r.date]=[]; byDate[r.date].push(r); });
-  return Object.keys(byDate).sort().reverse().map(date => {
-    const sl = sleepMap[date];
-    const wb = wbMap[date];
-    return `<div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono',monospace;background:var(--card2);border:1px solid var(--border);padding:3px 10px;border-radius:6px;margin:10px 0 6px;display:inline-flex;align-items:center;gap:8px">
-      ${date}
-      ${sl?`<span style="color:var(--purple)">🌙 ${sl.wake}–${sl.sleep}</span>`:''}
-      ${wb?`<span style="color:${wb.wellbeing==='great'?'var(--green)':wb.wellbeing==='bad'?'var(--red)':'var(--amber)'}">${wb.wellbeing==='great'?'😊':wb.wellbeing==='bad'?'😔':'😐'} dolor:${wb.pain??'—'}/5</span>`:''}
+  return Object.keys(byDate).sort().reverse().map(date=>{
+    const sl=sleepMap[date]; const wb=wbMap[date];
+    return `<div style="font-size:11px;color:var(--text3);font-family:'Inter',monospace;background:var(--card2);border:1px solid var(--border);padding:4px 10px;border-radius:6px;margin:10px 0 6px;display:inline-flex;align-items:center;gap:8px">
+      <i class="ti ti-calendar" style="font-size:12px"></i>${date}
+      ${sl?`<span style="color:var(--purple)"><i class="ti ti-moon" style="font-size:11px"></i>${sl.wake}–${sl.sleep}</span>`:''}
+      ${wb?`<span style="color:${wb.wellbeing==='great'?'var(--green)':wb.wellbeing==='bad'?'var(--red)':'var(--amber)'}"><i class="ti ti-heart-rate-monitor" style="font-size:11px"></i>dolor:${wb.pain??'—'}/5</span>`:''}
     </div>
     ${byDate[date].sort((a,b)=>a.hora.localeCompare(b.hora)).map(r=>{
       if(r.type==='miction'){
         const tags=[];
-        if(r.vol) tags.push(`<span class="tag tag-blue">💧 ${r.vol}ml</span>`);
-        if(r.dur) tags.push(`<span class="tag tag-gray">⏱ ${r.dur}s</span>`);
-        if(r.flow) tags.push(`<span class="tag tag-green">⚡ ${r.flow}ml/s</span>`);
+        if(r.vol) tags.push(`<span class="tag tag-blue"><i class="ti ti-droplets"></i>${r.vol}ml</span>`);
+        if(r.dur) tags.push(`<span class="tag tag-gray"><i class="ti ti-clock"></i>${r.dur}s</span>`);
+        if(r.flow) tags.push(`<span class="tag tag-green"><i class="ti ti-activity"></i>${r.flow}ml/s</span>`);
         if(r.urgency!=null) tags.push(`<span class="tag ${['tag-gray','tag-green','tag-amber','tag-red','tag-red'][r.urgency]}">U${r.urgency}</span>`);
-        if(r.pos) tags.push(`<span class="tag tag-gray">${r.pos==='sentado'?'🪑':'🧍'} ${r.pos}</span>`);
-        if(r.genero) tags.push(`<span class="tag tag-gray">${r.genero==='m'?'♂':'♀'}</span>`);
-        if(r.acoustics){
-          const ac=r.acoustics;
-          const cls={weak:'tag-red',low:'tag-amber',normal:'tag-green',strong:'tag-blue'}[ac.classification]||'tag-gray';
-          tags.push(`<span class="tag ${cls}">🎙 ${ac.classification} ${ac.avgDB}dB</span>`);
-          if(ac.pattern==='intermittent') tags.push(`<span class="tag tag-amber">⚡ intermitente</span>`);
-        }
-        return `<div class="record-item"><div class="record-icon" style="background:var(--accent-dim)">🚽</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-main">Micción</div><div class="record-tags">${tags.join('')}</div>${r.acoustics?`<div style="margin-top:4px">${renderMiniCurve(r.acoustics.curve)}</div>`:''}</div></div>`;
+        if(r.pos) tags.push(`<span class="tag tag-gray"><i class="ti ti-${r.pos==='sentado'?'armchair':'man'}"></i>${r.pos}</span>`);
+        if(r.genero) tags.push(`<span class="tag tag-gray"><i class="ti ti-gender-${r.genero==='m'?'male':'female'}"></i></span>`);
+        if(r.acoustics){ const ac=r.acoustics; const cls={weak:'tag-red',low:'tag-amber',normal:'tag-green',strong:'tag-blue'}[ac.classification]||'tag-gray'; tags.push(`<span class="tag ${cls}"><i class="ti ti-microphone"></i>${ac.classification} ${ac.avgDB}dB</span>`); if(ac.pattern==='intermittent') tags.push(`<span class="tag tag-amber"><i class="ti ti-wave-sine"></i>intermitente</span>`); }
+        return `<div class="rec-item"><div class="rec-icon ri-m"><i class="ti ti-droplets"></i></div><div class="rec-body"><div class="rec-time"><i class="ti ti-clock"></i>${r.hora}</div><div class="rec-title">Micción</div><div class="rec-tags">${tags.join('')}</div>${r.acoustics&&r.acoustics.curve?`<div style="margin-top:5px">${miniCurve(r.acoustics.curve)}</div>`:''}</div></div>`;
       }
-      if(r.type==='drink') return `<div class="record-item"><div class="record-icon" style="background:var(--green-dim)">💧</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-main">${r.tipo||'Bebida'}</div><div class="record-tags"><span class="tag tag-green">${r.vol||0}ml</span></div></div></div>`;
-      if(r.type==='leak') return `<div class="record-item"><div class="record-icon" style="background:var(--amber-dim)">⚠️</div><div class="record-body"><div class="record-time">${r.hora}</div><div class="record-main">Fuga — ${r.tipo}</div>${r.muda?'<div class="record-tags"><span class="tag tag-amber">Muda</span></div>':''}</div></div>`;
+      if(r.type==='drink') return `<div class="rec-item"><div class="rec-icon ri-d"><i class="ti ti-droplet"></i></div><div class="rec-body"><div class="rec-time"><i class="ti ti-clock"></i>${r.hora}</div><div class="rec-title">${r.tipo||'Bebida'}</div><div class="rec-tags"><span class="tag tag-green"><i class="ti ti-droplet"></i>${r.vol||0}ml</span></div></div></div>`;
+      if(r.type==='leak') return `<div class="rec-item"><div class="rec-icon ri-l"><i class="ti ti-alert-triangle"></i></div><div class="rec-body"><div class="rec-time"><i class="ti ti-clock"></i>${r.hora}</div><div class="rec-title">Fuga — ${r.tipo}</div>${r.muda?`<div class="rec-tags"><span class="tag tag-amber"><i class="ti ti-shirt"></i>Muda</span></div>`:''}</div></div>`;
       return '';
     }).join('')}`;
   }).join('');
 }
 
-function renderMiniCurve(curve) {
-  if (!curve || !curve.length) return '';
-  const max = Math.max(...curve.map(p=>p.db), 1);
-  const bars = curve.map(p=>{
-    const h = Math.max(2, Math.round((p.db/max)*40));
-    const color = p.db<12?'#ef5350':p.db<22?'#ffb74d':p.db<35?'#43d98c':'#4fc3f7';
-    return `<div class="flow-bar" style="height:${h}px;background:${color}"></div>`;
-  }).join('');
-  return `<div class="flow-curve" title="Curva de flujo acústico">${bars}</div>`;
+function miniCurve(curve){
+  if(!curve||!curve.length) return '';
+  const max=Math.max(...curve.map(p=>p.db),1);
+  const bars=curve.map(pt=>{ const h=Math.max(2,Math.round((pt.db/max)*36)); const col=pt.db<12?'#ef5350':pt.db<22?'#ffb74d':pt.db<35?'#43d98c':'#378ADD'; return `<div class="fc-bar" style="height:${h}px;background:${col}"></div>`; }).join('');
+  return `<div class="flow-curve">${bars}</div>`;
 }
 
 // ── ACOUSTIC TAB ──
-function renderAcousticTab(acousticRecs, flowDist) {
-  if (!acousticRecs.length) return '<div class="empty"><div class="empty-icon">🎙</div><p>Sin datos acústicos. El paciente debe usar el cronómetro con micrófono.</p></div>';
-  return `
-    <div class="card">
-      <div class="card-title">Distribución de clasificación acústica</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1rem">
-        <div class="stat-card"><div class="stat-label">🔴 Débil</div><div class="stat-val">${flowDist.weak}</div><div class="stat-ref">&lt;8 ml/s est.</div></div>
-        <div class="stat-card"><div class="stat-label">🟡 Bajo</div><div class="stat-val">${flowDist.low}</div><div class="stat-ref">8–15 ml/s est.</div></div>
-        <div class="stat-card"><div class="stat-label">🟢 Normal</div><div class="stat-val">${flowDist.normal}</div><div class="stat-ref">15–25 ml/s est.</div></div>
-        <div class="stat-card"><div class="stat-label">🔵 Fuerte</div><div class="stat-val">${flowDist.strong}</div><div class="stat-ref">&gt;25 ml/s est.</div></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">Detalle por micción</div>
-      <table style="width:100%;border-collapse:collapse;font-size:12px">
-        <tr style="background:var(--card2)"><th style="padding:6px 8px;text-align:left">Fecha/Hora</th><th>Vol ml</th><th>Dur s</th><th>Flujo ml/s</th><th>Clasif.</th><th>dB prom</th><th>dB pico</th><th>Baseline</th><th>Patrón</th><th>Curva</th></tr>
-        ${acousticRecs.map(r=>{
-          const ac=r.acoustics;
-          const cls={weak:'flow-weak',low:'flow-low',normal:'flow-normal',strong:'flow-strong'}[ac.classification]||'';
-          return `<tr style="border-top:1px solid var(--border)">
-            <td style="padding:6px 8px;font-family:'JetBrains Mono',monospace;font-size:11px">${r.date} ${r.hora}</td>
-            <td style="padding:6px 8px;text-align:center">${r.vol||'—'}</td>
-            <td style="padding:6px 8px;text-align:center">${r.dur||'—'}</td>
-            <td style="padding:6px 8px;text-align:center">${r.flow||'—'}</td>
-            <td style="padding:6px 8px;text-align:center"><span class="flow-badge ${cls}">${ac.classification}</span></td>
-            <td style="padding:6px 8px;text-align:center;font-family:'JetBrains Mono',monospace">${ac.avgDB}</td>
-            <td style="padding:6px 8px;text-align:center;font-family:'JetBrains Mono',monospace">${ac.peakDB}</td>
-            <td style="padding:6px 8px;text-align:center;font-family:'JetBrains Mono',monospace">${ac.ambientDB}</td>
-            <td style="padding:6px 8px;text-align:center"><span class="tag ${ac.pattern==='intermittent'?'tag-amber':'tag-green'}">${ac.pattern==='intermittent'?'Intermit.':'Continuo'}</span></td>
-            <td style="padding:6px 8px">${renderMiniCurve(ac.curve)}</td>
-          </tr>`;
-        }).join('')}
-      </table>
-    </div>`;
+function renderAcousticTab(acRecs,fD){
+  if(!acRecs.length) return '<div class="empty"><i class="ti ti-microphone-off"></i><p>Sin datos acústicos. El paciente debe usar el cronómetro con micrófono.</p></div>';
+  return `<div class="card"><div class="card-label"><i class="ti ti-chart-bar"></i>Distribución de clasificación</div>
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card"><div class="stat-lbl" style="color:var(--red)">Débil</div><div class="stat-val">${fD.weak}</div><div class="stat-ref">&lt;8 ml/s est.</div></div>
+      <div class="stat-card"><div class="stat-lbl" style="color:var(--amber)">Bajo</div><div class="stat-val">${fD.low}</div><div class="stat-ref">8–15 ml/s est.</div></div>
+      <div class="stat-card"><div class="stat-lbl" style="color:var(--green)">Normal</div><div class="stat-val">${fD.normal}</div><div class="stat-ref">15–25 ml/s est.</div></div>
+      <div class="stat-card"><div class="stat-lbl" style="color:var(--blue-act)">Fuerte</div><div class="stat-val">${fD.strong}</div><div class="stat-ref">&gt;25 ml/s est.</div></div>
+    </div></div>
+    <div class="card"><div class="card-label"><i class="ti ti-table"></i>Detalle por micción</div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">
+      <tr style="background:var(--card2)"><th style="padding:5px 7px;text-align:left">Fecha/Hora</th><th>Vol</th><th>Dur</th><th>Flujo</th><th>Clasif.</th><th>dB prom.</th><th>dB pico</th><th>Baseline</th><th>Patrón</th><th>Curva</th></tr>
+      ${acRecs.map(r=>{ const ac=r.acoustics; const cls={weak:'fb-weak',low:'fb-low',normal:'fb-normal',strong:'fb-strong'}[ac.classification]||''; return `<tr style="border-top:1px solid var(--border)"><td style="padding:5px 7px;font-family:'Inter',monospace;color:var(--text2)">${r.date} ${r.hora}</td><td style="text-align:center;padding:5px 3px">${r.vol||'—'}</td><td style="text-align:center;padding:5px 3px">${r.dur||'—'}</td><td style="text-align:center;padding:5px 3px">${r.flow||'—'}</td><td style="text-align:center;padding:5px 3px"><span class="flow-badge ${cls}">${ac.classification}</span></td><td style="text-align:center;padding:5px 3px;font-family:'Inter',monospace;font-weight:600">${ac.avgDB}</td><td style="text-align:center;padding:5px 3px;font-family:'Inter',monospace">${ac.peakDB}</td><td style="text-align:center;padding:5px 3px;font-family:'Inter',monospace">${ac.ambientDB}</td><td style="text-align:center;padding:5px 3px"><span class="tag ${ac.pattern==='intermittent'?'tag-amber':'tag-green'}" style="font-size:10px">${ac.pattern==='intermittent'?'Intermit.':'Continuo'}</span></td><td style="padding:5px 3px">${miniCurve(ac.curve)}</td></tr>`; }).join('')}
+    </table></div></div>`;
 }
 
 // ── CHARTS ──
-function destroyAllCharts() {
-  Object.values(chartsMap).forEach(c=>{ try{c.destroy()}catch(e){} });
-  chartsMap = {};
-}
+function destroyCharts(){ Object.values(chartsMap).forEach(c=>{ try{c.destroy()}catch(e){} }); chartsMap={}; }
 
-function buildCharts(mics, drks, wbMap, sleepMap) {
-  const CHART_OPTS = { responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#8892b0',font:{size:11}}}}, scales:{x:{ticks:{color:'#8892b0'},grid:{color:'#2d3350'}},y:{ticks:{color:'#8892b0'},grid:{color:'#2d3350'}}} };
+function isNocturnal(hora,wake,sleep){ if(!wake||!sleep) return false; const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;}; const r=toMin(hora),w=toMin(wake),s=toMin(sleep); return s>w?(r>=s||r<w):(r>=s&&r<w); }
 
-  // Hours chart (day vs night)
-  const c1 = document.getElementById('ch-hours');
-  if(c1) {
-    const hourDay=Array(24).fill(0), hourNight=Array(24).fill(0);
-    const today = new Date().toISOString().slice(0,10);
-    const sl = sleepMap[today];
-    mics.forEach(r=>{
-      const h=parseInt((r.hora||'0').split(':')[0]);
-      const isNight = sl && isNocturnal(r.hora, sl.wake, sl.sleep);
-      isNight ? hourNight[h]++ : hourDay[h]++;
-    });
-    chartsMap['hours']=new Chart(c1,{type:'bar',data:{labels:Array.from({length:24},(_,i)=>i+'h'),datasets:[
-      {label:'Diurna',data:hourDay,backgroundColor:'#0288d199',borderRadius:3},
-      {label:'Nocturna',data:hourNight,backgroundColor:'#ce93d899',borderRadius:3}
-    ]},options:{...CHART_OPTS,scales:{x:{...CHART_OPTS.scales.x,stacked:true},y:{...CHART_OPTS.scales.y,stacked:true,ticks:{stepSize:1,color:'#8892b0'}}}}});
-  }
-
-  // Volume scatter
-  const c2 = document.getElementById('ch-vol');
-  if(c2) {
-    const volData=mics.filter(r=>r.vol).map(r=>({x:r.hora,y:r.vol}));
-    chartsMap['vol']=new Chart(c2,{type:'scatter',data:{datasets:[
-      {label:'ml',data:volData,backgroundColor:'#43d98c88',pointRadius:7},
-      {data:[{x:'00:00',y:250},{x:'23:59',y:250}],type:'line',borderColor:'#43d98c44',borderDash:[4,4],pointRadius:0,label:'Min normal'},
-      {data:[{x:'00:00',y:400},{x:'23:59',y:400}],type:'line',borderColor:'#ffb74d44',borderDash:[4,4],pointRadius:0,label:'Max normal'}
-    ]},options:{...CHART_OPTS,scales:{x:{type:'category',ticks:{color:'#8892b0'},grid:{color:'#2d3350'}},y:{min:0,title:{display:true,text:'ml',color:'#8892b0'},ticks:{color:'#8892b0'},grid:{color:'#2d3350'}}}}});
-  }
-
+function buildCharts(mics,drks,wbMap,sleepMap){
+  const OPTS={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8896b3',font:{size:10}}}},scales:{x:{ticks:{color:'#8896b3',font:{size:10}},grid:{color:'#253048'}},y:{ticks:{color:'#8896b3',font:{size:10}},grid:{color:'#253048'}}}};
+  const today=new Date().toISOString().slice(0,10); const sl=sleepMap[today];
+  // Hours
+  const c1=document.getElementById('ch-hours');
+  if(c1){ const hd=Array(24).fill(0),hn=Array(24).fill(0); mics.forEach(r=>{ const h=parseInt((r.hora||'0').split(':')[0]); (sl&&isNocturnal(r.hora,sl.wake,sl.sleep)?hn:hd)[h]++; }); chartsMap['h']=new Chart(c1,{type:'bar',data:{labels:Array.from({length:24},(_,i)=>i+'h'),datasets:[{label:'Diurna',data:hd,backgroundColor:'#378ADD88',borderRadius:3},{label:'Nocturna',data:hn,backgroundColor:'rgba(206,147,216,.5)',borderRadius:3}]},options:{...OPTS,scales:{x:{...OPTS.scales.x,stacked:true},y:{...OPTS.scales.y,stacked:true,ticks:{stepSize:1,color:'#8896b3'}}}}}); }
+  // Volume
+  const c2=document.getElementById('ch-vol');
+  if(c2){ const vd=mics.filter(r=>r.vol).map(r=>({x:r.hora,y:r.vol})); chartsMap['v']=new Chart(c2,{type:'scatter',data:{datasets:[{label:'ml',data:vd,backgroundColor:'#43d98c88',pointRadius:7},{data:[{x:'00:00',y:250},{x:'23:59',y:250}],type:'line',borderColor:'#43d98c44',borderDash:[4,4],pointRadius:0},{data:[{x:'00:00',y:400},{x:'23:59',y:400}],type:'line',borderColor:'#ffb74d44',borderDash:[4,4],pointRadius:0}]},options:{...OPTS,scales:{x:{type:'category',ticks:{color:'#8896b3'},grid:{color:'#253048'}},y:{min:0,title:{display:true,text:'ml',color:'#8896b3'},ticks:{color:'#8896b3'},grid:{color:'#253048'}}},plugins:{legend:{display:false}}}}); }
   // Balance
-  const c3 = document.getElementById('ch-balance');
-  if(c3) {
-    const dayMap={};
-    mics.forEach(r=>{ if(!dayMap[r.date]) dayMap[r.date]={orina:0,bebida:0}; dayMap[r.date].orina+=(r.vol||0); });
-    drks.forEach(r=>{ if(!dayMap[r.date]) dayMap[r.date]={orina:0,bebida:0}; dayMap[r.date].bebida+=(r.vol||0); });
-    const days=Object.keys(dayMap).sort();
-    chartsMap['balance']=new Chart(c3,{type:'bar',data:{labels:days,datasets:[
-      {label:'Bebida',data:days.map(d=>dayMap[d].bebida),backgroundColor:'#74c69d99',borderRadius:3},
-      {label:'Orina',data:days.map(d=>dayMap[d].orina),backgroundColor:'#0288d199',borderRadius:3}
-    ]},options:{...CHART_OPTS}});
-  }
-
-  // Urgency doughnut
-  const c4 = document.getElementById('ch-urgency');
-  if(c4) {
-    const urgCounts=[0,0,0,0,0];
-    mics.forEach(r=>{ if(r.urgency!=null) urgCounts[r.urgency]++; });
-    chartsMap['urg']=new Chart(c4,{type:'doughnut',data:{labels:['U0','U1','U2','U3','U4'],datasets:[{data:urgCounts,backgroundColor:['#4a5380','#43d98c','#ffb74d','#ef5350','#c62828']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8892b0',font:{size:11}}}}}});
-  }
-
-  // Wellbeing line
-  const c5 = document.getElementById('ch-wellbeing');
-  if(c5) {
-    const wbMap2 = wbMap;
-    const dates = Object.keys(wbMap2).sort();
-    const wbVals = dates.map(d=>wbMap2[d].wellbeing==='great'?2:wbMap2[d].wellbeing==='ok'?1:0);
-    const painVals = dates.map(d=>wbMap2[d].pain??0);
-    chartsMap['wb']=new Chart(c5,{type:'line',data:{labels:dates,datasets:[
-      {label:'Bienestar (0–2)',data:wbVals,borderColor:'#43d98c',backgroundColor:'#43d98c22',fill:true,tension:0.3},
-      {label:'Dolor (0–5)',data:painVals,borderColor:'#ef5350',backgroundColor:'#ef535022',fill:true,tension:0.3}
-    ]},options:{...CHART_OPTS,scales:{x:{ticks:{color:'#8892b0'},grid:{color:'#2d3350'}},y:{min:0,ticks:{color:'#8892b0'},grid:{color:'#2d3350'}}}}});
-  }
+  const c3=document.getElementById('ch-bal');
+  if(c3){ const dm={}; mics.forEach(r=>{ if(!dm[r.date]) dm[r.date]={o:0,b:0}; dm[r.date].o+=(r.vol||0); }); drks.forEach(r=>{ if(!dm[r.date]) dm[r.date]={o:0,b:0}; dm[r.date].b+=(r.vol||0); }); const days=Object.keys(dm).sort(); chartsMap['b']=new Chart(c3,{type:'bar',data:{labels:days,datasets:[{label:'Bebida',data:days.map(d=>dm[d].b),backgroundColor:'#43d98c66',borderRadius:3},{label:'Orina',data:days.map(d=>dm[d].o),backgroundColor:'#378ADD66',borderRadius:3}]},options:{...OPTS}}); }
+  // Urgency
+  const c4=document.getElementById('ch-urg');
+  if(c4){ const uc=[0,0,0,0,0]; mics.forEach(r=>{ if(r.urgency!=null) uc[r.urgency]++; }); chartsMap['u']=new Chart(c4,{type:'doughnut',data:{labels:['U0','U1','U2','U3','U4'],datasets:[{data:uc,backgroundColor:['#4a5675','#43d98c','#ffb74d','#ef5350','#c62828']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#8896b3',font:{size:10}}}}}}); }
+  // Wellbeing
+  const c5=document.getElementById('ch-wb');
+  if(c5){ const dates=Object.keys(wbMap).sort(); const wv=dates.map(d=>wbMap[d].wellbeing==='great'?2:wbMap[d].wellbeing==='ok'?1:0); const pv=dates.map(d=>wbMap[d].pain??0); chartsMap['wb']=new Chart(c5,{type:'line',data:{labels:dates,datasets:[{label:'Bienestar (0–2)',data:wv,borderColor:'#43d98c',backgroundColor:'#43d98c22',fill:true,tension:.3},{label:'Dolor (0–5)',data:pv,borderColor:'#ef5350',backgroundColor:'#ef535022',fill:true,tension:.3}]},options:{...OPTS,scales:{x:{ticks:{color:'#8896b3'},grid:{color:'#253048'}},y:{min:0,ticks:{color:'#8896b3'},grid:{color:'#253048'}}}}}); }
 }
 
-function isNocturnal(hora, wake, sleep) {
-  if(!wake||!sleep) return false;
-  const toMin=t=>{ const[h,m]=t.split(':').map(Number); return h*60+m; };
-  const r=toMin(hora),w=toMin(wake),s=toMin(sleep);
-  return s>w ? (r>=s||r<w) : (r>=s&&r<w);
-}
-
-// ── PTABS ──
-window.ptab = (el, id) => {
-  el.closest('.ptabs').querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  ['pd-diary','pd-charts','pd-acoustic','pd-notes','pd-profile'].forEach(n=>{
-    const e=document.getElementById(n); if(e) e.style.display=n===id?'block':'none';
-  });
-  if (id==='pd-charts') {
-    destroyAllCharts();
-    const p=patientsCache[selectedPatientId];
-    if(p) selectPatient(selectedPatientId);
-  }
+window.ptab=(el,id)=>{
+  el.closest('.ptabs').querySelectorAll('.ptab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
+  ['pd-diary','pd-charts','pd-acoustic','pd-notes','pd-profile'].forEach(n=>{ const e=document.getElementById(n); if(e) e.style.display=n===id?'block':'none'; });
+  if(id==='pd-charts'){ destroyCharts(); selectPat(selPatId); }
 };
 
 // ── NEW PATIENT ──
-window.openNewPatient = () => {
-  document.getElementById('npNombre').value='';
-  document.getElementById('npFechaNac').value='';
-  document.getElementById('npGenero').value='';
-  document.getElementById('npYear').value=new Date().getFullYear();
-  document.getElementById('npClinica').value='';
-  document.getElementById('npTel').value='';
-  document.getElementById('npEmail').value='';
-  document.getElementById('npDiag').value='';
-  document.getElementById('npMedico').value=currentDoctorData?.nombre||'';
-  document.getElementById('npNotas').value='';
-  document.getElementById('npError').textContent='';
-  document.getElementById('modalNewPat').classList.add('open');
-};
-window.closeM = (name) => document.getElementById('modal'+name).classList.remove('open');
+window.openNewPat=()=>{ document.getElementById('npN').value=''; document.getElementById('npFN').value=''; document.getElementById('npG').value=''; document.getElementById('npY').value=new Date().getFullYear(); document.getElementById('npC').value=''; document.getElementById('npT').value=''; document.getElementById('npE').value=''; document.getElementById('npD').value=''; document.getElementById('npM').value=curDocData?.nombre||''; document.getElementById('npNo').value=''; document.getElementById('npErr').style.display='none'; document.getElementById('modalNewPat').classList.add('open'); };
+window.closeM=(name)=>document.getElementById('modal'+name).classList.remove('open');
 
-window.saveNewPatient = async () => {
-  const nombre = document.getElementById('npNombre').value.trim();
-  const clinica = document.getElementById('npClinica').value;
-  const year = document.getElementById('npYear').value;
-  if (!nombre) { document.getElementById('npError').textContent='El nombre es obligatorio'; return; }
-  if (!clinica) { document.getElementById('npError').textContent='Selecciona una clínica'; return; }
-  const code = genCode();
-  const data = {
-    nombre, fechaNac:document.getElementById('npFechaNac').value,
-    genero:document.getElementById('npGenero').value,
-    telefono:document.getElementById('npTel').value.trim(),
-    email:document.getElementById('npEmail').value.trim(),
-    diagnostico:document.getElementById('npDiag').value.trim(),
-    medicoTratante:document.getElementById('npMedico').value.trim(),
-    notasIniciales:document.getElementById('npNotas').value.trim(),
-    clinica, yearInicio:parseInt(year)||new Date().getFullYear(),
-    fechaInicio:new Date().toISOString().slice(0,10),
-    doctorId:currentDoctor.uid,
-    accessCode:code, status:'active', notes:[], createdAt:serverTimestamp()
-  };
-  try {
-    const ref = await addDoc(collection(db,'patients'),data);
-    closeM('NewPat');
-    // Auto-show print card
-    setTimeout(()=>printPatientCard(ref.id, {...data,id:ref.id}), 500);
-  } catch(e) { document.getElementById('npError').textContent=e.message; }
+window.saveNewPat=async()=>{
+  const nombre=document.getElementById('npN').value.trim(); const clinica=document.getElementById('npC').value; const year=document.getElementById('npY').value;
+  const err=document.getElementById('npErr'); err.style.display='none';
+  if(!nombre){ err.querySelector('span').textContent='El nombre es obligatorio'; err.style.display='flex'; return; }
+  if(!clinica){ err.querySelector('span').textContent='Selecciona una clínica'; err.style.display='flex'; return; }
+  const code=genCode();
+  const data={nombre,fechaNac:document.getElementById('npFN').value,genero:document.getElementById('npG').value,telefono:document.getElementById('npT').value.trim(),email:document.getElementById('npE').value.trim(),diagnostico:document.getElementById('npD').value.trim(),medicoTratante:im(),notasIniciales:document.getElementById('npNo').value.trim(),clinica,yearInicio:parseInt(year)||new Date().getFullYear(),fechaInicio:new Date().toISOString().slice(0,10),doctorId:curDoc.uid,accessCode:code,status:'active',notes:[],createdAt:serverTimestamp()};
+  try{const ref=await addDoc(collection(db,'patients'),data);closeM('NewPat');setTimeout(()=>printCard(ref.id,{...data,id:ref.id}),400);}
+  catch(e){err.querySelector('span').textContent=e.message;err.style.display='flex';}
 };
-
-function genCode() {
-  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let c='';
-  for(let i=0;i<4;i++) c+=chars[Math.floor(Math.random()*chars.length)];
-  return c+'-'+Array.from({length:4},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+function genCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=chars[Math.floor(Math.random()*chars.length)];return c+'-'+Array.from({length:4},()=>chars[Math.floor(Math.random()*chars.length)]).join('');}
+window.copyCode=(code)=>{navigator.clipboard?.writeText(code);};
+window.printCard=(id,patData)=>{
+  const p=patData||patsCache[id];if(!p)return;
+  const docName=curDocData?.nombre||'CURG';const appUrl=window.location.origin+'/paciente.html';
+  document.getElementById('printArea').innerHTML=`<div class="print-card"><div class="print-header"><div class="print-logo-dot"></div><div class="print-logo-line"></div><div class="print-header-text"><h2>Diario Miccional</h2><p>${docName}${p.clinica?' · '+p.clinica:''}</p></div><div class="print-badge"><span class="pb-innoia">by InnoIA</span><span class="pb-curg">CURG</span></div></div><div class="print-patient">${p.nombre||'—'}</div><div class="print-diag">${p.diagnostico||''}</div><div class="print-code-label">Tu código de acceso:</div><div class="print-code">${p.accessCode||'—'}</div><div id="qr-${id}" style="margin:10px 0"></div><div class="print-instr"><strong>¿Cómo usar tu Diario Miccional?</strong><br>1. Abre el navegador<br>2. Ve a: <strong>${appUrl}</strong><br>3. Ingresa tu código: <strong>${p.accessCode}</strong><br>4. Registra cada micción, bebida o fuga<br>5. Tu médico verá tus datos en tiempo real</div><div class="print-footer"><span>Diario Miccional by InnoIA</span><span>verificado CURG · 2026</span></div></div>`;
+  document.getElementById('printArea').style.display='block';
+  setTimeout(()=>{const qrEl=document.getElementById('qr-'+id);if(qrEl&&window.QRCode)new QRCode(qrEl,{text:appUrl+'?code='+(p.accessCode||''),width:110,height:110,colorDark:'#042C53',colorLight:'#ffffff'});setTimeout(()=>{window.print();document.getElementById('printArea').style.display='none';},500);},100);
+};
+window.openNoteModal=(id)=>{noteTargetId=id;document.getElementById('noteText').value='';document.getElementById('modalNote').classList.add('open');};
+window.saveNote=async()=>{const text=document.getElementById('noteText').value.trim();if(!text||!noteTargetId)return;const p=patsCache[noteTargetId];const notes=[...(p.notes||[]),{text,date:new Date().toISOString().slice(0,10),doctor:curDocData?.nombre||''}];await updateDoc(doc(db,'patients',noteTargetId),{notes});closeM('Note');selectPat(noteTargetId);};
+async function loadColleagues(){
+  const clinicas=curDocData?.clinicas||[];const list=document.getElementById('colleaguesList');
+  if(!clinicas.length){list.innerHTML='<p style="font-size:12px;color:var(--text2)">No tienes clínicas asignadas.</p>';return;}
+  const results=[];
+  for(const cl of clinicas){const snap=await getDocs(query(collection(db,'doctors'),where('clinicas','array-contains',cl)));snap.forEach(d=>{if(d.id!==curDoc.uid)results.push({...d.data(),clinicaMatch:cl});});}
+  const unique=[...new Map(results.map(r=>[r.email,r])).values()];
+  if(!unique.length){list.innerHTML='<p style="font-size:12px;color:var(--text2)">No hay otros médicos en tus clínicas.</p>';return;}
+  list.innerHTML=unique.map(c=>{const ini=(c.nombre||'DR').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();return `<div class="colleague-item"><div class="coll-av">${ini}</div><div><div style="font-size:13px;font-weight:500">${c.nombre||'—'}</div><div style="font-size:11px;color:var(--text2)">${c.especialidad||''} · ${c.clinicaMatch}</div></div></div>`;}).join('');
 }
-window.copyCode = (code) => { navigator.clipboard?.writeText(code); alert('Código copiado: '+code); };
-
-// ── PRINT CARD ──
-window.printPatientCard = (id, patData) => {
-  const p = patData || patientsCache[id];
-  if (!p) return;
-  const doctorName = currentDoctorData?.nombre || 'CURG';
-  const clinicaName = p.clinica || '';
-  const appUrl = window.location.origin + '/paciente.html';
-
-  const printContent = `
-    <div class="print-card" style="max-width:380px;margin:0 auto">
-      <div class="print-card-header">
-        <div style="font-size:2rem">🏥</div>
-        <div>
-          <div class="print-card-title">CURG Diario Miccional</div>
-          <div class="print-card-sub">${doctorName}${clinicaName?' · '+clinicaName:''}</div>
-        </div>
-      </div>
-      <div class="print-patient-name">${p.nombre||'—'}</div>
-      <div style="font-size:12px;color:#5a6a85;margin-bottom:8px">${p.diagnostico||''} ${p.fechaInicio?'· Desde '+p.fechaInicio:''}</div>
-      <div style="font-size:12px;font-weight:600;color:#1a2236;margin-bottom:4px">Tu código de acceso:</div>
-      <div class="print-code">${p.accessCode||'—'}</div>
-      <div id="qr-${id}" style="margin:12px 0"></div>
-      <div class="print-instructions">
-        <strong>¿Cómo usar tu diario miccional?</strong><br>
-        1. Abre el navegador de tu teléfono<br>
-        2. Ve a: <strong>${appUrl}</strong><br>
-        3. Ingresa tu código: <strong>${p.accessCode}</strong><br>
-        4. Registra cada micción, bebida o fuga<br>
-        5. Tu médico verá tus datos en tiempo real<br><br>
-        <strong>Soporte:</strong> curg@datamedica.app
-      </div>
-    </div>`;
-
-  document.getElementById('printArea').innerHTML = printContent;
-  document.getElementById('printArea').style.display = 'block';
-
-  // Generate QR
-  setTimeout(() => {
-    const qrEl = document.getElementById('qr-'+id);
-    if (qrEl && window.QRCode) {
-      new QRCode(qrEl, { text: appUrl+'?code='+p.accessCode, width:120, height:120, colorDark:'#1565c0', colorLight:'#ffffff' });
-    }
-    setTimeout(()=>{ window.print(); document.getElementById('printArea').style.display='none'; }, 500);
-  }, 100);
-};
-
-// ── NOTES ──
-window.openNoteModal = (id) => { noteTargetId=id; document.getElementById('noteText').value=''; document.getElementById('modalNote').classList.add('open'); };
-window.saveNote = async () => {
-  const text = document.getElementById('noteText').value.trim();
-  if (!text || !noteTargetId) return;
-  const p = patientsCache[noteTargetId];
-  const notes = [...(p.notes||[]), {text, date:new Date().toISOString().slice(0,10), doctor:currentDoctorData?.nombre||''}];
-  await updateDoc(doc(db,'patients',noteTargetId),{notes});
-  closeM('Note');
-  selectPatient(noteTargetId);
-};
-
-// ── COLLEAGUES ──
-async function loadColleagues() {
-  const clinicas = currentDoctorData?.clinicas || [];
-  if (!clinicas.length) { document.getElementById('colleaguesList').innerHTML='<p style="font-size:13px;color:var(--text2)">No tienes clínicas asignadas en tu perfil.</p>'; return; }
-  const results = [];
-  for (const clinica of clinicas) {
-    const q = query(collection(db,'doctors'), where('clinicas','array-contains',clinica));
-    const snap = await getDocs(q);
-    snap.forEach(d => { if(d.id!==currentDoctor.uid) results.push({...d.data(),clinicaMatch:clinica}); });
-  }
-  const unique = [...new Map(results.map(r=>[r.email,r])).values()];
-  if (!unique.length) { document.getElementById('colleaguesList').innerHTML='<p style="font-size:13px;color:var(--text2)">No hay otros médicos registrados en tus clínicas aún.</p>'; return; }
-  document.getElementById('colleaguesList').innerHTML = unique.map(c=>{
-    const initials=(c.nombre||'DR').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    return `<div class="colleague-item">
-      <div class="colleague-avatar">${initials}</div>
-      <div>
-        <div style="font-size:13px;font-weight:600">${c.nombre||'—'}</div>
-        <div style="font-size:11px;color:var(--text2)">${c.especialidad||''} · ${c.clinicaMatch}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── EXPORT CSV ──
-window.exportCSV = async (id) => {
-  const snap = await getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc')));
-  const recs = snap.docs.map(d=>d.data());
-  const p = patientsCache[id];
-  const rows=[['Paciente','Clínica','Año','Fecha','Hora','Tipo','Volumen_ml','Duracion_seg','Flujo_ml_s','Urgencia','Posicion','Tipo_bebida','Muda','Clasificacion_acustica','dB_promedio','dB_pico','dB_baseline','Patron_flujo','Notas']];
+window.exportCSV=async(id)=>{
+  const snap=await getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc')));
+  const recs=snap.docs.map(d=>d.data());const p=patsCache[id];
+  const rows=[['Paciente','Clínica','Año','Fecha','Hora','Tipo','Vol_ml','Dur_s','Flujo_ml_s','Urgencia','Posición','Tipo_bebida','Muda','Clasif_acústica','dB_prom','dB_pico','dB_baseline','Patrón','Notas']];
   recs.forEach(r=>rows.push([p.nombre,p.clinica,p.yearInicio,r.date,r.hora,r.type,r.vol||'',r.dur||'',r.flow||'',r.urgency??'',r.pos||'',r.tipo||'',r.muda?'SI':'',r.acoustics?.classification||'',r.acoustics?.avgDB||'',r.acoustics?.peakDB||'',r.acoustics?.ambientDB||'',r.acoustics?.pattern||'',r.notas||'']));
-  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
-  a.download=`CURG_${p.nombre?.replace(/ /g,'_')}_${p.clinica||'clinica'}_${p.yearInicio||''}.csv`;
-  a.click();
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('
+');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));a.download=`CURG_${p.nombre?.replace(/ /g,'_')}_${p.clinica||'clinica'}.csv`;a.click();
 };
-
-// ── FULL TECHNICAL REPORT ──
-window.generateFullReport = async (id) => {
-  const p = patientsCache[id];
-  if (!p) return;
-  const [recsSnap, sleepSnap, wbSnap] = await Promise.all([
-    getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc'))),
-    getDocs(collection(db,'patients',id,'sleep')),
-    getDocs(collection(db,'patients',id,'wellbeing'))
-  ]);
-  const recs=recsSnap.docs.map(d=>({id:d.id,...d.data()}));
-  const sleepMap={}; sleepSnap.docs.forEach(d=>{ sleepMap[d.id]=d.data(); });
-  const wbMap={}; wbSnap.docs.forEach(d=>{ wbMap[d.id]=d.data(); });
-  const mics=recs.filter(r=>r.type==='miction');
-  const drks=recs.filter(r=>r.type==='drink');
-  const leaks=recs.filter(r=>r.type==='leak');
-  const acousticRecs=mics.filter(r=>r.acoustics);
-  const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0);
-  const avgVol=mics.length?Math.round(totalVol/mics.length):0;
-  const avgDB=acousticRecs.length?(acousticRecs.reduce((a,r)=>a+(r.acoustics?.avgDB||0),0)/acousticRecs.length).toFixed(1):'—';
-  const flowDist={weak:0,low:0,normal:0,strong:0};
-  acousticRecs.forEach(r=>{ if(r.acoustics?.classification) flowDist[r.acoustics.classification]++; });
-  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe Técnico CURG — ${p.nombre}</title>
-  <style>
-  body{font-family:Arial,sans-serif;max-width:900px;margin:0 auto;padding:2rem;color:#1a2236;font-size:12px;}
-  h1{font-size:1.4rem;color:#1565c0;margin-bottom:4px;} h2{font-size:1rem;color:#1565c0;margin:1.5rem 0 0.5rem;border-bottom:1px solid #dde3ee;padding-bottom:4px;}
-  .header{background:#1565c0;color:#fff;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;}
-  .header h1{color:#fff;margin:0 0 4px;} .header p{margin:2px 0;opacity:0.85;}
-  .warn{background:#fff3e0;border:1px solid #e65100;border-radius:6px;padding:10px 12px;color:#e65100;margin-bottom:1rem;}
-  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;}
-  .stat{background:#f8fafc;border:1px solid #e0e7ef;border-radius:6px;padding:8px;}
-  .stat-l{font-size:10px;color:#5a6a85;font-weight:600;text-transform:uppercase;}
-  .stat-v{font-size:1.1rem;font-weight:700;margin-top:2px;} .stat-r{font-size:10px;color:#9aaac0;margin-top:2px;}
-  table{width:100%;border-collapse:collapse;margin-bottom:1rem;}
-  th{background:#f0f4f8;padding:5px 8px;text-align:left;font-weight:600;border:1px solid #dde3ee;}
-  td{padding:5px 8px;border:1px solid #eee;}
-  .tag{display:inline-block;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600;}
-  .tg{background:#e8f5e9;color:#2e7d32;} .tr{background:#ffebee;color:#c62828;}
-  .ta{background:#fff3e0;color:#e65100;} .tb{background:#e3f2fd;color:#1565c0;}
-  .curve{display:flex;align-items:flex-end;gap:1px;height:24px;background:#f8fafc;border-radius:3px;padding:2px;width:80px;}
-  .cb{flex:1;border-radius:1px;min-height:1px;}
-  .footer{margin-top:2rem;padding:1rem;background:#f8fafc;border-radius:6px;font-size:10px;color:#9aaac0;text-align:center;}
-  </style></head><body>
-  <div class="header">
-    <h1>🏥 CURG — Informe Técnico Completo</h1>
-    <p><strong>Paciente:</strong> ${p.nombre} &nbsp;|&nbsp; <strong>Clínica:</strong> ${p.clinica||'—'} &nbsp;|&nbsp; <strong>Año:</strong> ${p.yearInicio||'—'}</p>
-    <p><strong>Diagnóstico:</strong> ${p.diagnostico||'—'} &nbsp;|&nbsp; <strong>Médico:</strong> ${p.medicoTratante||currentDoctorData?.nombre||'—'}</p>
-    <p><strong>Generado:</strong> ${new Date().toLocaleString('es')} &nbsp;|&nbsp; <strong>Total registros:</strong> ${recs.length}</p>
-  </div>
-  <div class="warn">⚠️ Informe de apoyo clínico. No constituye diagnóstico médico. Interpretación exclusiva del profesional de salud tratante.</div>
-
-  <h2>📊 Resumen ejecutivo</h2>
-  <div class="grid">
-    <div class="stat"><div class="stat-l">Total micciones</div><div class="stat-v">${mics.length}</div><div class="stat-r">Normal: 4–7/día</div></div>
-    <div class="stat"><div class="stat-l">Vol. promedio/mic</div><div class="stat-v">${avgVol} ml</div><div class="stat-r">Normal: 250–400 ml</div></div>
-    <div class="stat"><div class="stat-l">Vol. total orina</div><div class="stat-v">${totalVol} ml</div><div class="stat-r">Normal: 800–2000/24h</div></div>
-    <div class="stat"><div class="stat-l">Líquido ingerido</div><div class="stat-v">${drks.reduce((a,r)=>a+(r.vol||0),0)} ml</div></div>
-    <div class="stat"><div class="stat-l">Fugas</div><div class="stat-v">${leaks.length}</div><div class="stat-r">Normal: 0</div></div>
-    <div class="stat"><div class="stat-l">Con análisis acústico</div><div class="stat-v">${acousticRecs.length}</div></div>
-    <div class="stat"><div class="stat-l">dB promedio global</div><div class="stat-v">${avgDB} dB</div><div class="stat-r">Sobre baseline</div></div>
-    <div class="stat"><div class="stat-l">Días con datos</div><div class="stat-v">${[...new Set(recs.map(r=>r.date))].length}</div></div>
-  </div>
-
-  <h2>🎙 Análisis acústico — Detalle completo</h2>
-  <p style="font-size:11px;color:#5a6a85;margin-bottom:8px">Clasificación basada en Tsui et al. 2006. dB relativo al baseline calibrado en cada sesión. Muestreo: 100ms.</p>
-  ${acousticRecs.length ? `
-  <table>
-    <tr><th>Fecha</th><th>Hora</th><th>Vol (ml)</th><th>Dur (s)</th><th>Flujo (ml/s)</th><th>Clasif.</th><th>dB prom</th><th>dB pico</th><th>dB baseline</th><th>Patrón</th><th>Muestras</th><th>Curva</th></tr>
-    ${acousticRecs.map(r=>{
-      const ac=r.acoustics;
-      const maxDB=Math.max(...(ac.curve||[{db:1}]).map(p=>p.db),1);
-      const curveBars=(ac.curve||[]).map(pt=>{
-        const h=Math.max(1,Math.round((pt.db/maxDB)*20));
-        const col=pt.db<12?'#ef5350':pt.db<22?'#ffb74d':pt.db<35?'#43d98c':'#4fc3f7';
-        return `<div class="cb" style="height:${h}px;background:${col}"></div>`;
-      }).join('');
-      const cls=ac.classification==='normal'?'tg':ac.classification==='strong'?'tb':ac.classification==='low'?'ta':'tr';
-      return `<tr>
-        <td>${r.date}</td><td>${r.hora}</td><td>${r.vol||'—'}</td><td>${r.dur||'—'}</td><td>${r.flow||'—'}</td>
-        <td><span class="tag ${cls}">${ac.classification}</span></td>
-        <td><strong>${ac.avgDB}</strong></td><td>${ac.peakDB}</td><td>${ac.ambientDB}</td>
-        <td><span class="tag ${ac.pattern==='intermittent'?'ta':'tg'}">${ac.pattern==='intermittent'?'Intermit.':'Continuo'}</span></td>
-        <td>${ac.samplesCount||'—'}</td>
-        <td><div class="curve">${curveBars}</div></td>
-      </tr>`;
-    }).join('')}
-  </table>
-  <div class="grid">
-    <div class="stat"><div class="stat-l">🔴 Débil (&lt;8 ml/s)</div><div class="stat-v">${flowDist.weak}</div></div>
-    <div class="stat"><div class="stat-l">🟡 Bajo (8–15 ml/s)</div><div class="stat-v">${flowDist.low}</div></div>
-    <div class="stat"><div class="stat-l">🟢 Normal (15–25 ml/s)</div><div class="stat-v">${flowDist.normal}</div></div>
-    <div class="stat"><div class="stat-l">🔵 Fuerte (&gt;25 ml/s)</div><div class="stat-v">${flowDist.strong}</div></div>
-  </div>` : '<p style="color:#9aaac0">Sin datos acústicos — el paciente no usó el cronómetro con micrófono.</p>'}
-
-  <h2>😊 Bienestar y síntomas subjetivos</h2>
-  ${Object.keys(wbMap).length ? `
-  <table><tr><th>Fecha</th><th>Bienestar</th><th>Dolor pélvico (0–5)</th></tr>
-  ${Object.entries(wbMap).sort().map(([d,wb])=>`
-  <tr><td>${d}</td>
-  <td><span class="tag ${wb.wellbeing==='great'?'tg':wb.wellbeing==='bad'?'tr':'ta'}">${wb.wellbeing==='great'?'😊 Muy bien':wb.wellbeing==='bad'?'😔 Mal':'😐 Regular'}</span></td>
-  <td>${wb.pain!=null?wb.pain+'/5':'—'}</td></tr>`).join('')}
-  </table>` : '<p style="color:#9aaac0">Sin datos de bienestar.</p>'}
-
-  <h2>🌙 Horarios de sueño y nicturia</h2>
-  ${Object.keys(sleepMap).length ? `
-  <table><tr><th>Fecha</th><th>Despertar</th><th>Dormir</th><th>Micciones nocturnas</th></tr>
-  ${Object.entries(sleepMap).sort().map(([d,sl])=>{
-    const nightMics=mics.filter(r=>r.date===d&&sl.wake&&sl.sleep&&isNocturnalStatic(r.hora,sl.wake,sl.sleep));
-    return `<tr><td>${d}</td><td>${sl.wake||'—'}</td><td>${sl.sleep||'—'}</td>
-    <td><span class="tag ${nightMics.length===0?'tg':nightMics.length===1?'ta':'tr'}">${nightMics.length} ${nightMics.length>1?'⚠️':''}</span></td></tr>`;
-  }).join('')}
-  </table>` : '<p style="color:#9aaac0">Sin datos de sueño.</p>'}
-
-  <h2>📋 Registro completo de micciones</h2>
-  <table><tr><th>Fecha</th><th>Hora</th><th>Vol</th><th>Dur</th><th>Flujo</th><th>Urgencia</th><th>Posición</th><th>Género</th><th>Notas</th></tr>
-  ${mics.sort((a,b)=>a.date.localeCompare(b.date)||a.hora.localeCompare(b.hora)).map(r=>
-  `<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.vol||'—'}</td><td>${r.dur?r.dur+'s':'—'}</td><td>${r.flow?r.flow+' ml/s':'—'}</td><td>U${r.urgency??'—'}</td><td>${r.pos||'—'}</td><td>${r.genero||'—'}</td><td>${r.notas||''}</td></tr>`
-  ).join('')}</table>
-
-  <h2>💧 Registro de bebidas</h2>
-  <table><tr><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Volumen</th></tr>
-  ${drks.sort((a,b)=>a.date.localeCompare(b.date)).map(r=>
-  `<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.tipo}</td><td>${r.vol||0} ml</td></tr>`
-  ).join('')}</table>
-
-  <h2>⚠️ Fugas</h2>
-  ${leaks.length?`<table><tr><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Muda</th></tr>
-  ${leaks.map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.tipo}</td><td>${r.muda?'Sí':'No'}</td></tr>`).join('')}</table>`:'<p style="color:#9aaac0">Sin fugas registradas.</p>'}
-
-  <div class="footer">
-    CURG Diario Miccional v2.0 · Generado ${new Date().toLocaleString('es')} · 
-    Médico: ${currentDoctorData?.nombre||'—'} · Clínica: ${p.clinica||'—'} ·
-    Base científica: ICS 2019, EAU Guidelines 2023, Tsui et al. 2006 ·
-    Protegido bajo Ley 1581/2012 Colombia y equivalentes LATAM
-  </div>
-  </body></html>`;
-
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
-  a.download=`CURG_TechReport_${p.nombre?.replace(/ /g,'_')}_${p.clinica||'clinica'}_${new Date().toISOString().slice(0,10)}.html`;
-  a.click();
+window.genFullReport=async(id)=>{
+  const p=patsCache[id];if(!p)return;
+  const [rSnap,slSnap,wbSnap]=await Promise.all([getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc'))),getDocs(collection(db,'patients',id,'sleep')),getDocs(collection(db,'patients',id,'wellbeing'))]);
+  const recs=rSnap.docs.map(d=>({id:d.id,...d.data()}));const sleepMap={};slSnap.docs.forEach(d=>{sleepMap[d.id]=d.data();});const wbMap={};wbSnap.docs.forEach(d=>{wbMap[d.id]=d.data();});
+  const mics=recs.filter(r=>r.type==='miction');const drks=recs.filter(r=>r.type==='drink');const leaks=recs.filter(r=>r.type==='leak');
+  const acRecs=mics.filter(r=>r.acoustics);const fD={weak:0,low:0,normal:0,strong:0};acRecs.forEach(r=>{if(r.acoustics?.classification)fD[r.acoustics.classification]++;});
+  const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0);const avgVol=mics.length?Math.round(totalVol/mics.length):0;
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe CURG — ${p.nombre}</title><style>body{font-family:Arial,sans-serif;max-width:900px;margin:0 auto;padding:2rem;font-size:12px;color:#1e2a3a;}.hdr{background:#042C53;color:#fff;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;}.hdr h1{font-size:1.2rem;margin:0 0 4px;color:#fff;}.hdr p{opacity:.85;font-size:11px;margin:2px 0;}.inn{color:#D85A30;font-weight:700;}.curg{color:#4fc3f7;font-weight:700;}.warn{background:#fff3e0;border:1px solid #e65100;border-radius:6px;padding:10px;color:#e65100;margin-bottom:1rem;font-size:11px;}h2{font-size:13px;color:#042C53;margin:1.5rem 0 .5rem;border-bottom:1px solid #e2e8f0;padding-bottom:4px;}.gr{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;}.st{background:#f4f6f9;border:1px solid #e2e8f0;border-radius:6px;padding:8px;}.sl{font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;}.sv{font-size:1.1rem;font-weight:700;}table{width:100%;border-collapse:collapse;margin-bottom:1rem;}th{background:#f4f6f9;padding:5px 8px;text-align:left;font-weight:600;border:1px solid #e2e8f0;}td{padding:5px 8px;border:1px solid #eee;}.ft{margin-top:2rem;padding:1rem;background:#f4f6f9;border-radius:6px;font-size:10px;color:#94a3b8;text-align:center;}</style></head><body>
+  <div class="hdr"><h1>Diario Miccional — Informe Técnico</h1><p>Paciente: <strong>${p.nombre}</strong> · Clínica: ${p.clinica||'—'} · Médico: ${p.medicoTratante||curDocData?.nombre||'—'}</p><p>by <span class="inn">InnoIA</span> · verificado <span class="curg">CURG</span> · ${new Date().toLocaleString('es')}</p></div>
+  <div class="warn">⚠️ Informe de apoyo clínico. No constituye diagnóstico médico.</div>
+  <h2>Resumen</h2><div class="gr"><div class="st"><div class="sl">Micciones</div><div class="sv">${mics.length}</div></div><div class="st"><div class="sl">Vol. prom.</div><div class="sv">${avgVol}ml</div></div><div class="st"><div class="sl">Vol. total</div><div class="sv">${totalVol}ml</div></div><div class="st"><div class="sl">Fugas</div><div class="sv">${leaks.length}</div></div></div>
+  ${acRecs.length?`<h2>Análisis acústico</h2><div class="gr"><div class="st"><div class="sl" style="color:#c62828">Débil</div><div class="sv">${fD.weak}</div></div><div class="st"><div class="sl" style="color:#e65100">Bajo</div><div class="sv">${fD.low}</div></div><div class="st"><div class="sl" style="color:#2e7d32">Normal</div><div class="sv">${fD.normal}</div></div><div class="st"><div class="sl" style="color:#1565c0">Fuerte</div><div class="sv">${fD.strong}</div></div></div><table><tr><th>Fecha</th><th>Hora</th><th>Clasif.</th><th>dB prom.</th><th>dB pico</th><th>Baseline</th><th>Patrón</th></tr>${acRecs.map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td><strong>${r.acoustics.classification}</strong></td><td><strong>${r.acoustics.avgDB}</strong></td><td>${r.acoustics.peakDB}</td><td>${r.acoustics.ambientDB}</td><td>${r.acoustics.pattern}</td></tr>`).join('')}</table>`:''}
+  <h2>Micciones</h2><table><tr><th>Fecha</th><th>Hora</th><th>Vol</th><th>Dur</th><th>Flujo</th><th>Urgencia</th><th>Posición</th></tr>${mics.sort((a,b)=>a.date.localeCompare(b.date)||a.hora.localeCompare(b.hora)).map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.vol||'—'}</td><td>${r.dur?r.dur+'s':'—'}</td><td>${r.flow?r.flow+' ml/s':'—'}</td><td>U${r.urgency??'—'}</td><td>${r.pos||'—'}</td></tr>`).join('')}</table>
+  <h2>Bebidas</h2><table><tr><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Vol.</th></tr>${drks.map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.tipo}</td><td>${r.vol||0}ml</td></tr>`).join('')}</table>
+  <div class="ft">Diario Miccional v2.0 · by InnoIA · verificado CURG · ICS 2019, EAU 2023</div></body></html>`;
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));a.download=`CURG_Report_${p.nombre?.replace(/ /g,'_')}_${new Date().toISOString().slice(0,10)}.html`;a.click();
 };
-
-function isNocturnalStatic(hora, wake, sleep) {
-  const toMin=t=>{ const[h,m]=t.split(':').map(Number); return h*60+m; };
-  const r=toMin(hora),w=toMin(wake),s=toMin(sleep);
-  return s>w?(r>=s||r<w):(r>=s&&r<w);
-}
-
-document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }));
+function isNocturnal(hora,wake,sleep){const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};const r=toMin(hora),w=toMin(wake),s=toMin(sleep);return s>w?(r>=s||r<w):(r>=s&&r<w);}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 </script>
 </body>
 </html>
