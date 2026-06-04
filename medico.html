@@ -822,7 +822,24 @@ function buildCharts(mics,drks,wbMap,sleepMap){
 window.ptab=(el,id)=>{
   el.closest('.ptabs').querySelectorAll('.ptab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
   ['pd-diary','pd-charts','pd-acoustic','pd-notes','pd-profile'].forEach(n=>{ const e=document.getElementById(n); if(e) e.style.display=n===id?'block':'none'; });
-  if(id==='pd-charts'){ destroyCharts(); selectPat(selPatId); }
+  if(id==='pd-charts'){
+    destroyCharts();
+    // Rebuild charts from cached data without reloading entire patient view
+    setTimeout(async()=>{
+      if(!selPatId) return;
+      const [rSnap,slSnap,wbSnap]=await Promise.all([
+        getDocs(query(collection(db,'patients',selPatId,'records'),orderBy('timestamp','desc'))),
+        getDocs(collection(db,'patients',selPatId,'sleep')),
+        getDocs(collection(db,'patients',selPatId,'wellbeing'))
+      ]);
+      const recs=rSnap.docs.map(d=>({id:d.id,...d.data()}));
+      const sleepMap={}; slSnap.docs.forEach(d=>{sleepMap[d.id]=d.data();});
+      const wbMap={}; wbSnap.docs.forEach(d=>{wbMap[d.id]=d.data();});
+      const mics=recs.filter(r=>r.type==='miction');
+      const drks=recs.filter(r=>r.type==='drink');
+      buildCharts(mics,drks,wbMap,sleepMap);
+    },50);
+  }
 };
 
 // ── NEW PATIENT ──
