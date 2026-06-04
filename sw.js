@@ -1,39 +1,65 @@
-// CURG Service Worker v2.0
-const CACHE_NAME = 'curg-v2';
-const URLS_TO_CACHE = ['/paciente.html', '/manifest.json'];
+// CURG Diario Miccional — Service Worker v2.1
+// by InnoIA · verificado CURG
+const CACHE = 'curg-v2.1';
+const CACHE_URLS = [
+  '/paciente.html',
+  '/manifest.json',
+  '/icon-192.svg',
+  '/icon-512.svg',
+  'https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css',
+  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap',
+  'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js'
+];
 
+// Install: cache key assets
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(URLS_TO_CACHE)));
+  e.waitUntil(
+    caches.open(CACHE).then(c => {
+      // Cache what we can, ignore failures for CDN resources
+      return Promise.allSettled(CACHE_URLS.map(url => c.add(url).catch(() => {})));
+    })
+  );
   self.skipWaiting();
 });
 
+// Activate: clean old caches
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))));
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    )
+  );
   self.clients.claim();
 });
 
+// Fetch: network first, fall back to cache
 self.addEventListener('fetch', e => {
-  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+  // Skip non-GET and Firebase requests (need live data)
+  if (e.request.method !== 'GET') return;
+  if (e.request.url.includes('firestore.googleapis.com')) return;
+  if (e.request.url.includes('firebase')) return;
+
+  e.respondWith(
+    fetch(e.request)
+      .then(response => {
+        // Cache successful responses
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(e.request))
+  );
 });
 
-// ── NOTIFICATION SCHEDULING ──
-// Receives messages from the main app to schedule notifications
-self.addEventListener('message', e => {
-  if (e.data?.type === 'SCHEDULE_NOTIFICATIONS') {
-    scheduleDaily();
-  }
-});
-
-function scheduleDaily() {
-  // Check and fire notifications at right times
-  // Called periodically by the app
-}
-
-// Push notifications
+// Notification click
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  e.waitUntil(clients.matchAll({ type: 'window' }).then(cls => {
-    if (cls.length) return cls[0].focus();
-    return clients.openWindow('/paciente.html');
-  }));
+  e.waitUntil(
+    clients.matchAll({ type: 'window' }).then(cls => {
+      if (cls.length) return cls[0].focus();
+      return clients.openWindow('/paciente.html');
+    })
+  );
 });
