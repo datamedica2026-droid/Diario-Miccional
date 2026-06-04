@@ -835,7 +835,7 @@ window.saveNewPat=async()=>{
   if(!nombre){ err.querySelector('span').textContent='El nombre es obligatorio'; err.style.display='flex'; return; }
   if(!clinica){ err.querySelector('span').textContent='Selecciona una clínica'; err.style.display='flex'; return; }
   const code=genCode();
-  const data={nombre,fechaNac:document.getElementById('npFN').value,genero:document.getElementById('npG').value,telefono:document.getElementById('npT').value.trim(),email:document.getElementById('npE').value.trim(),diagnostico:document.getElementById('npD').value.trim(),medicoTratante:im(),notasIniciales:document.getElementById('npNo').value.trim(),clinica,yearInicio:parseInt(year)||new Date().getFullYear(),fechaInicio:new Date().toISOString().slice(0,10),doctorId:curDoc.uid,accessCode:code,status:'active',notes:[],createdAt:serverTimestamp()};
+  const data={nombre,fechaNac:document.getElementById('npFN').value,genero:document.getElementById('npG').value,telefono:document.getElementById('npT').value.trim(),email:document.getElementById('npE').value.trim(),diagnostico:document.getElementById('npD').value.trim(),medicoTratante:document.getElementById('npM').value.trim(),notasIniciales:document.getElementById('npNo').value.trim(),clinica,yearInicio:parseInt(year)||new Date().getFullYear(),fechaInicio:new Date().toISOString().slice(0,10),doctorId:curDoc.uid,accessCode:code,status:'active',notes:[],createdAt:serverTimestamp()};
   try{const ref=await addDoc(collection(db,'patients'),data);closeM('NewPat');setTimeout(()=>printCard(ref.id,{...data,id:ref.id}),400);}
   catch(e){err.querySelector('span').textContent=e.message;err.style.display='flex';}
 };
