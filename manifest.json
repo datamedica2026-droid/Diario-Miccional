@@ -1,27 +1,65 @@
+
 {
-  "name": "CURG Diario Miccional",
-  "short_name": "CURG",
-  "description": "Diario miccional clínico con análisis acústico",
+  "name": "Diario Miccional — by InnoIA",
+  "short_name": "Diario Miccional",
+  "description": "Diario miccional clínico con análisis acústico. Desarrollado por InnoIA, verificado por CURG.",
   "start_url": "/paciente.html",
   "display": "standalone",
-  "background_color": "#f0f4f8",
-  "theme_color": "#1565c0",
-  "orientation": "portrait",
+  "background_color": "#042C53",
+  "theme_color": "#042C53",
+  "orientation": "portrait-primary",
+  "lang": "es",
+  "categories": [
+    "medical",
+    "health"
+  ],
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%231565c0'/><text y='130' x='96' text-anchor='middle' font-size='120'>🏥</text></svg>",
+      "src": "/icon-192.svg",
       "sizes": "192x192",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%231565c0'/><text y='360' x='256' text-anchor='middle' font-size='320'>🏥</text></svg>",
+      "src": "/icon-512.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "categories": ["medical", "health", "lifestyle"],
-  "lang": "es",
-  "dir": "ltr"
+  "screenshots": [
+    {
+      "src": "/paciente.html",
+      "sizes": "390x844",
+      "type": "text/html",
+      "form_factor": "narrow",
+      "label": "Diario del paciente"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Registrar micción",
+      "short_name": "Micción",
+      "description": "Registra una micción rápidamente",
+      "url": "/paciente.html#miction",
+      "icons": [
+        {
+          "src": "/icon-192.svg",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
 }
