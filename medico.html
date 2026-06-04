@@ -888,7 +888,6 @@ window.genFullReport=async(id)=>{
   <div class="ft">Diario Miccional v2.0 · by InnoIA · verificado CURG · ICS 2019, EAU 2023</div></body></html>`;
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));a.download=`CURG_Report_${p.nombre?.replace(/ /g,'_')}_${new Date().toISOString().slice(0,10)}.html`;a.click();
 };
-function isNocturnal(hora,wake,sleep){const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};const r=toMin(hora),w=toMin(wake),s=toMin(sleep);return s>w?(r>=s||r<w):(r>=s&&r<w);}
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 </script>
 </body>
