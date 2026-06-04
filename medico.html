@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -257,6 +256,27 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .print-instr strong{color:#1e2a3a;}
 .print-footer{margin-top:12px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;display:flex;justify-content:space-between;}
 
+/* ── CONSULTATION ── */
+.consult-banner{background:linear-gradient(135deg,#0d2137,#1a3a5c);border:1px solid var(--blue-act);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:12px;}
+.consult-banner i{font-size:22px;color:var(--blue-act);flex-shrink:0;}
+.consult-banner-text h3{font-size:13px;font-weight:600;color:#fff;margin-bottom:2px;}
+.consult-banner-text p{font-size:11px;color:#B5D4F4;}
+.consult-code{font-family:'Inter',monospace;font-size:1.1rem;font-weight:700;color:var(--blue-act);letter-spacing:.15em;background:rgba(55,138,221,.15);border:1px dashed var(--blue-act);border-radius:6px;padding:4px 12px;}
+.consult-entry{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
+.consult-entry h3{font-size:13px;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:6px;}
+.consult-entry h3 i{font-size:15px;color:var(--blue-act);}
+.consult-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.consult-item:last-child{border-bottom:none;}
+.consult-item-left{display:flex;align-items:center;gap:10px;}
+.consult-item-info h4{font-size:13px;font-weight:500;}
+.consult-item-info p{font-size:11px;color:var(--text2);margin-top:2px;}
+.consult-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.cs-active{background:var(--green-dim);color:var(--green);}
+.cs-expired{background:var(--card2);color:var(--text3);}
+.cs-revoked{background:var(--red-dim);color:var(--red);}
+.consult-readonly-banner{background:var(--amber-dim);border:1px solid var(--amber);border-radius:var(--radius);padding:8px 12px;font-size:12px;color:var(--amber);display:flex;align-items:center;gap:6px;margin-bottom:1rem;}
+.consult-readonly-banner i{font-size:14px;}
+
 /* ── BRAND FOOTER ── */
 .brand-footer{padding:12px 1.5rem;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border);background:var(--surface);}
 .brand-footer-text{font-size:11px;color:var(--text3);}
@@ -324,7 +344,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="form-group"><label>Contraseña</label><input type="password" id="loginPass" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="btn btn-primary btn-full" onclick="doLogin()"><i class="ti ti-login"></i>Entrar</button>
       <div id="loginErr" class="msg-err" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
-      <div style="text-align:center;margin-top:1rem"><span style="font-size:12px;color:var(--text2)">¿Primera vez? </span><button class="btn btn-sm" onclick="showReg()">Crear cuenta médico</button></div>
+      <div style="text-align:center;margin-top:10px">
+        <button class="btn btn-sm" style="color:var(--text3);border:none;background:transparent;font-size:12px" onclick="showForgot()">¿Olvidaste tu contraseña?</button>
+      </div>
+      <div style="text-align:center;margin-top:6px"><span style="font-size:12px;color:var(--text2)">¿Primera vez? </span><button class="btn btn-sm" onclick="showReg()">Crear cuenta médico</button></div>
+    </div>
+    <div id="forgotForm" style="display:none">
+      <div class="auth-title">Recuperar contraseña</div>
+      <div class="auth-sub">Te enviaremos un enlace para restablecer tu contraseña.</div>
+      <div class="form-group"><label>Correo electrónico</label><input type="email" id="forgotEmail" placeholder="doctor@clinica.com"></div>
+      <button class="btn btn-primary btn-full" onclick="doForgot()"><i class="ti ti-mail"></i>Enviar enlace</button>
+      <div id="forgotMsg" style="font-size:12px;margin-top:8px;text-align:center;display:none"></div>
+      <div style="text-align:center;margin-top:1rem"><button class="btn btn-sm" onclick="showLogin()"><i class="ti ti-arrow-left"></i>Volver</button></div>
     </div>
     <div id="regForm" style="display:none">
       <div class="auth-title">Crear cuenta médico</div>
@@ -363,6 +394,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="ttab" onclick="showTTab('colleagues',this)"><i class="ti ti-user-heart"></i>Colegas</div>
     <div class="ttab" onclick="showTTab('science',this)"><i class="ti ti-flask"></i>Base científica</div>
     <div class="ttab" onclick="showTTab('guide',this)"><i class="ti ti-book"></i>Guía de uso</div>
+    <div class="ttab" onclick="showTTab('consult',this)"><i class="ti ti-arrows-exchange"></i>Interconsulta</div>
   </div>
 
   <!-- PATIENTS TAB -->
@@ -440,6 +472,33 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="brand-footer"><span class="brand-footer-text">Desarrollado por <span class="innoia-text">InnoIA</span> · Verificado por <span class="curg-text">CURG</span> · Colombian Urology Research Group · v2.0 · 2026</span></div>
   </div>
 
+  <!-- INTERCONSULTA TAB -->
+  <div id="ttab-consult" style="display:none;padding:1.5rem;max-width:800px;margin:0 auto">
+    <!-- Entry mode: access a consultation -->
+    <div class="consult-entry">
+      <h3><i class="ti ti-key"></i>Acceder a interconsulta</h3>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px">Un colega te compartió un código de interconsulta. Ingrésalo para ver el diario del paciente.</p>
+      <div style="display:flex;gap:10px">
+        <input type="text" id="consultCodeInput" placeholder="CONSULT-XXXX" maxlength="12"
+          style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);font-family:'Inter',monospace;text-transform:uppercase;letter-spacing:.1em"
+          oninput="this.value=this.value.toUpperCase()">
+        <button class="btn btn-primary" onclick="accessConsultation()"><i class="ti ti-search"></i>Acceder</button>
+      </div>
+      <div id="consultAccessErr" style="font-size:12px;color:var(--red);margin-top:8px;display:none"></div>
+    </div>
+
+    <!-- My consultations -->
+    <div class="consult-entry">
+      <h3><i class="ti ti-share"></i>Mis interconsultas activas</h3>
+      <div id="myConsultsList"><p style="font-size:12px;color:var(--text2)">Selecciona un paciente y usa el botón "Interconsulta" para generar un código.</p></div>
+    </div>
+  </div>
+
+  <!-- CONSULTATION VIEW (readonly) -->
+  <div id="ttab-consult-view" style="display:none;padding:1.5rem;max-width:900px;margin:0 auto">
+    <div id="consultViewContent"></div>
+  </div>
+
   <!-- GUIDE TAB -->
   <div id="ttab-guide" style="display:none;padding:1.5rem;max-width:800px;margin:0 auto">
     <div class="card">
@@ -507,12 +566,37 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </div>
 
+<!-- MODAL INTERCONSULTA -->
+<div class="modal-overlay" id="modalConsult">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-arrows-exchange"></i>Interconsulta generada</div>
+    <div id="consultModalContent"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeM('Consult')"><i class="ti ti-x"></i>Cerrar</button>
+      <button class="btn btn-primary" onclick="copyConsultCode()"><i class="ti ti-copy"></i>Copiar código</button>
+      <button class="btn btn-amber" onclick="shareConsultCode()"><i class="ti ti-share"></i>Compartir</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONSULT NOTE -->
+<div class="modal-overlay" id="modalConsultNote">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-notes"></i>Nota de interconsulta</div>
+    <div class="form-group"><label>Tu opinión / nota clínica</label><textarea id="consultNoteText" rows="5" placeholder="Observaciones de la interconsulta..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeM('ConsultNote')"><i class="ti ti-x"></i>Cancelar</button>
+      <button class="btn btn-primary" onclick="saveConsultNote()"><i class="ti ti-device-floppy"></i>Guardar nota</button>
+    </div>
+  </div>
+</div>
+
 <!-- PRINT AREA -->
 <div id="printArea" style="display:none"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, getDocs, collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const fb = initializeApp({
@@ -541,8 +625,18 @@ function checkDoctorConsent(){ if(!localStorage.getItem('curg_doc_consent')) doc
 window.toggleLang=()=>{ lang=lang==='es'?'en':'es'; document.getElementById('langBtn').textContent=lang==='es'?'EN':'ES'; if(selPatId) selectPat(selPatId); };
 
 // ── AUTH ──
-window.showReg=()=>{ document.getElementById('loginForm').style.display='none'; document.getElementById('regForm').style.display='block'; };
-window.showLogin=()=>{ document.getElementById('regForm').style.display='none'; document.getElementById('loginForm').style.display='block'; };
+window.showReg=()=>{ ['loginForm','forgotForm'].forEach(i=>document.getElementById(i).style.display='none'); document.getElementById('regForm').style.display='block'; };
+window.showForgot=()=>{ ['loginForm','regForm'].forEach(i=>document.getElementById(i).style.display='none'); document.getElementById('forgotForm').style.display='block'; };
+window.doForgot=async()=>{
+  const email=document.getElementById('forgotEmail').value.trim();
+  const msg=document.getElementById('forgotMsg');
+  if(!email){ msg.style.color='var(--red)'; msg.textContent='Ingresa tu correo.'; msg.style.display='block'; return; }
+  try{
+    await sendPasswordResetEmail(auth,email);
+    msg.style.color='var(--green)'; msg.textContent='✓ Enlace enviado. Revisa tu correo.'; msg.style.display='block';
+  }catch(e){ msg.style.color='var(--red)'; msg.textContent='Error: '+e.message; msg.style.display='block'; }
+};
+window.showLogin=()=>{ ['regForm','forgotForm'].forEach(i=>document.getElementById(i).style.display='none'); document.getElementById('loginForm').style.display='block'; };
 
 window.doLogin=async()=>{
   const email=document.getElementById('loginEmail').value.trim(); const pass=document.getElementById('loginPass').value;
@@ -587,8 +681,9 @@ onAuthStateChanged(auth,async user=>{
 // ── TABS ──
 window.showTTab=(name,el)=>{
   document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
-  ['patients','colleagues','science','guide'].forEach(n=>{ const e=document.getElementById('ttab-'+n); if(e) e.style.display=n===name?(n==='patients'?'flex':'block'):'none'; });
+  ['patients','colleagues','science','guide','consult','consult-view'].forEach(n=>{ const e=document.getElementById('ttab-'+n); if(e) e.style.display=n===name?(n==='patients'?'flex':'block'):'none'; });
   if(name==='colleagues') loadColleagues();
+  if(name==='consult') loadMyConsults();
 };
 
 // ── FILTERS ──
@@ -694,6 +789,7 @@ function renderPatView(p,recs,sleepMap,wbMap){
         <button class="btn btn-sm btn-green" onclick="openNoteModal('${p.id}')"><i class="ti ti-notes"></i>Nota</button>
         <button class="btn btn-sm" onclick="exportCSV('${p.id}')"><i class="ti ti-table-export"></i>CSV</button>
         <button class="btn btn-sm btn-primary" onclick="genFullReport('${p.id}')"><i class="ti ti-file-report"></i>Informe</button>
+        <button class="btn btn-sm btn-amber" onclick="generateConsultCode('${p.id}')"><i class="ti ti-arrows-exchange"></i>Interconsulta</button>
       </div>
     </div>
 
@@ -869,13 +965,44 @@ window.printCard=(id,patData)=>{
 window.openNoteModal=(id)=>{noteTargetId=id;document.getElementById('noteText').value='';document.getElementById('modalNote').classList.add('open');};
 window.saveNote=async()=>{const text=document.getElementById('noteText').value.trim();if(!text||!noteTargetId)return;const p=patsCache[noteTargetId];const notes=[...(p.notes||[]),{text,date:new Date().toISOString().slice(0,10),doctor:curDocData?.nombre||''}];await updateDoc(doc(db,'patients',noteTargetId),{notes});closeM('Note');selectPat(noteTargetId);};
 async function loadColleagues(){
-  const clinicas=curDocData?.clinicas||[];const list=document.getElementById('colleaguesList');
-  if(!clinicas.length){list.innerHTML='<p style="font-size:12px;color:var(--text2)">No tienes clínicas asignadas.</p>';return;}
-  const results=[];
-  for(const cl of clinicas){const snap=await getDocs(query(collection(db,'doctors'),where('clinicas','array-contains',cl)));snap.forEach(d=>{if(d.id!==curDoc.uid)results.push({...d.data(),clinicaMatch:cl});});}
-  const unique=[...new Map(results.map(r=>[r.email,r])).values()];
-  if(!unique.length){list.innerHTML='<p style="font-size:12px;color:var(--text2)">No hay otros médicos en tus clínicas.</p>';return;}
-  list.innerHTML=unique.map(c=>{const ini=(c.nombre||'DR').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();return `<div class="colleague-item"><div class="coll-av">${ini}</div><div><div style="font-size:13px;font-weight:500">${c.nombre||'—'}</div><div style="font-size:11px;color:var(--text2)">${c.especialidad||''} · ${c.clinicaMatch}</div></div></div>`;}).join('');
+  const list=document.getElementById('colleaguesList');
+  if(!list) return;
+  list.innerHTML='<p style="font-size:12px;color:var(--text2)">Cargando...</p>';
+  const clinicas=curDocData?.clinicas||[];
+  if(!clinicas.length){
+    list.innerHTML='<p style="font-size:12px;color:var(--text2)">No tienes clínicas asignadas en tu perfil. Edita tu perfil en Firebase para agregar clínicas.</p>';
+    return;
+  }
+  try{
+    // Load ALL doctors and filter client-side to avoid composite index requirement
+    const snap=await getDocs(collection(db,'doctors'));
+    const results=[];
+    snap.forEach(d=>{
+      if(d.id===curDoc.uid) return;
+      const data=d.data();
+      const docClinics=data.clinicas||[];
+      // Find matching clinic
+      const match=clinicas.find(cl=>docClinics.some(dc=>dc.toLowerCase().trim()===cl.toLowerCase().trim()));
+      if(match) results.push({...data,clinicaMatch:match});
+    });
+    const unique=[...new Map(results.map(r=>[r.email||r.nombre,r])).values()];
+    if(!unique.length){
+      list.innerHTML='<p style="font-size:12px;color:var(--text2)">No hay otros médicos registrados en tus clínicas aún.</p>';
+      return;
+    }
+    list.innerHTML=unique.map(c=>{
+      const ini=(c.nombre||'DR').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      return `<div class="colleague-item">
+        <div class="coll-av">${ini}</div>
+        <div>
+          <div style="font-size:13px;font-weight:500">${c.nombre||'—'}</div>
+          <div style="font-size:11px;color:var(--text2)">${c.especialidad||'Médico'} · <span style="color:var(--blue-act)">${c.clinicaMatch}</span></div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    list.innerHTML=`<p style="font-size:12px;color:var(--text2)">Error al cargar colegas: ${e.message}</p>`;
+  }
 }
 window.exportCSV=async(id)=>{
   const snap=await getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc')));
@@ -1037,6 +1164,299 @@ window.genFullReport=async(id)=>{
   a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
   a.download='CURG_TechReport_'+String(p.nombre||'paciente').replace(/ /g,'_')+'_'+String(p.clinica||'clinica')+'_'+new Date().toISOString().slice(0,10)+'.html';
   a.click();
+};
+
+// ── INTERCONSULTATION SYSTEM ──
+let currentConsultCode = null;
+let currentConsultPatId = null;
+let activeConsultId = null;
+
+function genConsultCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c='CONSULT-';
+  for(let i=0;i<4;i++) c+=chars[Math.floor(Math.random()*chars.length)];
+  return c;
+}
+
+window.generateConsultCode=async(patId)=>{
+  const p=patsCache[patId]; if(!p) return;
+  currentConsultPatId=patId;
+
+  // Check for existing active consultation
+  const existing=await getDocs(query(collection(db,'consultations'),
+    where('patientId','==',patId),
+    where('fromDoctorId','==',curDoc.uid),
+    where('status','==','active')
+  ));
+
+  let code, consultId;
+
+  if(!existing.empty){
+    // Reuse existing active one
+    const doc1=existing.docs[0];
+    code=doc1.data().code;
+    consultId=doc1.id;
+    const exp=doc1.data().expiresAt?.toDate();
+    const hoursLeft=exp?Math.max(0,Math.round((exp-Date.now())/3600000)):0;
+    if(hoursLeft<=0){
+      // Expired, create new
+      code=genConsultCode();
+      const ref=await addDoc(collection(db,'consultations'),{
+        patientId:patId, patientName:p.nombre,
+        fromDoctorId:curDoc.uid, fromDoctorName:curDocData?.nombre||'',
+        code, status:'active',
+        createdAt:serverTimestamp(),
+        expiresAt:new Date(Date.now()+48*3600000),
+        notes:[]
+      });
+      consultId=ref.id;
+    }
+  } else {
+    code=genConsultCode();
+    const ref=await addDoc(collection(db,'consultations'),{
+      patientId:patId, patientName:p.nombre,
+      fromDoctorId:curDoc.uid, fromDoctorName:curDocData?.nombre||'',
+      code, status:'active',
+      createdAt:serverTimestamp(),
+      expiresAt:new Date(Date.now()+48*3600000),
+      notes:[]
+    });
+    consultId=ref.id;
+  }
+
+  currentConsultCode=code;
+  activeConsultId=consultId;
+
+  const appUrl=window.location.origin+'/medico.html';
+  document.getElementById('consultModalContent').innerHTML=`
+    <div class="consult-banner">
+      <i class="ti ti-arrows-exchange"></i>
+      <div class="consult-banner-text">
+        <h3>Interconsulta para: ${p.nombre}</h3>
+        <p>Válida por 48 horas · ${p.diagnostico||''}</p>
+      </div>
+    </div>
+    <div style="text-align:center;margin:1.25rem 0">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Código de interconsulta:</div>
+      <div class="consult-code" style="font-size:1.4rem;padding:10px 24px">${code}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">Expira en 48 horas</div>
+    </div>
+    <div style="background:var(--card2);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--text2)">
+      <strong style="color:var(--text)">Instrucciones para tu colega:</strong><br>
+      1. Entrar a: <span style="color:var(--blue-act)">${appUrl}</span><br>
+      2. Ir a la pestaña <strong>Interconsulta</strong><br>
+      3. Ingresar el código: <strong style="color:var(--blue-act)">${code}</strong><br>
+      4. Accede al diario en modo lectura y puede dejar una nota clínica
+    </div>
+  `;
+  document.getElementById('modalConsult').classList.add('open');
+  loadMyConsults();
+};
+
+window.copyConsultCode=()=>{
+  if(currentConsultCode) navigator.clipboard?.writeText(currentConsultCode);
+};
+
+window.shareConsultCode=()=>{
+  const appUrl=window.location.origin+'/medico.html';
+  const msg=`Te comparto un diario miccional para interconsulta.
+
+Código: ${currentConsultCode}
+Accede en: ${appUrl} → pestaña Interconsulta
+Válido por 48 horas.`;
+  if(navigator.share){
+    navigator.share({title:'Interconsulta CURG',text:msg});
+  } else {
+    navigator.clipboard?.writeText(msg);
+    alert('Mensaje copiado al portapapeles');
+  }
+};
+
+async function loadMyConsults(){
+  const list=document.getElementById('myConsultsList'); if(!list) return;
+  try{
+    const snap=await getDocs(query(collection(db,'consultations'),
+      where('fromDoctorId','==',curDoc.uid),
+      orderBy('createdAt','desc')
+    ));
+    if(snap.empty){ list.innerHTML='<p style="font-size:12px;color:var(--text2)">Sin interconsultas activas.</p>'; return; }
+    const now=Date.now();
+    // Auto-expire
+    const items=snap.docs.map(d=>({id:d.id,...d.data()})).map(c=>{
+      const exp=c.expiresAt?.toDate?.()?.getTime()||c.expiresAt;
+      const expired=exp&&exp<now;
+      return {...c,expired};
+    });
+    list.innerHTML=items.slice(0,10).map(c=>`
+      <div class="consult-item">
+        <div class="consult-item-left">
+          <i class="ti ti-user-circle" style="font-size:20px;color:var(--text3)"></i>
+          <div class="consult-item-info">
+            <h4>${c.patientName||'—'}</h4>
+            <p><span class="consult-code" style="font-size:11px;padding:2px 8px">${c.code}</span> · ${c.notes?.length||0} nota(s)</p>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="consult-status ${c.expired||c.status==='expired'?'cs-expired':c.status==='revoked'?'cs-revoked':'cs-active'}">${c.expired||c.status==='expired'?'Expirada':c.status==='revoked'?'Revocada':'Activa'}</span>
+          ${!c.expired&&c.status==='active'?`<button class="btn btn-sm btn-danger" onclick="revokeConsult('${c.id}')"><i class="ti ti-ban"></i>Revocar</button>`:''}
+        </div>
+      </div>`).join('');
+  }catch(e){
+    list.innerHTML=`<p style="font-size:12px;color:var(--red)">Error: ${e.message}</p>`;
+  }
+}
+
+window.revokeConsult=async(consultId)=>{
+  await updateDoc(doc(db,'consultations',consultId),{status:'revoked'});
+  loadMyConsults();
+};
+
+// ── ACCESS CONSULTATION (read-only view) ──
+window.accessConsultation=async()=>{
+  const code=document.getElementById('consultCodeInput').value.trim().toUpperCase();
+  const errEl=document.getElementById('consultAccessErr');
+  errEl.style.display='none';
+  if(code.length<8){ errEl.textContent='Ingresa el código completo'; errEl.style.display='block'; return; }
+
+  try{
+    const snap=await getDocs(query(collection(db,'consultations'),where('code','==',code)));
+    if(snap.empty){ errEl.textContent='Código no encontrado.'; errEl.style.display='block'; return; }
+
+    const consultDoc=snap.docs[0];
+    const consult={id:consultDoc.id,...consultDoc.data()};
+
+    // Check expiry
+    const exp=consult.expiresAt?.toDate?.()?.getTime()||consult.expiresAt;
+    if(exp&&exp<Date.now()){ errEl.textContent='Este código ha expirado (48h).'; errEl.style.display='block'; return; }
+    if(consult.status==='revoked'){ errEl.textContent='Este código fue revocado por el médico.'; errEl.style.display='block'; return; }
+
+    // Load patient data (read-only)
+    const patId=consult.patientId;
+    const [rSnap,slSnap,wbSnap,patSnap]=await Promise.all([
+      getDocs(query(collection(db,'patients',patId,'records'),orderBy('timestamp','desc'))),
+      getDocs(collection(db,'patients',patId,'sleep')),
+      getDocs(collection(db,'patients',patId,'wellbeing')),
+      getDoc(doc(db,'patients',patId))
+    ]);
+
+    const p=patSnap.exists()?{id:patId,...patSnap.data()}:{id:patId,nombre:consult.patientName};
+    const recs=rSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const sleepMap={}; slSnap.docs.forEach(d=>{sleepMap[d.id]=d.data();});
+    const wbMap={}; wbSnap.docs.forEach(d=>{wbMap[d.id]=d.data();});
+
+    activeConsultId=consult.id;
+    renderConsultView(consult,p,recs,sleepMap,wbMap);
+
+  }catch(e){ errEl.textContent='Error: '+e.message; errEl.style.display='block'; }
+};
+
+function renderConsultView(consult,p,recs,sleepMap,wbMap){
+  const mics=recs.filter(r=>r.type==='miction');
+  const drks=recs.filter(r=>r.type==='drink');
+  const leaks=recs.filter(r=>r.type==='leak');
+  const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0);
+  const avgVol=mics.length?Math.round(totalVol/mics.length):0;
+  const acRecs=mics.filter(r=>r.acoustics);
+  const allDB=acRecs.map(r=>r.acoustics?.avgDB||0).filter(Boolean);
+  const avgDB=allDB.length?(allDB.reduce((a,b)=>a+b,0)/allDB.length).toFixed(1):'—';
+  const today=new Date().toISOString().slice(0,10);
+  const todaySleep=sleepMap[today]; const todayWb=wbMap[today];
+
+  // Show consultation view tab
+  document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active'));
+  ['patients','colleagues','science','guide','consult'].forEach(n=>{
+    const e=document.getElementById('ttab-'+n); if(e) e.style.display='none';
+  });
+  document.getElementById('ttab-consult-view').style.display='block';
+
+  document.getElementById('consultViewContent').innerHTML=`
+    <div class="consult-readonly-banner">
+      <i class="ti ti-eye"></i>
+      <strong>Vista de solo lectura</strong> · Interconsulta de ${consult.fromDoctorName||'médico'} · Código: <strong>${consult.code}</strong>
+    </div>
+
+    <div class="profile-hero">
+      <div class="profile-av" style="background:var(--blue-light);color:var(--blue-act);border:2px solid var(--blue-act)44">
+        ${(p.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+      </div>
+      <div style="flex:1">
+        <div class="profile-name">${p.nombre||'—'}</div>
+        <div class="profile-tags">
+          ${p.genero==='m'?'<span class="tag tag-blue"><i class="ti ti-gender-male"></i>Masculino</span>':p.genero==='f'?'<span class="tag tag-blue"><i class="ti ti-gender-female"></i>Femenino</span>':''}
+          ${p.diagnostico?`<span class="tag tag-purple"><i class="ti ti-stethoscope"></i>${p.diagnostico}</span>`:''}
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openConsultNoteModal()">
+        <i class="ti ti-notes"></i>Agregar nota de interconsulta
+      </button>
+    </div>
+
+    ${(consult.notes||[]).length?`
+    <div class="card" style="margin-bottom:1rem">
+      <div class="card-label"><i class="ti ti-notes"></i>Notas de interconsulta</div>
+      ${consult.notes.map(n=>`
+        <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">${n.date} · Dr. ${n.doctor||'—'}</div>
+          <div style="font-size:13px">${n.text}</div>
+        </div>`).join('')}
+    </div>`:''}
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-lbl">Micciones</div><div class="stat-val">${mics.length}</div></div>
+      <div class="stat-card"><div class="stat-lbl">Vol. promedio</div><div class="stat-val">${avgVol}<span class="stat-unit">ml</span></div></div>
+      <div class="stat-card"><div class="stat-lbl">Fugas</div><div class="stat-val">${leaks.length}</div></div>
+      <div class="stat-card"><div class="stat-lbl">dB promedio</div><div class="stat-val">${avgDB}<span class="stat-unit">dB</span></div></div>
+    </div>
+
+    ${todaySleep?`<div class="sleep-block"><i class="ti ti-moon"></i>Hoy: Despertó <strong>${todaySleep.wake||'—'}</strong> · Se acuesta <strong>${todaySleep.sleep||'—'}</strong></div>`:''}
+    ${todayWb?`<div class="wb-block"><span style="font-size:11px;color:var(--text2)">Bienestar hoy:</span>
+      <span class="wb-badge wb-${todayWb.wellbeing||'ok'}">
+        <i class="ti ti-${todayWb.wellbeing==='great'?'mood-happy':todayWb.wellbeing==='bad'?'mood-sad':'mood-neutral'}"></i>
+        ${todayWb.wellbeing==='great'?'Muy bien':todayWb.wellbeing==='bad'?'Mal':'Regular'}
+      </span>
+      ${todayWb.pain!=null?`<span class="tag tag-gray"><i class="ti ti-heart-rate-monitor"></i>Dolor: ${todayWb.pain}/5</span>`:''}</div>`:''}
+
+    <div class="ptabs" style="margin-top:1rem">
+      <div class="ptab active" onclick="cptab(this,'cpd-diary')"><i class="ti ti-list"></i>Diario</div>
+      <div class="ptab" onclick="cptab(this,'cpd-acoustic')"><i class="ti ti-microphone"></i>Análisis acústico</div>
+    </div>
+
+    <div id="cpd-diary">${renderDiary(recs,sleepMap,wbMap)}</div>
+    <div id="cpd-acoustic" style="display:none">${renderAcousticTab(acRecs,{weak:acRecs.filter(r=>r.acoustics?.classification==='weak').length,low:acRecs.filter(r=>r.acoustics?.classification==='low').length,normal:acRecs.filter(r=>r.acoustics?.classification==='normal').length,strong:acRecs.filter(r=>r.acoustics?.classification==='strong').length})}</div>
+
+    <div style="margin-top:1rem">
+      <button class="btn" onclick="backToConsult()"><i class="ti ti-arrow-left"></i>Volver</button>
+    </div>
+  `;
+}
+
+window.cptab=(el,id)=>{
+  el.closest('.ptabs').querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  ['cpd-diary','cpd-acoustic'].forEach(n=>{const e=document.getElementById(n);if(e)e.style.display=n===id?'block':'none';});
+};
+
+window.backToConsult=()=>{
+  document.getElementById('ttab-consult-view').style.display='none';
+  showTTab('consult',document.querySelector('.ttab:nth-child(5)'));
+};
+
+window.openConsultNoteModal=()=>{ document.getElementById('consultNoteText').value=''; document.getElementById('modalConsultNote').classList.add('open'); };
+
+window.saveConsultNote=async()=>{
+  const text=document.getElementById('consultNoteText').value.trim();
+  if(!text||!activeConsultId) return;
+  const consultRef=doc(db,'consultations',activeConsultId);
+  const snap=await getDoc(consultRef);
+  if(!snap.exists()) return;
+  const notes=[...(snap.data().notes||[]),{
+    text, date:new Date().toISOString().slice(0,10),
+    doctor:curDocData?.nombre||'—', doctorId:curDoc.uid
+  }];
+  await updateDoc(consultRef,{notes});
+  closeM('ConsultNote');
+  // Refresh view
+  window.accessConsultation();
 };
 
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
