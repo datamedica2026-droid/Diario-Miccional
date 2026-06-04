@@ -862,11 +862,14 @@ async function loadColleagues(){
 window.exportCSV=async(id)=>{
   const snap=await getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc')));
   const recs=snap.docs.map(d=>d.data());const p=patsCache[id];
-  const rows=[['Paciente','Clínica','Año','Fecha','Hora','Tipo','Vol_ml','Dur_s','Flujo_ml_s','Urgencia','Posición','Tipo_bebida','Muda','Clasif_acústica','dB_prom','dB_pico','dB_baseline','Patrón','Notas']];
-  recs.forEach(r=>rows.push([p.nombre,p.clinica,p.yearInicio,r.date,r.hora,r.type,r.vol||'',r.dur||'',r.flow||'',r.urgency??'',r.pos||'',r.tipo||'',r.muda?'SI':'',r.acoustics?.classification||'',r.acoustics?.avgDB||'',r.acoustics?.peakDB||'',r.acoustics?.ambientDB||'',r.acoustics?.pattern||'',r.notas||'']));
-  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('
-');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));a.download=`CURG_${p.nombre?.replace(/ /g,'_')}_${p.clinica||'clinica'}.csv`;a.click();
+  const rows=[['Paciente','Clinica','Ano','Fecha','Hora','Tipo','Vol_ml','Dur_s','Flujo_ml_s','Urgencia','Posicion','Tipo_bebida','Muda','Clasif_acustica','dB_prom','dB_pico','dB_baseline','Patron','Notas']];
+  recs.forEach(r=>rows.push([p.nombre,p.clinica,p.yearInicio,r.date,r.hora,r.type,r.vol||'',r.dur||'',r.flow||'',r.urgency!=null?r.urgency:'',r.pos||'',r.tipo||'',r.muda?'SI':'',r.acoustics?.classification||'',r.acoustics?.avgDB||'',r.acoustics?.peakDB||'',r.acoustics?.ambientDB||'',r.acoustics?.pattern||'',r.notas||'']));
+  const lines=rows.map(row=>row.map(v=>String(v)).join(','));
+  const csv=lines.join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='CURG_'+String(p.nombre||'paciente').replace(/ /g,'_')+'_'+String(p.clinica||'clinica')+'.csv';
+  a.click();
 };
 window.genFullReport=async(id)=>{
   const p=patsCache[id];if(!p)return;
