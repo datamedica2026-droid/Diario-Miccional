@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Diario Miccional — by InnoIA</title>
-<link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#042C53">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Diario Miccional">
@@ -866,9 +866,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, getDocs, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script>
+// Stub functions so inline onclick handlers don't throw before the module loads
+['fmtCode','connectCode','obTab','selfReg','logout','showScreen','saveSleep','setWb','setPain',
+ 'openM','closeM','chronoStart','chronoStop','chronoReset','saveRecord','saveDrink','saveLeak',
+ 'delRec','toggleHistorial','filterByDate','setPeriod','genPDF','renderAnalysis','toggleTheme',
+ 'toggleLang','toggleNotif','saveNotifTime','openEditPatProfile','savePatProfile','installPWA',
+ 'dismissInstall','checkConsent','acceptConsent','revokeConsent'].forEach(fn=>{
+   if(!window[fn]) window[fn]=(...a)=>console.warn(fn+' not yet loaded',a);
+});
+(async()=>{
+const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+const { getFirestore, doc, setDoc, getDoc, collection, query, where, onSnapshot, addDoc, serverTimestamp, orderBy, getDocs, deleteDoc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
 
 const fb = initializeApp({
   apiKey:"AIzaSyANR_4lIz4Z6At3FMykRIzRPyMCE2U4454",
@@ -1036,7 +1045,7 @@ let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredPrompt=e; if(!localStorage.getItem('curg_install_dismissed')) document.getElementById('installBanner').style.display='flex'; });
 window.installPWA=async()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); deferredPrompt=null; document.getElementById('installBanner').style.display='none'; };
 window.dismissInstall=()=>{ localStorage.setItem('curg_install_dismissed','1'); document.getElementById('installBanner').style.display='none'; };
-if('serviceWorker'in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+// Service worker disabled (standalone file — no sw.js available)
 
 // ── NOTIFICATIONS ──
 const NOTIF_SCHED={wake:{times:['05:00'],msg:'Buenos días — registra tu hora de levantada'},water:{times:['08:00','10:00','12:00','14:00','16:00','18:00'],msg:'Recuerda registrar lo que bebes'},miction:{times:['09:00','12:00','15:00','18:00'],msg:'Momento de registrar tu micción'},sleep:{times:['18:00'],msg:'Recuerda registrar tu hora de dormir'}};
@@ -1551,6 +1560,7 @@ function renderProfile(){
       <span style="text-decoration:underline;cursor:pointer;color:var(--coral)" onclick="revokeConsent()">Revocar</span>
     </div>`;
 }
+})(); // end async IIFE
 </script>
 </div><!-- end app-shell -->
 </body>
