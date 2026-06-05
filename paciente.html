@@ -929,22 +929,44 @@ window.fmtCode=(el)=>{ let v=el.value.toUpperCase().replace(/[^A-Z0-9]/g,''); if
 window.connectCode=async()=>{
   const code=document.getElementById('codeInput').value.trim().toUpperCase();
   const errEl=document.getElementById('codeErr');
-  errEl.style.display='none';
-  if(code.length<9){ errEl.querySelector('span').textContent='Ingresa el código completo (XXXX-XXXX)'; errEl.style.display='flex'; return; }
+  
+  function showErr(msg){
+    if(!errEl) return;
+    errEl.style.display='flex';
+    const sp=errEl.querySelector('span');
+    if(sp) sp.textContent=msg;
+    else errEl.textContent=msg;
+  }
+  
+  if(errEl) errEl.style.display='none';
+  if(code.length<9){ showErr('Ingresa el código completo (XXXX-XXXX)'); return; }
+  
+  // Show loading state
+  const btn=document.querySelector('#ob-code .btn-primary');
+  if(btn){ btn.disabled=true; btn.innerHTML='<i class="ti ti-loader-2"></i> Conectando...'; }
+  
   try{
     const snap=await getDocs(query(collection(db,'patients'),where('accessCode','==',code)));
-    if(snap.empty){ errEl.querySelector('span').textContent='Código no encontrado. Verifica con tu médico.'; errEl.style.display='flex'; return; }
+    if(snap.empty){
+      showErr('Código no encontrado. Verifica con tu médico.');
+      if(btn){ btn.disabled=false; btn.innerHTML='<i class="ti ti-link"></i>Conectar'; }
+      return;
+    }
     patient={id:snap.docs[0].id,...snap.docs[0].data()};
     localStorage.setItem('dm_patient',JSON.stringify(patient));
     enterApp();
-  }catch(e){ errEl.querySelector('span').textContent=e.message; errEl.style.display='flex'; }
+  }catch(e){
+    console.error('connectCode error:', e);
+    showErr('Error: '+e.message);
+    if(btn){ btn.disabled=false; btn.innerHTML='<i class="ti ti-link"></i>Conectar'; }
+  }
 };
 
 window.selfReg=async()=>{
   const nombre=document.getElementById('rN').value.trim();
   const errEl=document.getElementById('regErr');
   errEl.style.display='none';
-  if(!nombre){ errEl.querySelector('span').textContent='El nombre es obligatorio'; errEl.style.display='flex'; return; }
+  if(!nombre){ const sp=errEl?.querySelector('span'); if(sp)sp.textContent='El nombre es obligatorio'; else if(errEl)errEl.textContent='El nombre es obligatorio'; if(errEl)errEl.style.display='flex'; return; }
   try{
     const data={nombre,fechaNac:document.getElementById('rD').value,genero:document.getElementById('rG').value,telefono:document.getElementById('rT').value.trim(),email:document.getElementById('rE').value.trim(),diagnostico:document.getElementById('rDiag').value.trim(),status:'pending',doctorId:null,accessCode:null,notes:[],createdAt:serverTimestamp()};
     const ref=await addDoc(collection(db,'patients'),data);
