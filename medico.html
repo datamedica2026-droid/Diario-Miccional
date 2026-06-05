@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
 :root{
@@ -21,12 +22,24 @@
   --purple:#ce93d8;--purple-dim:#1e0a2e;
   --radius:10px;--radius-lg:16px;
 }
+[data-theme="light"]{
+  --bg:#f4f7fb;--surface:#ffffff;--card:#ffffff;--card2:#f1f5fb;
+  --border:#dde4ef;--border2:#c5d0e0;
+  --text:#1a2235;--text2:#4a5675;--text3:#94a3b8;
+  --blue-light:#e6f1fb;
+  --green:#27a768;--green-dim:#eaf3de;
+  --amber:#d97706;--amber-dim:#fef3c7;
+  --red:#dc2626;--red-dim:#fee2e2;
+  --purple:#7c3aed;--purple-dim:#ede9fe;
+  --coral-light:#fbe8e1;--coral-dark:#9a3515;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
+html,body{overflow-x:hidden;max-width:100vw;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
 
 /* ── AUTH ── */
 .auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(ellipse at top,#0d2137 0%,var(--bg) 60%);}
-.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.5rem;width:100%;max-width:440px;}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.5rem;width:100%;max-width:min(440px,95vw);}
 .auth-brand{display:flex;align-items:center;gap:14px;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
 .auth-brand-icon{width:44px;height:44px;background:var(--blue-deep);border-radius:12px;display:flex;align-items:center;justify-content:center;}
 .auth-brand-icon i{font-size:22px;color:var(--blue-act);}
@@ -82,7 +95,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* ── APP LAYOUT ── */
 .app{display:none;flex-direction:column;min-height:100vh;}
 .app.visible{display:flex;}
-.topbar{background:var(--blue-deep);height:52px;display:flex;align-items:center;padding:0 1.25rem;gap:10px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(55,138,221,.2);}
+.topbar{background:var(--blue-deep);height:52px;display:flex;align-items:center;padding:0 1.25rem;gap:8px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(55,138,221,.2);overflow:hidden;}
 .topbar-dot{width:8px;height:8px;border-radius:50%;background:var(--coral);}
 .topbar-line{width:2px;height:20px;background:rgba(216,90,48,.2);margin-left:3px;}
 .topbar-title{font-size:13px;font-weight:600;color:#fff;margin-left:4px;}
@@ -94,19 +107,19 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .doctor-name{font-size:12px;font-weight:500;color:#fff;}
 
 /* ── TOP TABS ── */
-.top-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 1.25rem;overflow-x:auto;}
+.top-tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 .75rem;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}.top-tabs::-webkit-scrollbar{display:none;}
 .ttab{padding:10px 14px;font-size:12px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:var(--text2);white-space:nowrap;transition:all .15s;display:flex;align-items:center;gap:5px;}
 .ttab i{font-size:14px;}
 .ttab.active{color:var(--blue-act);border-bottom-color:var(--blue-act);}
 
 /* ── MAIN LAYOUT ── */
-.main-layout{display:flex;flex:1;overflow:hidden;height:calc(100vh - 104px);}
+.main-layout{display:flex;flex:1;overflow:hidden;overflow-x:hidden;height:calc(100vh - 104px);max-width:100vw;}
 .sidebar{width:275px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
 .sidebar-top{padding:1rem;border-bottom:1px solid var(--border);}
 .sidebar-filters{padding:.75rem 1rem;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:6px;}
 .sidebar-filters select,.sidebar-filters input{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:7px 9px;font-size:12px;color:var(--text2);width:100%;font-family:inherit;}
-.sidebar-list{flex:1;overflow-y:auto;padding:.75rem;}
-.content{flex:1;overflow-y:auto;padding:1.5rem;background:var(--bg);}
+.sidebar-list{flex:1;overflow-y:auto;padding:.75rem;-webkit-overflow-scrolling:touch;}
+.content{flex:1;overflow-y:auto;overflow-x:hidden;padding:1.5rem;background:var(--bg);max-width:100%;}
 
 /* ── PATIENT LIST ── */
 .pat-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:2px;transition:background .15s;}
@@ -214,7 +227,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* ── MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem;}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;width:100%;max-width:min(560px,95vw);max-height:90vh;overflow-y:auto;}
 .modal-title{font-size:1rem;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;}
 .modal-title i{font-size:18px;color:var(--blue-act);}
 .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border);}
@@ -255,6 +268,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .print-instr{font-size:11px;color:#64748b;line-height:1.65;margin-top:10px;}
 .print-instr strong{color:#1e2a3a;}
 .print-footer{margin-top:12px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:10px;color:#94a3b8;display:flex;justify-content:space-between;}
+
+/* ── DATE FILTER CHIPS ── */
+.date-chip{padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--card2);font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap;color:var(--text2);}
+.date-chip.active{background:var(--blue-light);border-color:var(--blue-act);color:var(--blue-act);}
+
+/* ── COMPARATIVE ── */
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:1rem;}
+.comp-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:.875rem;}
+.comp-name{font-size:12px;font-weight:600;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.comp-stat{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text2);margin-bottom:4px;}
+.comp-stat strong{color:var(--text);font-family:'Inter',monospace;}
+.comp-bar-wrap{height:4px;background:var(--border);border-radius:2px;margin-top:3px;}
+.comp-bar{height:4px;border-radius:2px;background:var(--blue-act);}
+.inactivity-alert{background:var(--amber-dim);border:1px solid var(--amber);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--amber);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.inactivity-alert i{font-size:14px;flex-shrink:0;}
 
 /* ── COLLEAGUE CARDS ── */
 .colleagues-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
@@ -300,7 +328,50 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .empty{text-align:center;padding:3rem 1rem;color:var(--text3);}
 .empty i{font-size:2.5rem;display:block;margin-bottom:.75rem;}
 
-@media(max-width:800px){.main-layout{flex-direction:column;height:auto;}.sidebar{width:100%;height:auto;border-right:none;border-bottom:1px solid var(--border);}.profile-hero{flex-direction:column;}.hero-actions{margin-left:0;flex-direction:row;flex-wrap:wrap;}}
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .main-layout{flex-direction:column;height:auto;}
+  .sidebar{width:100%;height:auto;max-height:280px;border-right:none;border-bottom:1px solid var(--border);overflow-y:auto;}
+  .sidebar-list{max-height:180px;overflow-y:auto;}
+  .content{overflow-y:auto;min-height:60vh;}
+  .profile-hero{flex-direction:column;}
+  .hero-actions{margin-left:0;flex-direction:row;flex-wrap:wrap;}
+  .stat-grid{grid-template-columns:repeat(3,1fr);}
+  .colleagues-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));}
+  .comp-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));}
+}
+@media(max-width:600px){
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;}
+  .topbar{padding:0 .75rem;gap:6px;}
+  .topbar-title{font-size:12px;}
+  .topbar-sub{display:none;}
+  .doctor-chip .doctor-name{display:none;}
+  .top-tabs{padding:0 .5rem;}
+  .ttab{padding:8px 10px;font-size:11px;}
+  .ttab span{display:none;}
+  .main-layout{height:auto;}
+  .sidebar{max-height:220px;}
+  .content{padding:1rem .75rem;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .profile-hero{gap:.75rem;padding:1rem;}
+  .profile-name{font-size:1rem;}
+  .hero-actions .btn-sm{font-size:11px;padding:4px 8px;}
+  .card{padding:1rem;}
+  .modal{padding:1.25rem;}
+  .colleagues-grid{grid-template-columns:1fr 1fr;}
+  .comp-grid{grid-template-columns:1fr 1fr;}
+  .auth-card{padding:1.5rem;}
+}
+@media(max-width:400px){
+  .top-tabs{gap:0;}
+  .ttab{padding:8px 6px;font-size:10px;}
+  .stat-grid{grid-template-columns:1fr 1fr;}
+  .sidebar-filters select,.sidebar-filters input{font-size:11px;padding:5px 7px;}
+  .form-row{grid-template-columns:1fr;}
+  .colleagues-grid{grid-template-columns:1fr;}
+  .hero-actions{gap:4px;}
+  .hero-actions .btn-sm{font-size:10px;padding:3px 7px;}
+}
 </style>
 </head>
 <body>
@@ -333,7 +404,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <label class="consent-check"><input type="checkbox" id="dck1" onchange="checkDocConsent()"><span>Acepto la política de privacidad y me comprometo al uso ético de los datos de mis pacientes.</span></label>
     <label class="consent-check"><input type="checkbox" id="dck2" onchange="checkDocConsent()"><span>Entiendo que soy corresponsable del tratamiento de datos de salud conforme a la normativa aplicable.</span></label>
     <button class="btn-consent" id="btnDocConsent" onclick="acceptDocConsent()">Aceptar y continuar</button>
-    <div class="consent-legal">Panel Médico v2.0 · by InnoIA · verificado CURG · Política junio 2026</div>
+    <div class="consent-legal">Panel Médico v2.0 · by InnoIA · verificado CURG · Política junio 2026 · <a href="/privacidad.html" target="_blank" style="color:var(--blue-act)">Ver política</a></div>
   </div>
 </div>
 
@@ -396,6 +467,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <span class="topbar-sub">Panel Médico</span>
     <div class="topbar-spacer"></div>
     <button class="btn-lang" id="langBtn" onclick="toggleLang()">EN</button>
+      <button id="themeBtn" onclick="toggleTheme()" style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:4px 8px;border-radius:6px;font-size:14px;cursor:pointer;font-family:inherit" title="Cambiar tema">🌙</button>
     <div class="doctor-chip">
       <div class="doctor-av" id="docAv">DR</div>
       <span class="doctor-name" id="docName">...</span>
@@ -410,6 +482,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="ttab" onclick="showTTab('science',this)"><i class="ti ti-flask"></i>Base científica</div>
     <div class="ttab" onclick="showTTab('guide',this)"><i class="ti ti-book"></i>Guía de uso</div>
     <div class="ttab" onclick="showTTab('consult',this)"><i class="ti ti-arrows-exchange"></i>Interconsulta</div>
+    <div class="ttab" onclick="showTTab('comparative',this)"><i class="ti ti-chart-bar"></i>Comparativo</div>
   </div>
 
   <!-- PATIENTS TAB -->
@@ -437,13 +510,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 
   <!-- COLLEAGUES TAB -->
-  <div id="ttab-colleagues" style="display:none;padding:1.5rem;max-width:700px;margin:0 auto">
-    <div class="card"><div class="card-label"><i class="ti ti-user-heart"></i>Colegas en tus clínicas</div>
-    <div id="colleaguesList"><div style="font-size:12px;color:var(--text2)">Cargando...</div></div></div>
+  <div <div id="ttab-colleagues" style="display:none;padding:1.5rem;max-width:min(1100px,100vw);margin:0 auto;overflow-x:hidden">
+    <div style="margin-bottom:1.25rem">
+      <div style="font-size:1rem;font-weight:600">Colegas en tus clínicas</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:2px">Médicos en tus mismas instituciones · Para agregar clínicas usa el botón ⚙️ en el topbar</div>
+    </div>
+    <div class="colleagues-grid" id="colleaguesList">
+      <div style="font-size:12px;color:var(--text2)">Cargando...</div>
+    </div>
   </div>
 
   <!-- SCIENCE TAB -->
-  <div id="ttab-science" style="display:none;padding:1.5rem;max-width:800px;margin:0 auto">
+  <div id="ttab-science" style="display:none;padding:1.5rem;max-width:min(800px,100vw);margin:0 auto;overflow-x:hidden">
     <div class="card">
       <div class="sci-section">
         <div class="sci-h2"><i class="ti ti-clipboard-list"></i>El diario miccional como herramienta clínica</div>
@@ -488,7 +566,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 
   <!-- INTERCONSULTA TAB -->
-  <div id="ttab-consult" style="display:none;padding:1.5rem;max-width:800px;margin:0 auto">
+  <div id="ttab-consult" style="display:none;padding:1.5rem;max-width:min(800px,100vw);margin:0 auto;overflow-x:hidden">
     <!-- Entry mode: access a consultation -->
     <div class="consult-entry">
       <h3><i class="ti ti-key"></i>Acceder a interconsulta</h3>
@@ -515,12 +593,32 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 
   <!-- CONSULTATION VIEW (readonly) -->
-  <div id="ttab-consult-view" style="display:none;padding:1.5rem;max-width:900px;margin:0 auto">
+  <div id="ttab-consult-view" style="display:none;padding:1.5rem;max-width:min(900px,100vw);margin:0 auto;overflow-x:hidden">
     <div id="consultViewContent"></div>
   </div>
 
+  <!-- COMPARATIVE TAB -->
+  <div id="ttab-comparative" style="display:none;padding:1.5rem;max-width:min(1100px,100vw);margin:0 auto;overflow-x:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:1rem;font-weight:600">Análisis comparativo</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">Todos los pacientes de tu clínica · últimos 7 días</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="compClinica" onchange="loadComparative()" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--text);font-family:inherit"></select>
+        <button class="btn btn-sm btn-primary" onclick="loadComparative()"><i class="ti ti-refresh"></i>Actualizar</button>
+      </div>
+    </div>
+    <!-- Inactivity alerts -->
+    <div id="inactivityAlerts" style="margin-bottom:1rem"></div>
+    <!-- Comparative stats -->
+    <div id="comparativeContent">
+      <div class="empty"><i class="ti ti-chart-bar"></i><p>Selecciona una clínica para ver el comparativo</p></div>
+    </div>
+  </div>
+
   <!-- GUIDE TAB -->
-  <div id="ttab-guide" style="display:none;padding:1.5rem;max-width:800px;margin:0 auto">
+  <div id="ttab-guide" style="display:none;padding:1.5rem;max-width:min(800px,100vw);margin:0 auto;overflow-x:hidden">
     <div class="card">
       <div class="sci-section">
         <div class="sci-h2"><i class="ti ti-rocket"></i>Primeros pasos</div>
@@ -615,6 +713,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="modal-overlay" id="modalEditProfile">
   <div class="modal">
     <div class="modal-title"><i class="ti ti-user-edit"></i>Editar mi perfil</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+      <div style="position:relative;cursor:pointer" onclick="document.getElementById('epPhotoFile').click()">
+        <div id="epAvatarPreview" style="width:72px;height:72px;border-radius:50%;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--blue-act);overflow:hidden;border:2px solid var(--border2)"></div>
+        <div style="position:absolute;bottom:0;right:0;width:22px;height:22px;background:var(--blue-act);border-radius:50%;display:flex;align-items:center;justify-content:center"><i class="ti ti-camera" style="font-size:11px;color:#fff"></i></div>
+        <input type="file" id="epPhotoFile" accept="image/*" style="display:none" onchange="previewProfilePhoto(this)">
+      </div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500">Foto de perfil</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">Se mostrará a tus colegas. JPG/PNG máx. 2MB.</div>
+        <button class="btn btn-sm" style="margin-top:6px;font-size:11px" onclick="document.getElementById('epPhotoFile').click()"><i class="ti ti-upload"></i>Subir foto</button>
+      </div>
+    </div>
     <div class="form-row">
       <div class="form-group"><label>Nombre completo</label><input type="text" id="epNombre"></div>
       <div class="form-group"><label>Especialidad</label><input type="text" id="epEspec"></div>
@@ -721,284 +831,27 @@ window.acceptDocConsent=()=>{ localStorage.setItem('curg_doc_consent',JSON.strin
 function checkDoctorConsent(){ if(!localStorage.getItem('curg_doc_consent')) document.getElementById('doctorConsentModal').classList.add('open'); }
 
 // ── LANG ──
-window.toggleLang=()=>{ lang=lang==='es'?'en':'es'; document.getElementById('langBtn').textContent=lang==='es'?'EN':'ES'; if(selPatId) selectPat(selPatId); };
+// ── THEME ──
+let isDark = true;
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', isDark?'dark':'light');
+  const btn=document.getElementById('themeBtn');
+  if(btn) btn.textContent=isDark?'🌙':'☀️';
+  localStorage.setItem('med_theme', isDark?'dark':'light');
+}
+window.toggleTheme=()=>{ isDark=!isDark; applyTheme(); };
+// Init theme
+isDark = localStorage.getItem('med_theme')!=='light';
+applyTheme();
 
-// ── AUTH ──
-window.showReg=()=>{ ['loginForm','forgotForm'].forEach(i=>document.getElementById(i).style.display='none'); document.getElementById('regForm').style.display='block'; };
-window.showForgot=()=>{ ['loginForm','regForm'].forEach(i=>document.getElementById(i).style.display='none'); document.getElementById('forgotForm').style.display='block'; };
-window.doForgot=async()=>{
-  const email=document.getElementById('forgotEmail').value.trim();
-  const msg=document.getElementById('forgotMsg');
-  if(!email){ msg.style.color='var(--red)'; msg.textContent='Ingresa tu correo.'; msg.style.display='block'; return; }
-  try{
-    await sendPasswordResetEmail(auth,email);
-    msg.style.color='var(--green)'; msg.textContent='✓ Enlace enviado. Revisa tu correo.'; msg.style.display='block';
-  }catch(e){ msg.style.color='var(--red)'; msg.textContent='Error: '+e.message; msg.style.display='block'; }
+window.toggleLang=()=>{
+  lang=lang==='es'?'en':'es';
+  document.getElementById('langBtn').textContent=lang==='es'?'EN':'ES';
+  // Update topbar subtitle
+  const sub=document.querySelector('.topbar-sub');
+  if(sub) sub.textContent=lang==='es'?'Panel Médico':'Doctor Panel';
+  if(selPatId) selectPat(selPatId);
 };
-window.showLogin=()=>{ ['regForm','forgotForm'].forEach(i=>document.getElementById(i).style.display='none'); document.getElementById('loginForm').style.display='block'; };
-
-window.doLogin=async()=>{
-  const email=document.getElementById('loginEmail').value.trim(); const pass=document.getElementById('loginPass').value;
-  const err=document.getElementById('loginErr'); err.style.display='none';
-  try{ await signInWithEmailAndPassword(auth,email,pass); }
-  catch(e){ err.querySelector('span').textContent='Credenciales incorrectas.'; err.style.display='flex'; }
-};
-
-window.doRegister=async()=>{
-  const nombre=document.getElementById('rN').value.trim(); const email=document.getElementById('rEM').value.trim(); const pass=document.getElementById('rP').value;
-  const err=document.getElementById('regErr'); err.style.display='none';
-  if(!nombre||!email||!pass){ err.querySelector('span').textContent='Completa nombre, email y contraseña.'; err.style.display='flex'; return; }
-  try{
-    const cred=await createUserWithEmailAndPassword(auth,email,pass);
-    const clinicas=document.getElementById('rC').value.split(',').map(c=>c.trim()).filter(Boolean);
-    await setDoc(doc(db,'doctors',cred.user.uid),{nombre,especialidad:document.getElementById('rE').value.trim(),clinicas,email,createdAt:serverTimestamp()});
-  }catch(e){ err.querySelector('span').textContent=e.message; err.style.display='flex'; }
-};
-
-window.doLogout=()=>signOut(auth);
-
-onAuthStateChanged(auth,async user=>{
-  if(user){
-    curDoc=user;
-    const snap=await getDoc(doc(db,'doctors',user.uid));
-    curDocData=snap.exists()?snap.data():{nombre:user.email,clinicas:[]};
-    const initials=(curDocData.nombre||'DR').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    document.getElementById('docAv').textContent=initials;
-    document.getElementById('docName').textContent=curDocData.nombre||user.email;
-    document.getElementById('authScreen').style.display='none';
-    document.getElementById('mainApp').classList.add('visible');
-    checkDoctorConsent();
-    populateFilters();
-    loadPats();
-    loadColleagues();
-  }else{
-    document.getElementById('authScreen').style.display='flex';
-    document.getElementById('mainApp').classList.remove('visible');
-  }
-});
-
-// ── TABS ──
-window.showTTab=(name,el)=>{
-  document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
-  ['patients','colleagues','science','guide','consult','consult-view'].forEach(n=>{ const e=document.getElementById('ttab-'+n); if(e) e.style.display=n===name?(n==='patients'?'flex':'block'):'none'; });
-  if(name==='colleagues') loadColleagues();
-  if(name==='consult'){ loadMyConsults(); loadReceivedConsults(); }
-};
-
-// ── FILTERS ──
-function populateFilters(){
-  const clinicas=curDocData?.clinicas||[];
-  const fC=document.getElementById('fClinica'); fC.innerHTML='<option value="">Todas las clínicas</option>'; clinicas.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; fC.appendChild(o); });
-  const npC=document.getElementById('npC'); npC.innerHTML='<option value="">Selecciona clínica...</option>'; clinicas.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; npC.appendChild(o); });
-  const fY=document.getElementById('fYear'); fY.innerHTML='<option value="">Todos los años</option>';
-  const y=new Date().getFullYear(); for(let i=y;i>=y-4;i--){ const o=document.createElement('option'); o.value=i; o.textContent=i; fY.appendChild(o); }
-  document.getElementById('npY').value=y;
-}
-
-// ── PATIENTS ──
-function loadPats(){
-  const q=query(collection(db,'patients'),where('doctorId','==',curDoc.uid));
-  onSnapshot(q,snap=>{ patsCache={}; snap.forEach(d=>{ patsCache[d.id]={id:d.id,...d.data()}; }); filterPats(); });
-}
-window.filterPats=()=>{
-  const cl=document.getElementById('fClinica').value; const yr=document.getElementById('fYear').value; const s=document.getElementById('fSearch').value.toLowerCase();
-  let pats=Object.values(patsCache);
-  if(cl) pats=pats.filter(p=>p.clinica===cl);
-  if(yr) pats=pats.filter(p=>String(p.yearInicio)===String(yr));
-  if(s) pats=pats.filter(p=>(p.nombre||'').toLowerCase().includes(s));
-  pats.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
-  renderPatList(pats);
-};
-
-function renderPatList(pats){
-  const list=document.getElementById('patList');
-  if(!pats.length){ list.innerHTML='<div class="empty"><i class="ti ti-search" style="font-size:1.5rem"></i><p style="font-size:12px">Sin resultados</p></div>'; return; }
-  const colors=['#378ADD','#43d98c','#ffb74d','#ce93d8','#ef9a9a','#80cbc4'];
-  list.innerHTML=pats.map((p,i)=>{
-    const c=colors[i%colors.length]; const ini=(p.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const st=getStatus(p);
-    return `<div class="pat-item ${p.id===selPatId?'active':''}" onclick="selectPat('${p.id}')">
-      <div class="pat-av" style="background:${c}22;color:${c};border:1px solid ${c}44">${ini}</div>
-      <div style="flex:1;min-width:0"><div class="pat-name">${p.nombre||'—'}</div><div class="pat-meta">${p.clinica||''} · ${p.yearInicio||''}</div></div>
-      <div class="status-dot ${st}"></div>
-    </div>`;
-  }).join('');
-}
-
-function getStatus(p){ if(!p.lastRecord) return 'dot-gray'; const d=(Date.now()-p.lastRecord)/86400000; return d<1?'dot-green':d<3?'dot-amber':'dot-red'; }
-
-// ── SELECT PATIENT ──
-window.selectPat=async(id)=>{
-  selPatId=id; filterPats();
-  const p=patsCache[id]; if(!p) return;
-  const [rSnap,slSnap,wbSnap]=await Promise.all([
-    getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc'))),
-    getDocs(collection(db,'patients',id,'sleep')),
-    getDocs(collection(db,'patients',id,'wellbeing'))
-  ]);
-  const recs=rSnap.docs.map(d=>({id:d.id,...d.data()}));
-  const sleepMap={}; slSnap.docs.forEach(d=>{sleepMap[d.id]=d.data();});
-  const wbMap={}; wbSnap.docs.forEach(d=>{wbMap[d.id]=d.data();});
-  renderPatView(p,recs,sleepMap,wbMap);
-};
-
-function renderPatView(p,recs,sleepMap,wbMap){
-  destroyCharts();
-  const colors=['#378ADD','#43d98c','#ffb74d','#ce93d8'];
-  const c=colors[0]; const ini=(p.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const age=p.fechaNac?Math.floor((Date.now()-new Date(p.fechaNac))/(365.25*86400000)):null;
-  const mics=recs.filter(r=>r.type==='miction'); const drks=recs.filter(r=>r.type==='drink'); const leaks=recs.filter(r=>r.type==='leak');
-  const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0); const avgVol=mics.length?Math.round(totalVol/mics.length):0;
-  const avgFlow=mics.filter(r=>r.flow).length?(mics.filter(r=>r.flow).reduce((a,r)=>a+r.flow,0)/mics.filter(r=>r.flow).length).toFixed(1):'—';
-  const acRecs=mics.filter(r=>r.acoustics); const fD={weak:0,low:0,normal:0,strong:0}; const allDB=[];
-  acRecs.forEach(r=>{ if(r.acoustics?.classification) fD[r.acoustics.classification]++; if(r.acoustics?.avgDB) allDB.push(r.acoustics.avgDB); });
-  const avgDB=allDB.length?(allDB.reduce((a,b)=>a+b,0)/allDB.length).toFixed(1):'—';
-  const today=new Date().toISOString().slice(0,10); const todaySleep=sleepMap[today]; const todayWb=wbMap[today];
-  const alerts=[];
-  if(mics.filter(r=>r.date===today).length>8) alerts.push({t:'red',i:'ti-alert-octagon',m:`${mics.filter(r=>r.date===today).length} micciones hoy — polaquiuria`});
-  if(totalVol>2800) alerts.push({t:'red',i:'ti-droplets',m:`Volumen ${totalVol}ml — posible poliuria`});
-  if(leaks.length>0) alerts.push({t:'amber',i:'ti-alert-triangle',m:`${leaks.length} fuga(s) registrada(s)`});
-  if(p.lastRecord&&(Date.now()-p.lastRecord)/86400000>2) alerts.push({t:'amber',i:'ti-clock',m:'Sin registros hace más de 2 días'});
-
-  document.getElementById('patContent').innerHTML=`
-    <div class="profile-hero">
-      <div class="profile-av" style="background:${c}22;color:${c};border:2px solid ${c}44">${ini}</div>
-      <div style="flex:1">
-        <div class="profile-name">${p.nombre||'—'}</div>
-        <div class="profile-tags">
-          ${age?`<span class="tag tag-gray">${age} años</span>`:''}
-          ${p.genero==='m'?'<span class="tag tag-blue"><i class="ti ti-gender-male"></i>Masculino</span>':p.genero==='f'?'<span class="tag tag-blue"><i class="ti ti-gender-female"></i>Femenino</span>':''}
-          ${p.diagnostico?`<span class="tag tag-purple"><i class="ti ti-stethoscope"></i>${p.diagnostico}</span>`:''}
-          ${p.clinica?`<span class="tag tag-gray"><i class="ti ti-building-hospital"></i>${p.clinica}</span>`:''}
-          ${p.yearInicio?`<span class="tag tag-gray"><i class="ti ti-calendar"></i>${p.yearInicio}</span>`:''}
-        </div>
-        <div class="profile-info">
-          ${p.telefono?`<span><i class="ti ti-phone"></i>${p.telefono}</span>`:''}
-          ${p.email?`<span><i class="ti ti-mail"></i>${p.email}</span>`:''}
-        </div>
-        <div class="code-box">
-          <i class="ti ti-key" style="font-size:13px;color:var(--text3)"></i>
-          <span style="font-size:11px;color:var(--text2)">Código:</span>
-          <span class="code-val">${p.accessCode||'—'}</span>
-          <button class="btn btn-sm" onclick="copyCode('${p.accessCode||''}')"><i class="ti ti-copy"></i></button>
-          <button class="btn btn-sm btn-amber" onclick="printCard('${p.id}')"><i class="ti ti-printer"></i>Ficha</button>
-        </div>
-      </div>
-      <div class="hero-actions">
-        <button class="btn btn-sm" onclick="openEditPat('${p.id}')"><i class="ti ti-pencil"></i>Editar</button>
-        <button class="btn btn-sm btn-green" onclick="openNoteModal('${p.id}')"><i class="ti ti-notes"></i>Nota</button>
-        <button class="btn btn-sm" onclick="exportCSV('${p.id}')"><i class="ti ti-table-export"></i>CSV</button>
-        <button class="btn btn-sm btn-primary" onclick="genFullReport('${p.id}')"><i class="ti ti-file-report"></i>Informe</button>
-        <button class="btn btn-sm btn-amber" onclick="generateConsultCode('${p.id}')"><i class="ti ti-arrows-exchange"></i>Interconsulta</button>
-        <button class="btn btn-sm btn-danger" onclick="confirmDeletePat('${p.id}','${(p.nombre||'').replace(/'/g,'&apos;')}')"><i class="ti ti-trash"></i>Eliminar</button>
-      </div>
-    </div>
-
-    ${alerts.map(a=>`<div class="alert alert-${a.t}"><i class="ti ${a.i}"></i>${a.m}</div>`).join('')}
-    ${todaySleep?`<div class="sleep-block"><i class="ti ti-moon"></i>Hoy: Despertó <strong>${todaySleep.wake||'—'}</strong> · Se acuesta <strong>${todaySleep.sleep||'—'}</strong></div>`:''}
-    ${todayWb?`<div class="wb-block"><span style="font-size:11px;color:var(--text2)">Hoy:</span><span class="wb-badge wb-${todayWb.wellbeing||'ok'}"><i class="ti ti-${todayWb.wellbeing==='great'?'mood-happy':todayWb.wellbeing==='bad'?'mood-sad':'mood-neutral'}"></i>${todayWb.wellbeing==='great'?'Muy bien':todayWb.wellbeing==='bad'?'Mal':'Regular'}</span>${todayWb.pain!=null?`<span class="tag tag-gray"><i class="ti ti-heart-rate-monitor"></i>Dolor: ${todayWb.pain}/5</span>`:''}</div>`:''}
-
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-lbl">Micciones</div><div class="stat-val">${mics.length}</div><div class="stat-ref">Normal: 4–7/día</div></div>
-      <div class="stat-card"><div class="stat-lbl">Vol. promedio</div><div class="stat-val">${avgVol}<span class="stat-unit">ml</span></div><div class="stat-ref">Normal: 250–400ml</div></div>
-      <div class="stat-card"><div class="stat-lbl">Flujo prom.</div><div class="stat-val">${avgFlow}<span class="stat-unit">ml/s</span></div><div class="stat-ref">♀&gt;15 ♂&gt;12</div></div>
-      <div class="stat-card"><div class="stat-lbl">Fugas</div><div class="stat-val" style="color:${leaks.length>0?'var(--amber)':'var(--text)'}">${leaks.length}</div></div>
-      <div class="stat-card"><div class="stat-lbl">dB promedio</div><div class="stat-val">${avgDB}<span class="stat-unit">dB</span></div><div class="stat-ref">Sobre baseline</div></div>
-      <div class="stat-card"><div class="stat-lbl">Bebidas</div><div class="stat-val">${drks.reduce((a,r)=>a+(r.vol||0),0)}<span class="stat-unit">ml</span></div></div>
-    </div>
-
-    <div class="ptabs">
-      <div class="ptab active" onclick="ptab(this,'pd-diary')"><i class="ti ti-list"></i>Diario</div>
-      <div class="ptab" onclick="ptab(this,'pd-charts')"><i class="ti ti-chart-bar"></i>Gráficas</div>
-      <div class="ptab" onclick="ptab(this,'pd-acoustic')"><i class="ti ti-microphone"></i>Análisis acústico</div>
-      <div class="ptab" onclick="ptab(this,'pd-notes')"><i class="ti ti-notes"></i>Notas</div>
-      <div class="ptab" onclick="ptab(this,'pd-profile')"><i class="ti ti-user-circle"></i>Perfil</div>
-    </div>
-
-    <div id="pd-diary">${renderDiary(recs,sleepMap,wbMap)}</div>
-    <div id="pd-charts" style="display:none">
-      <div class="card"><div class="card-label"><i class="ti ti-chart-bar"></i>Micciones por hora (diurna / nocturna)</div><div class="chart-wrap"><canvas id="ch-hours"></canvas></div></div>
-      <div class="card"><div class="card-label"><i class="ti ti-chart-dots"></i>Volumen por micción (ml)</div><div class="chart-wrap"><canvas id="ch-vol"></canvas></div></div>
-      <div class="card"><div class="card-label"><i class="ti ti-chart-arrows-vertical"></i>Balance líquido vs orina (ml/día)</div><div class="chart-wrap"><canvas id="ch-bal"></canvas></div></div>
-      <div class="card"><div class="card-label"><i class="ti ti-chart-pie"></i>Distribución urgencia</div><div class="chart-wrap" style="height:160px"><canvas id="ch-urg"></canvas></div></div>
-      <div class="card"><div class="card-label"><i class="ti ti-heart-rate-monitor"></i>Bienestar y dolor (escala)</div><div class="chart-wrap"><canvas id="ch-wb"></canvas></div></div>
-    </div>
-    <div id="pd-acoustic" style="display:none">${renderAcousticTab(acRecs,fD)}</div>
-    <div id="pd-notes" style="display:none">
-      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-        <button class="btn btn-green" onclick="openNoteModal('${p.id}')"><i class="ti ti-plus"></i>Nota clínica</button>
-        <button class="btn btn-primary" onclick="openMsgModal('${p.id}')"><i class="ti ti-message-circle"></i>Mensaje al paciente</button>
-      </div>
-      ${(p.notes||[]).length?(p.notes||[]).map(n=>`<div class="card" style="margin-bottom:8px"><div style="font-size:11px;color:var(--text3);margin-bottom:4px;display:flex;align-items:center;gap:5px"><i class="ti ti-calendar" style="font-size:12px"></i>${n.date} · ${n.doctor||''}</div><div style="font-size:13px">${n.text}</div></div>`).join(''):'<div class="empty"><i class="ti ti-notes"></i><p>Sin notas clínicas</p></div>'}
-    </div>
-    <div id="pd-profile" style="display:none">
-      <div class="card"><table style="width:100%;font-size:12px;border-collapse:collapse">
-        ${[['Nombre',p.nombre],['Fecha nac.',p.fechaNac],['Género',p.genero==='m'?'Masculino':p.genero==='f'?'Femenino':p.genero||'—'],['Edad',age?age+' años':'—'],['Teléfono',p.telefono],['Email',p.email],['Diagnóstico',p.diagnostico],['Médico',p.medicoTratante],['Clínica',p.clinica],['Año inicio',p.yearInicio],['Código acceso',p.accessCode],['Notas iniciales',p.notasIniciales]].map(([k,v])=>`<tr><td style="padding:8px 0;color:var(--text2);width:40%;display:flex;align-items:center;gap:5px">${k}</td><td style="padding:8px 0;font-weight:500;font-family:'Inter',monospace;font-size:11px">${v||'—'}</td></tr>`).join('')}
-      </table></div>
-    </div>
-  `;
-  setTimeout(()=>buildCharts(mics,drks,wbMap,sleepMap),150);
-}
-
-// ── DIARY ──
-function renderDiary(recs,sleepMap,wbMap){
-  if(!recs.length) return '<div class="empty"><i class="ti ti-clipboard"></i><p>Sin registros</p></div>';
-  const byDate={};
-  recs.forEach(r=>{ if(!byDate[r.date]) byDate[r.date]=[]; byDate[r.date].push(r); });
-  return Object.keys(byDate).sort().reverse().map(date=>{
-    const sl=sleepMap[date]; const wb=wbMap[date];
-    return `<div style="font-size:11px;color:var(--text3);font-family:'Inter',monospace;background:var(--card2);border:1px solid var(--border);padding:4px 10px;border-radius:6px;margin:10px 0 6px;display:inline-flex;align-items:center;gap:8px">
-      <i class="ti ti-calendar" style="font-size:12px"></i>${date}
-      ${sl?`<span style="color:var(--purple)"><i class="ti ti-moon" style="font-size:11px"></i>${sl.wake}–${sl.sleep}</span>`:''}
-      ${wb?`<span style="color:${wb.wellbeing==='great'?'var(--green)':wb.wellbeing==='bad'?'var(--red)':'var(--amber)'}"><i class="ti ti-heart-rate-monitor" style="font-size:11px"></i>dolor:${wb.pain??'—'}/5</span>`:''}
-    </div>
-    ${byDate[date].sort((a,b)=>a.hora.localeCompare(b.hora)).map(r=>{
-      if(r.type==='miction'){
-        const tags=[];
-        if(r.vol) tags.push(`<span class="tag tag-blue"><i class="ti ti-droplets"></i>${r.vol}ml</span>`);
-        if(r.dur) tags.push(`<span class="tag tag-gray"><i class="ti ti-clock"></i>${r.dur}s</span>`);
-        if(r.flow) tags.push(`<span class="tag tag-green"><i class="ti ti-activity"></i>${r.flow}ml/s</span>`);
-        if(r.urgency!=null) tags.push(`<span class="tag ${['tag-gray','tag-green','tag-amber','tag-red','tag-red'][r.urgency]}">U${r.urgency}</span>`);
-        if(r.pos) tags.push(`<span class="tag tag-gray"><i class="ti ti-${r.pos==='sentado'?'armchair':'man'}"></i>${r.pos}</span>`);
-        if(r.genero) tags.push(`<span class="tag tag-gray"><i class="ti ti-gender-${r.genero==='m'?'male':'female'}"></i></span>`);
-        if(r.acoustics){ const ac=r.acoustics; const cls={weak:'tag-red',low:'tag-amber',normal:'tag-green',strong:'tag-blue'}[ac.classification]||'tag-gray'; tags.push(`<span class="tag ${cls}"><i class="ti ti-microphone"></i>${ac.classification} ${ac.avgDB}dB</span>`); if(ac.pattern==='intermittent') tags.push(`<span class="tag tag-amber"><i class="ti ti-wave-sine"></i>intermitente</span>`); }
-        return `<div class="rec-item"><div class="rec-icon ri-m"><i class="ti ti-droplets"></i></div><div class="rec-body"><div class="rec-time"><i class="ti ti-clock"></i>${r.hora}</div><div class="rec-title">Micción</div><div class="rec-tags">${tags.join('')}</div>${r.acoustics&&r.acoustics.curve?`<div style="margin-top:5px">${miniCurve(r.acoustics.curve)}</div>`:''}</div></div>`;
-      }
-      if(r.type==='drink') return `<div class="rec-item"><div class="rec-icon ri-d"><i class="ti ti-droplet"></i></div><div class="rec-body"><div class="rec-time"><i class="ti ti-clock"></i>${r.hora}</div><div class="rec-title">${r.tipo||'Bebida'}</div><div class="rec-tags"><span class="tag tag-green"><i class="ti ti-droplet"></i>${r.vol||0}ml</span></div></div></div>`;
-      if(r.type==='leak') return `<div class="rec-item"><div class="rec-icon ri-l"><i class="ti ti-alert-triangle"></i></div><div class="rec-body"><div class="rec-time"><i class="ti ti-clock"></i>${r.hora}</div><div class="rec-title">Fuga — ${r.tipo}</div>${r.muda?`<div class="rec-tags"><span class="tag tag-amber"><i class="ti ti-shirt"></i>Muda</span></div>`:''}</div></div>`;
-      return '';
-    }).join('')}`;
-  }).join('');
-}
-
-function miniCurve(curve){
-  if(!curve||!curve.length) return '';
-  const max=Math.max(...curve.map(p=>p.db),1);
-  const bars=curve.map(pt=>{ const h=Math.max(2,Math.round((pt.db/max)*36)); const col=pt.db<12?'#ef5350':pt.db<22?'#ffb74d':pt.db<35?'#43d98c':'#378ADD'; return `<div class="fc-bar" style="height:${h}px;background:${col}"></div>`; }).join('');
-  return `<div class="flow-curve">${bars}</div>`;
-}
-
-// ── ACOUSTIC TAB ──
-function renderAcousticTab(acRecs,fD){
-  if(!acRecs.length) return '<div class="empty"><i class="ti ti-microphone-off"></i><p>Sin datos acústicos. El paciente debe usar el cronómetro con micrófono.</p></div>';
-  return `<div class="card"><div class="card-label"><i class="ti ti-chart-bar"></i>Distribución de clasificación</div>
-    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
-      <div class="stat-card"><div class="stat-lbl" style="color:var(--red)">Débil</div><div class="stat-val">${fD.weak}</div><div class="stat-ref">&lt;8 ml/s est.</div></div>
-      <div class="stat-card"><div class="stat-lbl" style="color:var(--amber)">Bajo</div><div class="stat-val">${fD.low}</div><div class="stat-ref">8–15 ml/s est.</div></div>
-      <div class="stat-card"><div class="stat-lbl" style="color:var(--green)">Normal</div><div class="stat-val">${fD.normal}</div><div class="stat-ref">15–25 ml/s est.</div></div>
-      <div class="stat-card"><div class="stat-lbl" style="color:var(--blue-act)">Fuerte</div><div class="stat-val">${fD.strong}</div><div class="stat-ref">&gt;25 ml/s est.</div></div>
-    </div></div>
-    <div class="card"><div class="card-label"><i class="ti ti-table"></i>Detalle por micción</div>
-    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">
-      <tr style="background:var(--card2)"><th style="padding:5px 7px;text-align:left">Fecha/Hora</th><th>Vol</th><th>Dur</th><th>Flujo</th><th>Clasif.</th><th>dB prom.</th><th>dB pico</th><th>Baseline</th><th>Patrón</th><th>Curva</th></tr>
-      ${acRecs.map(r=>{ const ac=r.acoustics; const cls={weak:'fb-weak',low:'fb-low',normal:'fb-normal',strong:'fb-strong'}[ac.classification]||''; return `<tr style="border-top:1px solid var(--border)"><td style="padding:5px 7px;font-family:'Inter',monospace;color:var(--text2)">${r.date} ${r.hora}</td><td style="text-align:center;padding:5px 3px">${r.vol||'—'}</td><td style="text-align:center;padding:5px 3px">${r.dur||'—'}</td><td style="text-align:center;padding:5px 3px">${r.flow||'—'}</td><td style="text-align:center;padding:5px 3px"><span class="flow-badge ${cls}">${ac.classification}</span></td><td style="text-align:center;padding:5px 3px;font-family:'Inter',monospace;font-weight:600">${ac.avgDB}</td><td style="text-align:center;padding:5px 3px;font-family:'Inter',monospace">${ac.peakDB}</td><td style="text-align:center;padding:5px 3px;font-family:'Inter',monospace">${ac.ambientDB}</td><td style="text-align:center;padding:5px 3px"><span class="tag ${ac.pattern==='intermittent'?'tag-amber':'tag-green'}" style="font-size:10px">${ac.pattern==='intermittent'?'Intermit.':'Continuo'}</span></td><td style="padding:5px 3px">${miniCurve(ac.curve)}</td></tr>`; }).join('')}
-    </table></div></div>`;
-}
-
-// ── CHARTS ──
-function destroyCharts(){ Object.values(chartsMap).forEach(c=>{ try{c.destroy()}catch(e){} }); chartsMap={}; }
-
-function isNocturnal(hora,wake,sleep){ if(!wake||!sleep) return false; const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;}; const r=toMin(hora),w=toMin(wake),s=toMin(sleep); return s>w?(r>=s||r<w):(r>=s&&r<w); }
 
 function buildCharts(mics,drks,wbMap,sleepMap){
   const OPTS={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8896b3',font:{size:10}}}},scales:{x:{ticks:{color:'#8896b3',font:{size:10}},grid:{color:'#253048'}},y:{ticks:{color:'#8896b3',font:{size:10}},grid:{color:'#253048'}}}};
@@ -1043,6 +896,337 @@ window.ptab=(el,id)=>{
   }
 };
 
+// ── AUTH + PATIENT SYSTEM ──
+onAuthStateChanged(auth, async user=>{
+  if(user){
+    curDoc=user;
+    try{
+      const snap=await getDoc(doc(db,'doctors',user.uid));
+      curDocData=snap.exists()?snap.data():{nombre:user.email,clinicas:[]};
+    }catch(e){ curDocData={nombre:user.email,clinicas:[]}; }
+    const initials=(curDocData.nombre||'DR').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const avEl=document.getElementById('docAv');
+    if(curDocData.photoURL){
+      avEl.innerHTML=`<img src="${curDocData.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      avEl.style.padding='0';
+    } else {
+      avEl.textContent=initials;
+    }
+    document.getElementById('docName').textContent=curDocData.nombre||user.email;
+    document.getElementById('authScreen').style.display='none';
+    document.getElementById('mainApp').classList.add('visible');
+    checkDoctorConsent();
+    populateFilters();
+    loadPats();
+    loadColleagues();
+  }else{
+    document.getElementById('authScreen').style.display='flex';
+    document.getElementById('mainApp').classList.remove('visible');
+    curDoc=null; curDocData=null; patsCache={}; selPatId=null;
+  }
+});
+
+// ── AUTH ACTIONS ──
+window.showReg=()=>{ ['loginForm','forgotForm'].forEach(i=>{ const e=document.getElementById(i); if(e) e.style.display='none'; }); document.getElementById('regForm').style.display='block'; };
+window.showForgot=()=>{ ['loginForm','regForm'].forEach(i=>{ const e=document.getElementById(i); if(e) e.style.display='none'; }); document.getElementById('forgotForm').style.display='block'; };
+window.showLogin=()=>{ ['regForm','forgotForm'].forEach(i=>{ const e=document.getElementById(i); if(e) e.style.display='none'; }); document.getElementById('loginForm').style.display='block'; };
+window.doLogin=async()=>{
+  const email=document.getElementById('loginEmail').value.trim(); const pass=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginErr'); err.style.display='none';
+  try{ await signInWithEmailAndPassword(auth,email,pass); }
+  catch(e){ err.querySelector('span').textContent='Credenciales incorrectas.'; err.style.display='flex'; }
+};
+window.doRegister=async()=>{
+  const nombre=document.getElementById('rN').value.trim(); const email=document.getElementById('rEM').value.trim(); const pass=document.getElementById('rP').value;
+  const err=document.getElementById('regErr'); err.style.display='none';
+  if(!nombre||!email||!pass){ err.querySelector('span').textContent='Completa nombre, email y contraseña.'; err.style.display='flex'; return; }
+  try{
+    const cred=await createUserWithEmailAndPassword(auth,email,pass);
+    const clinicas=document.getElementById('rC').value.split(',').map(c=>c.trim()).filter(Boolean);
+    await setDoc(doc(db,'doctors',cred.user.uid),{nombre,especialidad:document.getElementById('rE').value.trim(),clinicas,email,createdAt:serverTimestamp()});
+  }catch(e){ err.querySelector('span').textContent=e.message; err.style.display='flex'; }
+};
+window.doForgot=async()=>{
+  const email=document.getElementById('forgotEmail')?.value.trim();
+  const msg=document.getElementById('forgotMsg');
+  if(!email||!msg) return;
+  try{ await sendPasswordResetEmail(auth,email); msg.style.color='var(--green)'; msg.textContent='✓ Enlace enviado. Revisa tu correo.'; msg.style.display='block'; }
+  catch(e){ msg.style.color='var(--red)'; msg.textContent='Error: '+e.message; msg.style.display='block'; }
+};
+window.doLogout=()=>signOut(auth);
+
+// ── TOP TABS ──
+window.showTTab=(name,el)=>{
+  document.querySelectorAll('.ttab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  ['patients','colleagues','science','guide','consult','consult-view','comparative'].forEach(n=>{
+    const e=document.getElementById('ttab-'+n); if(e) e.style.display=n===name?(n==='patients'?'flex':'block'):'none';
+  });
+  if(name==='colleagues') loadColleagues();
+  if(name==='consult'){ loadMyConsults(); loadReceivedConsults(); }
+  if(name==='comparative'){ populateCompClinica(); loadComparative(); }
+};
+
+// ── FILTERS ──
+function populateFilters(){
+  const clinicas=curDocData?.clinicas||[];
+  const fC=document.getElementById('fClinica'); if(fC){ fC.innerHTML='<option value="">Todas las clínicas</option>'; clinicas.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; fC.appendChild(o); }); }
+  const npC=document.getElementById('npC'); if(npC){ npC.innerHTML='<option value="">Selecciona clínica...</option>'; clinicas.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; npC.appendChild(o); }); }
+  const fY=document.getElementById('fYear'); if(fY){ fY.innerHTML='<option value="">Todos los años</option>'; const y=new Date().getFullYear(); for(let i=y;i>=y-4;i--){ const o=document.createElement('option'); o.value=i; o.textContent=i; fY.appendChild(o); } }
+  if(document.getElementById('npY')) document.getElementById('npY').value=new Date().getFullYear();
+}
+
+// ── PATIENTS ──
+let patsUnsubscribe=null;
+function loadPats(){
+  if(patsUnsubscribe) patsUnsubscribe();
+  const q=query(collection(db,'patients'),where('doctorId','==',curDoc.uid));
+  patsUnsubscribe=onSnapshot(q,snap=>{
+    patsCache={};
+    snap.forEach(d=>{ patsCache[d.id]={id:d.id,...d.data()}; });
+    filterPats();
+    checkInactivityOnLoad();
+  });
+}
+
+window.filterPats=()=>{
+  const cl=document.getElementById('fClinica')?.value||'';
+  const yr=document.getElementById('fYear')?.value||'';
+  const s=(document.getElementById('fSearch')?.value||'').toLowerCase();
+  let pats=Object.values(patsCache);
+  if(cl) pats=pats.filter(p=>p.clinica===cl);
+  if(yr) pats=pats.filter(p=>String(p.yearInicio)===String(yr));
+  if(s) pats=pats.filter(p=>(p.nombre||'').toLowerCase().includes(s));
+  pats.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
+  renderPatList(pats);
+};
+
+function getPatStatus(p){ if(!p.lastRecord) return 'dot-gray'; const d=(Date.now()-p.lastRecord)/86400000; return d<1?'dot-green':d<3?'dot-amber':'dot-red'; }
+const PAT_COLORS=['#378ADD','#43d98c','#ffb74d','#ce93d8','#ef9a9a','#80cbc4'];
+
+function renderPatList(pats){
+  const list=document.getElementById('patList');
+  if(!list) return;
+  if(!pats.length){ list.innerHTML='<div class="empty"><i class="ti ti-search" style="font-size:1.5rem"></i><p style="font-size:12px">Sin resultados</p></div>'; return; }
+  list.innerHTML=pats.map((p,i)=>{
+    const c=PAT_COLORS[i%PAT_COLORS.length];
+    const ini=(p.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const st=getPatStatus(p);
+    return `<div class="pat-item ${p.id===selPatId?'active':''}" onclick="selectPat('${p.id}')">
+      <div class="pat-av" style="background:${c}22;color:${c};border:1px solid ${c}44">${ini}</div>
+      <div style="flex:1;min-width:0"><div class="pat-name">${p.nombre||'—'}</div><div class="pat-meta">${p.clinica||''} · ${p.yearInicio||''}</div></div>
+      <div class="status-dot ${st}"></div>
+    </div>`;
+  }).join('');
+}
+
+window.selectPat=async(id)=>{
+  selPatId=id; filterPats();
+  const p=patsCache[id]; if(!p) return;
+  const [rSnap,slSnap,wbSnap]=await Promise.all([
+    getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc'))),
+    getDocs(collection(db,'patients',id,'sleep')),
+    getDocs(collection(db,'patients',id,'wellbeing'))
+  ]);
+  const recs=rSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const sleepMap={}; slSnap.docs.forEach(d=>{sleepMap[d.id]=d.data();});
+  const wbMap={}; wbSnap.docs.forEach(d=>{wbMap[d.id]=d.data();});
+  renderPatView(p,recs,sleepMap,wbMap);
+};
+
+
+// ── ISNOCTURNAL HELPER ──
+function isNocturnal(hora,wake,sleep){
+  if(!wake||!sleep) return false;
+  const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};
+  const r=toMin(hora),w=toMin(wake),s=toMin(sleep);
+  return s>w?(r>=s||r<w):(r>=s&&r<w);
+}
+function destroyCharts(){ Object.values(chartsMap).forEach(c=>{try{c.destroy()}catch(e){}}); chartsMap={}; }
+
+// ── RENDER DIARY ──
+function renderDiary(recs, sleepMap, wbMap){
+  if(!recs.length) return '<div class="empty"><i class="ti ti-clipboard"></i><p>Sin registros</p></div>';
+  const byDate={};
+  recs.forEach(r=>{ if(!byDate[r.date]) byDate[r.date]=[]; byDate[r.date].push(r); });
+  return Object.keys(byDate).sort().reverse().map(date=>{
+    const sl=sleepMap[date]; const wb=wbMap[date];
+    return `<div style="font-size:11px;color:var(--text3);font-family:'Inter',monospace;background:var(--card2);border:1px solid var(--border);padding:4px 10px;border-radius:6px;margin:10px 0 6px;display:inline-flex;align-items:center;gap:8px">
+      <i class="ti ti-calendar" style="font-size:12px"></i>${date}
+      ${sl?`<span style="color:var(--purple)"><i class="ti ti-moon" style="font-size:11px"></i>${sl.wake||'—'}–${sl.sleep||'—'}</span>`:''}
+      ${wb?`<span style="color:${wb.wellbeing==='great'?'var(--green)':wb.wellbeing==='bad'?'var(--red)':'var(--amber)'}"><i class="ti ti-heart-rate-monitor" style="font-size:11px"></i>dolor:${wb.pain??'—'}/5</span>`:''}
+    </div>
+    ${byDate[date].sort((a,b)=>a.hora.localeCompare(b.hora)).map(r=>{
+      if(r.type==='miction'){
+        const tags=[]; if(r.vol) tags.push(`<span class="tag tag-blue"><i class="ti ti-droplets"></i>${r.vol}ml</span>`); if(r.dur) tags.push(`<span class="tag tag-gray"><i class="ti ti-clock"></i>${r.dur}s</span>`); if(r.flow) tags.push(`<span class="tag tag-green"><i class="ti ti-activity"></i>${r.flow}ml/s</span>`); if(r.urgency!=null) tags.push(`<span class="tag ${['tag-gray','tag-green','tag-amber','tag-red','tag-red'][r.urgency]||'tag-gray'}">U${r.urgency}</span>`); if(r.pos) tags.push(`<span class="tag tag-gray"><i class="ti ti-${r.pos==='sentado'?'armchair':'man'}"></i>${r.pos}</span>`); if(r.acoustics){ const ac=r.acoustics; const cls={weak:'tag-red',low:'tag-amber',normal:'tag-green',strong:'tag-blue'}[ac.classification]||'tag-gray'; tags.push(`<span class="tag ${cls}"><i class="ti ti-microphone"></i>${ac.classification} ${ac.avgDB}dB</span>`); }
+        return `<div class="rec-item"><div class="rec-icon ri-m"><i class="ti ti-droplets"></i></div><div class="rec-body"><div class="rec-time"><i class="ti ti-clock"></i>${r.hora}</div><div class="rec-title">Micción</div><div class="rec-tags">${tags.join('')}</div>${r.acoustics?.curve?`<div style="margin-top:5px">${miniCurve(r.acoustics.curve)}</div>`:''}</div></div>`;
+      }
+      if(r.type==='drink') return `<div class="rec-item"><div class="rec-icon ri-d"><i class="ti ti-droplet"></i></div><div class="rec-body"><div class="rec-time"><i class="ti ti-clock"></i>${r.hora}</div><div class="rec-title">${r.tipo||'Bebida'}</div><div class="rec-tags"><span class="tag tag-green"><i class="ti ti-droplet"></i>${r.vol||0}ml</span></div></div></div>`;
+      if(r.type==='leak') return `<div class="rec-item"><div class="rec-icon ri-l"><i class="ti ti-alert-triangle"></i></div><div class="rec-body"><div class="rec-time"><i class="ti ti-clock"></i>${r.hora}</div><div class="rec-title">Fuga — ${r.tipo}</div>${r.muda?`<div class="rec-tags"><span class="tag tag-amber"><i class="ti ti-shirt"></i>Muda</span></div>`:''}</div></div>`;
+      return '';
+    }).join('')}`;
+  }).join('');
+}
+
+function miniCurve(curve){
+  if(!curve||!curve.length) return '';
+  const max=Math.max(...curve.map(p=>p.db),1);
+  const bars=curve.map(pt=>{ const h=Math.max(2,Math.round((pt.db/max)*36)); const col=pt.db<12?'#ef5350':pt.db<22?'#ffb74d':pt.db<35?'#43d98c':'#378ADD'; return `<div class="fc-bar" style="height:${h}px;background:${col}"></div>`; }).join('');
+  return `<div class="flow-curve">${bars}</div>`;
+}
+
+function renderAcousticTab(acRecs,fD){
+  if(!acRecs.length) return '<div class="empty"><i class="ti ti-microphone-off"></i><p>Sin datos acústicos.</p></div>';
+  return `<div class="card"><div class="card-label"><i class="ti ti-chart-bar"></i>Distribución</div>
+    <div class="stat-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card"><div class="stat-lbl" style="color:var(--red)">Débil</div><div class="stat-val">${fD.weak}</div></div>
+      <div class="stat-card"><div class="stat-lbl" style="color:var(--amber)">Bajo</div><div class="stat-val">${fD.low}</div></div>
+      <div class="stat-card"><div class="stat-lbl" style="color:var(--green)">Normal</div><div class="stat-val">${fD.normal}</div></div>
+      <div class="stat-card"><div class="stat-lbl" style="color:var(--blue-act)">Fuerte</div><div class="stat-val">${fD.strong}</div></div>
+    </div></div>
+    <div class="card"><div class="card-label"><i class="ti ti-table"></i>Detalle por micción</div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">
+      <tr style="background:var(--card2)"><th style="padding:5px 7px;text-align:left">Fecha/Hora</th><th>Vol</th><th>Clasif.</th><th>dB prom.</th><th>dB pico</th><th>Baseline</th><th>Patrón</th><th>Curva</th></tr>
+      ${acRecs.map(r=>{ const ac=r.acoustics; const cls={weak:'fb-weak',low:'fb-low',normal:'fb-normal',strong:'fb-strong'}[ac.classification]||''; return `<tr style="border-top:1px solid var(--border)"><td style="padding:5px 7px;font-family:'Inter',monospace;color:var(--text2)">${r.date} ${r.hora}</td><td style="text-align:center;padding:5px 3px">${r.vol||'—'}</td><td style="text-align:center;padding:5px 3px"><span class="flow-badge ${cls}">${ac.classification}</span></td><td style="text-align:center;padding:5px 3px;font-family:'Inter',monospace;font-weight:600">${ac.avgDB}</td><td style="text-align:center;padding:5px 3px;font-family:'Inter',monospace">${ac.peakDB}</td><td style="text-align:center;padding:5px 3px;font-family:'Inter',monospace">${ac.ambientDB}</td><td style="text-align:center;padding:5px 3px"><span class="tag ${ac.pattern==='intermittent'?'tag-amber':'tag-green'}" style="font-size:10px">${ac.pattern==='intermittent'?'Intermit.':'Continuo'}</span></td><td style="padding:5px 3px">${miniCurve(ac.curve)}</td></tr>`; }).join('')}
+    </table></div></div>`;
+}
+
+// ── RENDER PATIENT VIEW ──
+// Date filter state for patient diary
+let patDiaryAllRecs=[], patDiaryAllSleep={}, patDiaryAllWb={};
+
+function renderPatView(p, recs, sleepMap, wbMap){
+  destroyCharts();
+  patDiaryAllRecs=recs; patDiaryAllSleep=sleepMap; patDiaryAllWb=wbMap;
+  const c='#378ADD';
+  const ini=(p.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const age=p.fechaNac?Math.floor((Date.now()-new Date(p.fechaNac))/(365.25*86400000)):null;
+  const mics=recs.filter(r=>r.type==='miction'); const drks=recs.filter(r=>r.type==='drink'); const leaks=recs.filter(r=>r.type==='leak');
+  const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0); const avgVol=mics.length?Math.round(totalVol/mics.length):0;
+  const avgFlow=mics.filter(r=>r.flow).length?(mics.filter(r=>r.flow).reduce((a,r)=>a+r.flow,0)/mics.filter(r=>r.flow).length).toFixed(1):'—';
+  const acRecs=mics.filter(r=>r.acoustics); const fD={weak:0,low:0,normal:0,strong:0}; const allDB=[];
+  acRecs.forEach(r=>{ if(r.acoustics?.classification) fD[r.acoustics.classification]++; if(r.acoustics?.avgDB) allDB.push(r.acoustics.avgDB); });
+  const avgDB=allDB.length?(allDB.reduce((a,b)=>a+b,0)/allDB.length).toFixed(1):'—';
+  const today=new Date().toISOString().slice(0,10); const todaySleep=sleepMap[today]; const todayWb=wbMap[today];
+  const alerts=[];
+  if(mics.filter(r=>r.date===today).length>8) alerts.push({t:'red',i:'ti-alert-octagon',m:`${mics.filter(r=>r.date===today).length} micciones hoy`});
+  if(totalVol>2800) alerts.push({t:'red',i:'ti-droplets',m:`Volumen ${totalVol}ml — posible poliuria`});
+  if(leaks.length>0) alerts.push({t:'amber',i:'ti-alert-triangle',m:`${leaks.length} fuga(s) registrada(s)`});
+  if(p.lastRecord&&(Date.now()-p.lastRecord)/86400000>2) alerts.push({t:'amber',i:'ti-clock',m:'Sin registros hace más de 2 días'});
+
+  // Date chips for diary filter
+  const allDates=[...new Set(recs.map(r=>r.date))].sort().reverse();
+  const datePicker=allDates.length>1?`<div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:4px">
+    <button class="date-chip active" onclick="filterDiaryDate('all',this)">Todos</button>
+    ${allDates.slice(0,14).map(d=>`<button class="date-chip" onclick="filterDiaryDate('${d}',this)">${d}</button>`).join('')}
+  </div>`:'';
+
+  document.getElementById('patContent').innerHTML=`
+    <div class="profile-hero">
+      <div class="profile-av" style="background:${c}22;color:${c};border:2px solid ${c}44">${ini}</div>
+      <div style="flex:1">
+        <div class="profile-name">${p.nombre||'—'}</div>
+        <div class="profile-tags">
+          ${age?`<span class="tag tag-gray">${age} años</span>`:''}
+          ${p.genero==='m'?'<span class="tag tag-blue"><i class="ti ti-gender-male"></i>Masculino</span>':p.genero==='f'?'<span class="tag tag-blue"><i class="ti ti-gender-female"></i>Femenino</span>':''}
+          ${p.diagnostico?`<span class="tag tag-purple"><i class="ti ti-stethoscope"></i>${p.diagnostico}</span>`:''}
+          ${p.clinica?`<span class="tag tag-gray"><i class="ti ti-building-hospital"></i>${p.clinica}</span>`:''}
+          ${p.yearInicio?`<span class="tag tag-gray"><i class="ti ti-calendar"></i>${p.yearInicio}</span>`:''}
+        </div>
+        <div class="profile-info">
+          ${p.telefono?`<span><i class="ti ti-phone"></i>${p.telefono}</span>`:''}
+          ${p.email?`<span><i class="ti ti-mail"></i>${p.email}</span>`:''}
+        </div>
+        <div class="code-box">
+          <i class="ti ti-key" style="font-size:13px;color:var(--text3)"></i>
+          <span style="font-size:11px;color:var(--text2)">Código:</span>
+          <span class="code-val">${p.accessCode||'—'}</span>
+          <button class="btn btn-sm" onclick="copyCode('${p.accessCode||''}')"><i class="ti ti-copy"></i></button>
+          <button class="btn btn-sm btn-amber" onclick="printCard('${p.id}')"><i class="ti ti-printer"></i>Ficha</button>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <button class="btn btn-sm" onclick="openEditPat('${p.id}')"><i class="ti ti-pencil"></i>Editar</button>
+        <button class="btn btn-sm btn-green" onclick="openNoteModal('${p.id}')"><i class="ti ti-notes"></i>Nota</button>
+        <button class="btn btn-sm btn-primary" onclick="genFullReport('${p.id}')"><i class="ti ti-file-report"></i>Informe</button>
+        <button class="btn btn-sm btn-amber" onclick="generateConsultCode('${p.id}')"><i class="ti ti-arrows-exchange"></i>Interconsulta</button>
+        <button class="btn btn-sm btn-danger" onclick="confirmDeletePat('${p.id}','${(p.nombre||'').replace(/'/g,'&apos;')}')"><i class="ti ti-trash"></i>Eliminar</button>
+      </div>
+    </div>
+
+    ${alerts.map(a=>`<div class="alert alert-${a.t}"><i class="ti ${a.i}"></i>${a.m}</div>`).join('')}
+    ${todaySleep?`<div class="sleep-block"><i class="ti ti-moon"></i>Hoy: Despertó <strong>${todaySleep.wake||'—'}</strong> · Se acuesta <strong>${todaySleep.sleep||'—'}</strong></div>`:''}
+    ${todayWb?`<div class="wb-block"><span style="font-size:11px;color:var(--text2)">Hoy:</span><span class="wb-badge wb-${todayWb.wellbeing||'ok'}"><i class="ti ti-${todayWb.wellbeing==='great'?'mood-happy':todayWb.wellbeing==='bad'?'mood-sad':'mood-neutral'}"></i>${todayWb.wellbeing==='great'?'Muy bien':todayWb.wellbeing==='bad'?'Mal':'Regular'}</span>${todayWb.pain!=null?`<span class="tag tag-gray"><i class="ti ti-heart-rate-monitor"></i>Dolor: ${todayWb.pain}/5</span>`:''}</div>`:''}
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-lbl">Micciones</div><div class="stat-val">${mics.length}</div><div class="stat-ref">Normal: 4–7/día</div></div>
+      <div class="stat-card"><div class="stat-lbl">Vol. promedio</div><div class="stat-val">${avgVol}<span class="stat-unit">ml</span></div></div>
+      <div class="stat-card"><div class="stat-lbl">Flujo prom.</div><div class="stat-val">${avgFlow}<span class="stat-unit">ml/s</span></div></div>
+      <div class="stat-card"><div class="stat-lbl">Fugas</div><div class="stat-val" style="color:${leaks.length>0?'var(--amber)':'var(--text)'}">${leaks.length}</div></div>
+      <div class="stat-card"><div class="stat-lbl">dB promedio</div><div class="stat-val">${avgDB}<span class="stat-unit">dB</span></div></div>
+      <div class="stat-card"><div class="stat-lbl">Bebidas</div><div class="stat-val">${drks.reduce((a,r)=>a+(r.vol||0),0)}<span class="stat-unit">ml</span></div></div>
+    </div>
+
+    <div class="ptabs">
+      <div class="ptab active" onclick="ptab(this,'pd-diary')"><i class="ti ti-list"></i>Diario</div>
+      <div class="ptab" onclick="ptab(this,'pd-charts')"><i class="ti ti-chart-bar"></i>Gráficas</div>
+      <div class="ptab" onclick="ptab(this,'pd-acoustic')"><i class="ti ti-microphone"></i>Acústico</div>
+      <div class="ptab" onclick="ptab(this,'pd-notes')"><i class="ti ti-notes"></i>Notas</div>
+      <div class="ptab" onclick="ptab(this,'pd-profile')"><i class="ti ti-user-circle"></i>Perfil</div>
+    </div>
+
+    <div id="pd-diary">
+      ${datePicker}
+      <div id="diaryRecords">${renderDiary(recs,sleepMap,wbMap)}</div>
+    </div>
+    <div id="pd-charts" style="display:none">
+      <div class="card"><div class="card-label"><i class="ti ti-chart-bar"></i>Micciones por hora</div><div class="chart-wrap"><canvas id="ch-hours"></canvas></div></div>
+      <div class="card"><div class="card-label"><i class="ti ti-chart-dots"></i>Volumen por micción (ml)</div><div class="chart-wrap"><canvas id="ch-vol"></canvas></div></div>
+      <div class="card"><div class="card-label"><i class="ti ti-chart-arrows-vertical"></i>Balance líquido (ml/día)</div><div class="chart-wrap"><canvas id="ch-bal"></canvas></div></div>
+      <div class="card"><div class="card-label"><i class="ti ti-chart-pie"></i>Distribución urgencia</div><div class="chart-wrap" style="height:160px"><canvas id="ch-urg"></canvas></div></div>
+      <div class="card"><div class="card-label"><i class="ti ti-heart-rate-monitor"></i>Bienestar y dolor</div><div class="chart-wrap"><canvas id="ch-wb"></canvas></div></div>
+    </div>
+    <div id="pd-acoustic" style="display:none">${renderAcousticTab(acRecs,fD)}</div>
+    <div id="pd-notes" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn btn-green" onclick="openNoteModal('${p.id}')"><i class="ti ti-plus"></i>Nota clínica</button>
+        <button class="btn btn-primary" onclick="openMsgModal('${p.id}')"><i class="ti ti-message-circle"></i>Mensaje al paciente</button>
+      </div>
+      ${(p.notes||[]).length?(p.notes||[]).map(n=>`<div class="card" style="margin-bottom:8px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;display:flex;align-items:center;gap:5px">
+          <i class="ti ti-calendar" style="font-size:12px"></i>${n.date} · ${n.doctor||''}
+          ${n.readByPatient===false?'<span style="background:var(--coral-light);color:var(--coral-dark);font-size:10px;padding:1px 6px;border-radius:8px;font-weight:600">No leído</span>':''}
+          ${n.readByPatient===true?'<span style="background:var(--green-dim);color:var(--green);font-size:10px;padding:1px 6px;border-radius:8px">Leído ✓</span>':''}
+        </div>
+        <div style="font-size:13px">${n.text}</div>
+      </div>`).join(''):'<div class="empty"><i class="ti ti-notes"></i><p>Sin notas</p></div>'}
+    </div>
+    <div id="pd-profile" style="display:none">
+      <div class="card"><table style="width:100%;font-size:12px;border-collapse:collapse">
+        ${[['Nombre',p.nombre],['Fecha nac.',p.fechaNac],['Género',p.genero==='m'?'Masculino':p.genero==='f'?'Femenino':p.genero||'—'],['Edad',age?age+' años':'—'],['Teléfono',p.telefono],['Email',p.email],['Diagnóstico',p.diagnostico],['Médico',p.medicoTratante],['Clínica',p.clinica],['Año inicio',p.yearInicio],['Código',p.accessCode]].map(([k,v])=>`<tr><td style="padding:8px 0;color:var(--text2);width:40%">${k}</td><td style="padding:8px 0;font-weight:500">${v||'—'}</td></tr>`).join('')}
+      </table></div>
+    </div>
+  `;
+  setTimeout(()=>buildCharts(mics,drks,wbMap,sleepMap),150);
+}
+
+// ── DIARY DATE FILTER ──
+window.filterDiaryDate=(date,el)=>{
+  document.querySelectorAll('.date-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  const container=document.getElementById('diaryRecords');
+  if(!container) return;
+  if(date==='all'){
+    container.innerHTML=renderDiary(patDiaryAllRecs,patDiaryAllSleep,patDiaryAllWb);
+  } else {
+    const filtered=patDiaryAllRecs.filter(r=>r.date===date);
+    const sl={[date]:patDiaryAllSleep[date]||{}};
+    const wb={[date]:patDiaryAllWb[date]||{}};
+    container.innerHTML=renderDiary(filtered,sl,wb);
+  }
+};
+
+
 // ── NEW PATIENT ──
 window.openNewPat=()=>{ document.getElementById('npN').value=''; document.getElementById('npFN').value=''; document.getElementById('npG').value=''; document.getElementById('npY').value=new Date().getFullYear(); document.getElementById('npC').value=''; document.getElementById('npT').value=''; document.getElementById('npE').value=''; document.getElementById('npD').value=''; document.getElementById('npM').value=curDocData?.nombre||''; document.getElementById('npNo').value=''; document.getElementById('npErr').style.display='none'; document.getElementById('modalNewPat').classList.add('open'); };
 window.closeM=(name)=>document.getElementById('modal'+name).classList.remove('open');
@@ -1069,6 +1253,20 @@ window.printCard=(id,patData)=>{
 window.openNoteModal=(id)=>{noteTargetId=id;document.getElementById('noteText').value='';document.getElementById('modalNote').classList.add('open');};
 window.saveNote=async()=>{const text=document.getElementById('noteText').value.trim();if(!text||!noteTargetId)return;const p=patsCache[noteTargetId];const notes=[...(p.notes||[]),{text,date:new Date().toISOString().slice(0,10),doctor:curDocData?.nombre||''}];await updateDoc(doc(db,'patients',noteTargetId),{notes});closeM('Note');selectPat(noteTargetId);};
 // ── EDIT DOCTOR PROFILE ──
+let epPhotoBase64 = null;
+
+window.previewProfilePhoto=(input)=>{
+  const file=input.files[0]; if(!file) return;
+  if(file.size>2*1024*1024){ alert('Imagen demasiado grande. Máximo 2MB.'); return; }
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    epPhotoBase64=e.target.result;
+    const prev=document.getElementById('epAvatarPreview');
+    if(prev) prev.innerHTML=`<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+  };
+  reader.readAsDataURL(file);
+};
+
 window.openEditProfile=()=>{
   document.getElementById('epNombre').value=curDocData?.nombre||'';
   document.getElementById('epEspec').value=curDocData?.especialidad||'';
@@ -1082,14 +1280,18 @@ window.saveEditProfile=async()=>{
   if(!nombre){err.querySelector('span').textContent='El nombre es obligatorio';err.style.display='flex';return;}
   const clinicas=document.getElementById('epClinicas').value.split(',').map(c=>c.trim()).filter(Boolean);
   try{
-    await updateDoc(doc(db,'doctors',curDoc.uid),{
-      nombre,
-      especialidad:document.getElementById('epEspec').value.trim(),
-      clinicas
-    });
-    curDocData={...curDocData,nombre,especialidad:document.getElementById('epEspec').value.trim(),clinicas};
+    const updates={nombre,especialidad:document.getElementById('epEspec').value.trim(),clinicas};
+    if(epPhotoBase64) updates.photoURL=epPhotoBase64;
+    await updateDoc(doc(db,'doctors',curDoc.uid),updates);
+    curDocData={...curDocData,...updates};
     document.getElementById('docName').textContent=nombre;
-    document.getElementById('docAv').textContent=nombre.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const avEl=document.getElementById('docAv');
+    if(curDocData.photoURL){
+      avEl.innerHTML=`<img src="${curDocData.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      avEl.style.padding='0';
+    } else {
+      avEl.textContent=nombre.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    }
     populateFilters();
     closeM('EditProfile');
   }catch(e){err.querySelector('span').textContent=e.message;err.style.display='flex';}
@@ -1144,41 +1346,56 @@ window.saveEditPat=async()=>{
 async function loadColleagues(){
   const list=document.getElementById('colleaguesList');
   if(!list) return;
-  list.innerHTML='<p style="font-size:12px;color:var(--text2)">Cargando...</p>';
+  list.innerHTML='<div style="font-size:12px;color:var(--text2);padding:1rem">Cargando...</div>';
   const clinicas=curDocData?.clinicas||[];
   if(!clinicas.length){
-    list.innerHTML='<p style="font-size:12px;color:var(--text2)">No tienes clínicas asignadas en tu perfil. Edita tu perfil en Firebase para agregar clínicas.</p>';
+    list.innerHTML='<div style="grid-column:1/-1;font-size:13px;color:var(--text2)"><i class="ti ti-info-circle" style="color:var(--blue-act)"></i> No tienes clínicas asignadas. Usa el botón ⚙️ para editar tu perfil y agregar clínicas.</div>';
     return;
   }
+  const GRADS=[['#0d47a1','#1976d2'],['#1b5e20','#388e3c'],['#4a148c','#7b1fa2'],['#b71c1c','#d32f2f'],['#e65100','#f57c00'],['#006064','#00838f'],['#1a237e','#3949ab'],['#37474f','#546e7a']];
   try{
-    // Load ALL doctors and filter client-side to avoid composite index requirement
     const snap=await getDocs(collection(db,'doctors'));
+    const seen=new Set();
     const results=[];
     snap.forEach(d=>{
-      if(d.id===curDoc.uid) return;
+      if(d.id===curDoc.uid||seen.has(d.id)) return;
       const data=d.data();
       const docClinics=data.clinicas||[];
-      // Find matching clinic
       const match=clinicas.find(cl=>docClinics.some(dc=>dc.toLowerCase().trim()===cl.toLowerCase().trim()));
-      if(match) results.push({...data,clinicaMatch:match});
+      if(match){ seen.add(d.id); results.push({id:d.id,...data,clinicaMatch:match}); }
     });
-    const unique=[...new Map(results.map(r=>[r.email||r.nombre,r])).values()];
-    if(!unique.length){
-      list.innerHTML='<p style="font-size:12px;color:var(--text2)">No hay otros médicos registrados en tus clínicas aún.</p>';
+    if(!results.length){
+      list.innerHTML='<div style="grid-column:1/-1;font-size:13px;color:var(--text2)">No hay otros médicos registrados en tus clínicas aún.</div>';
       return;
     }
-    list.innerHTML=unique.map(c=>{
+    list.innerHTML=results.map((c,i)=>{
+      const g=GRADS[i%GRADS.length];
       const ini=(c.nombre||'DR').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      return `<div class="colleague-item">
-        <div class="coll-av">${ini}</div>
-        <div>
-          <div style="font-size:13px;font-weight:500">${c.nombre||'—'}</div>
-          <div style="font-size:11px;color:var(--text2)">${c.especialidad||'Médico'} · <span style="color:var(--blue-act)">${c.clinicaMatch}</span></div>
+      const av=c.photoURL
+        ?`<img src="${c.photoURL}" style="width:100%;height:100%;object-fit:cover;">`
+        :`<span style="color:#fff">${ini}</span>`;
+      const avBg=c.photoURL?'var(--card2)':`linear-gradient(135deg,${g[0]},${g[1]})`;
+      const safeName=(c.nombre||'').replace(/'/g,'&apos;');
+      return `<div class="colleague-card">
+        <div class="colleague-card-top">
+          <div class="colleague-card-banner" style="background:linear-gradient(135deg,${g[0]},${g[1]})"></div>
+          <div class="colleague-card-avatar" style="background:${avBg}">${av}</div>
+        </div>
+        <div class="colleague-card-body">
+          <div class="colleague-card-name">${c.nombre||'—'}</div>
+          <div class="colleague-card-spec"><i class="ti ti-stethoscope"></i>${c.especialidad||'Médico'}</div>
+          <div class="colleague-card-clinic"><i class="ti ti-building-hospital"></i>${c.clinicaMatch}</div>
+          <div class="colleague-card-actions">
+            <button class="btn btn-primary btn-sm" onclick="startColleagueConsult('${c.id}','${safeName}')">
+              <i class="ti ti-arrows-exchange"></i>Interconsulta
+            </button>
+            ${c.email?`<button class="btn btn-sm" onclick="window.location.href='mailto:${c.email}?subject=Interconsulta%20CURG'"><i class="ti ti-mail"></i>Email</button>`:''}
+          </div>
         </div>
       </div>`;
     }).join('');
   }catch(e){
-    list.innerHTML=`<p style="font-size:12px;color:var(--text2)">Error al cargar colegas: ${e.message}</p>`;
+    list.innerHTML=`<div style="grid-column:1/-1;font-size:12px;color:var(--red)"><i class="ti ti-alert-circle"></i> Error: ${e.message}</div>`;
   }
 }
 
@@ -1260,6 +1477,32 @@ window.viewReceivedConsult=(code)=>{
   setTimeout(()=>accessConsultation(),100);
 };
 
+window.exportXLSX=async(id)=>{
+  if(!window.XLSX){ alert('Cargando XLSX...'); return; }
+  const snap=await getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc')));
+  const recs=snap.docs.map(d=>d.data()); const p=patsCache[id];
+  // Sheet 1: Micciones
+  const mics=recs.filter(r=>r.type==='miction').map(r=>({
+    'Paciente':p.nombre,'Clínica':p.clinica,'Año':p.yearInicio,
+    'Fecha':r.date,'Hora':r.hora,'Volumen (ml)':r.vol||'','Duración (s)':r.dur||'',
+    'Flujo (ml/s)':r.flow||'','Urgencia':r.urgency!=null?`U${r.urgency}`:'','Posición':r.pos||'',
+    'Género':r.genero||'','Clasif. acústica':r.acoustics?.classification||'',
+    'dB promedio':r.acoustics?.avgDB||'','dB pico':r.acoustics?.peakDB||'',
+    'Baseline dB':r.acoustics?.ambientDB||'','Patrón':r.acoustics?.pattern||'','Notas':r.notas||''
+  }));
+  // Sheet 2: Bebidas
+  const drks=recs.filter(r=>r.type==='drink').map(r=>({'Fecha':r.date,'Hora':r.hora,'Tipo':r.tipo||'','Volumen (ml)':r.vol||'','Notas':r.notas||''}));
+  // Sheet 3: Fugas
+  const leaks=recs.filter(r=>r.type==='leak').map(r=>({'Fecha':r.date,'Hora':r.hora,'Tipo':r.tipo||'','Requirió muda':r.muda?'Sí':'No','Notas':r.notas||''}));
+  const wb=XLSX.utils.book_new();
+  if(mics.length) XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(mics),'Micciones');
+  if(drks.length) XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(drks),'Bebidas');
+  if(leaks.length) XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(leaks),'Fugas');
+  if(!mics.length&&!drks.length&&!leaks.length){ alert('Sin registros para exportar'); return; }
+  const filename=`CURG_${(p.nombre||'paciente').replace(/ /g,'_')}_${p.clinica||'clinica'}_${new Date().toISOString().slice(0,10)}.xlsx`;
+  XLSX.writeFile(wb,filename);
+};
+
 window.exportCSV=async(id)=>{
   const snap=await getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc')));
   const recs=snap.docs.map(d=>d.data());const p=patsCache[id];
@@ -1293,7 +1536,7 @@ window.genFullReport=async(id)=>{
   const avgDB=acRecs.length?(acRecs.reduce((a,r)=>a+(r.acoustics?.avgDB||0),0)/acRecs.length).toFixed(1):'—';
   const urgC=[0,0,0,0,0]; mics.forEach(r=>{if(r.urgency!=null)urgC[r.urgency]++;});
 
-  const styles=`body{font-family:Arial,sans-serif;max-width:900px;margin:0 auto;padding:2rem;color:#1e2a3a;font-size:12px;}
+  const styles=`body{font-family:Arial,sans-serif;max-width:min(900px,100vw);margin:0 auto;overflow-x:hidden;padding:2rem;color:#1e2a3a;font-size:12px;}
   .hdr{background:#042C53;color:#fff;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;}
   .hdr h1{font-size:1.2rem;margin:0 0 4px;color:#fff;}.hdr p{opacity:.85;font-size:11px;margin:2px 0;}
   .inn{color:#D85A30;font-weight:700;}.curg{color:#4fc3f7;font-weight:700;}
@@ -1716,6 +1959,124 @@ window.saveConsultNote=async()=>{
   // Refresh view
   window.accessConsultation();
 };
+
+// ── COMPARATIVE ANALYSIS ──
+function populateCompClinica(){
+  const sel=document.getElementById('compClinica');
+  if(!sel) return;
+  const clinicas=curDocData?.clinicas||[];
+  sel.innerHTML=clinicas.map(c=>`<option value="${c}">${c}</option>`).join('');
+}
+
+async function loadComparative(){
+  const sel=document.getElementById('compClinica');
+  const clinica=sel?.value;
+  const content=document.getElementById('comparativeContent');
+  const alertsDiv=document.getElementById('inactivityAlerts');
+  if(!clinica||!content) return;
+  content.innerHTML='<div style="font-size:12px;color:var(--text2);padding:1rem">Cargando...</div>';
+  alertsDiv.innerHTML='';
+
+  try{
+    // Load all doctor's patients and filter client-side (avoids composite index)
+    const pSnap=await getDocs(query(collection(db,'patients'),where('doctorId','==',curDoc.uid)));
+    const allPats=pSnap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.clinica===clinica);
+    if(!allPats.length){ content.innerHTML='<div class="empty"><i class="ti ti-users"></i><p style="font-size:13px">No hay pacientes en esta clínica.</p></div>'; return; }
+    const pSnap2={docs:allPats.map(p=>({id:p.id,data:()=>p}))}; // compatibility wrapper
+
+    const now=Date.now();
+    const sevenDaysAgo=new Date(); sevenDaysAgo.setDate(sevenDaysAgo.getDate()-7);
+    const fromDate=sevenDaysAgo.toISOString().slice(0,10);
+    const stats=[];
+    const inactives=[];
+
+    for(const pd of allPats){
+      const p=pd;
+      // Check inactivity
+      const daysSince=p.lastRecord?(now-p.lastRecord)/86400000:999;
+      if(daysSince>3) inactives.push({...p,daysSince:Math.round(daysSince)});
+      // Load records last 7 days
+      const rSnap=await getDocs(query(collection(db,'patients',pd.id,'records'),orderBy('timestamp','desc')));
+      const recs=rSnap.docs.map(d=>d.data()).filter(r=>r.date>=fromDate);
+      const mics=recs.filter(r=>r.type==='miction');
+      const leaks=recs.filter(r=>r.type==='leak');
+      const days=[...new Set(mics.map(r=>r.date))].length||1;
+      const avgMics=+(mics.length/days).toFixed(1);
+      const avgVol=mics.length?Math.round(mics.reduce((a,r)=>a+(r.vol||0),0)/mics.length):0;
+      const acRecs=mics.filter(r=>r.acoustics);
+      const avgDB=acRecs.length?+(acRecs.reduce((a,r)=>a+(r.acoustics?.avgDB||0),0)/acRecs.length).toFixed(1):null;
+      const urgHigh=mics.filter(r=>r.urgency!=null&&r.urgency>=3).length;
+      stats.push({p,mics:mics.length,days,avgMics,avgVol,leaks:leaks.length,avgDB,urgHigh,daysSince});
+    }
+
+    // Sort by avgMics desc
+    stats.sort((a,b)=>b.avgMics-a.avgMics);
+    const maxMics=Math.max(...stats.map(s=>s.avgMics),1);
+    const maxVol=Math.max(...stats.map(s=>s.avgVol),1);
+
+    // Render inactivity alerts
+    if(inactives.length){
+      alertsDiv.innerHTML=inactives.map(p=>`
+        <div class="inactivity-alert">
+          <i class="ti ti-clock"></i>
+          <div>
+            <strong>${p.nombre}</strong> — sin registros hace <strong>${p.daysSince} días</strong>
+            ${p.telefono?`<button class="btn btn-sm btn-amber" style="margin-left:8px;padding:2px 8px;font-size:11px" onclick="window.location.href='tel:${p.telefono}'"><i class="ti ti-phone"></i>Llamar</button>`:''}
+          </div>
+        </div>`).join('');
+    }
+
+    // Render comparative cards
+    content.innerHTML=`
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:5px"><i class="ti ti-info-circle" style="font-size:13px"></i>${stats.length} pacientes · últimos 7 días · ordenados por frecuencia</div>
+      <div class="comp-grid">
+        ${stats.map(s=>{
+          const barMics=Math.round((s.avgMics/maxMics)*100);
+          const barVol=Math.round((s.avgVol/maxVol)*100);
+          const statusColor=s.avgMics>8?'var(--red)':s.avgMics>=4?'var(--green)':'var(--amber)';
+          return `<div class="comp-card" style="cursor:pointer" onclick="selectPat('${s.p.id}');showTTab('patients',document.querySelector('.ttab'))">
+            <div class="comp-name" title="${s.p.nombre}">${s.p.nombre}</div>
+            <div class="comp-stat"><span>Mic/día</span><strong style="color:${statusColor}">${s.avgMics}</strong></div>
+            <div class="comp-bar-wrap"><div class="comp-bar" style="width:${barMics}%;background:${statusColor}"></div></div>
+            <div class="comp-stat" style="margin-top:6px"><span>Vol prom</span><strong>${s.avgVol}ml</strong></div>
+            <div class="comp-bar-wrap"><div class="comp-bar" style="width:${barVol}%;background:var(--blue-act);opacity:.7"></div></div>
+            ${s.leaks>0?`<div class="comp-stat" style="margin-top:6px;color:var(--amber)"><span><i class="ti ti-alert-triangle" style="font-size:11px"></i> Fugas</span><strong>${s.leaks}</strong></div>`:''}
+            ${s.avgDB?`<div class="comp-stat" style="margin-top:4px"><span>dB prom</span><strong>${s.avgDB}</strong></div>`:''}
+            ${s.urgHigh>0?`<div class="comp-stat" style="color:var(--red)"><span>Urgencia ≥3</span><strong>${s.urgHigh}</strong></div>`:''}
+            ${s.daysSince>3?`<div style="font-size:10px;color:var(--amber);margin-top:6px"><i class="ti ti-clock" style="font-size:11px"></i> Sin actividad ${Math.round(s.daysSince)}d</div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;display:flex;align-items:center;gap:4px">
+        <i class="ti ti-circle" style="font-size:11px;color:var(--green)"></i>4–7 mic/día normal
+        <i class="ti ti-circle" style="font-size:11px;color:var(--amber);margin-left:8px"></i>&lt;4 baja
+        <i class="ti ti-circle" style="font-size:11px;color:var(--red);margin-left:8px"></i>&gt;8 polaquiuria
+      </div>`;
+  }catch(e){
+    content.innerHTML=`<div style="font-size:12px;color:var(--red)">Error: ${e.message}</div>`;
+  }
+}
+
+// ── INACTIVITY CHECK on patient load ──
+function checkInactivityOnLoad(){
+  // Check all cached patients for inactivity and show badge
+  const inactives=Object.values(patsCache).filter(p=>{
+    if(!p.lastRecord) return true;
+    return (Date.now()-p.lastRecord)/86400000>3;
+  });
+  // Update comparative tab badge
+  const compTab=document.querySelector('.ttab:last-child');
+  if(compTab&&inactives.length){
+    const existing=compTab.querySelector('.inact-badge');
+    if(!existing){
+      const badge=document.createElement('span');
+      badge.className='inact-badge';
+      badge.style.cssText='background:var(--amber);color:#000;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:4px;';
+      badge.textContent=inactives.length;
+      compTab.appendChild(badge);
+    }
+  }
+}
 
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 </script>
