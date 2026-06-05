@@ -32,7 +32,15 @@
   --blue-light:#0d2137;--coral-light:#2e1208;--green-light:#0a2e1e;--amber-light:#2e1f00;--red-light:#2e0a0a;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto;font-size:15px;}
+html,body{overflow-x:hidden;max-width:100vw;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;}
+.app-shell{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;overflow-x:hidden;}
+@media(min-width:700px){
+  body{background:var(--blue-deep);background-image:radial-gradient(ellipse at 30% 20%,rgba(55,138,221,.15) 0%,transparent 60%);}
+  .app-shell{box-shadow:0 0 60px rgba(0,0,0,.5);border-radius:0;min-height:100vh;}
+  .topbar{border-radius:0;}
+  .bottom-nav{border-radius:0;}
+}
 
 /* ── CONSENT ── */
 .consent-overlay{position:fixed;inset:0;background:rgba(4,44,83,0.85);z-index:9999;display:flex;align-items:flex-end;justify-content:center;}
@@ -66,7 +74,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .btn-theme{background:transparent;border:none;cursor:pointer;color:#fff;font-size:18px;padding:4px;}
 
 /* ── SCREENS ── */
-.screen{display:none;padding:1.25rem 1rem 6rem;}
+.screen{display:none;padding:1.25rem 1rem 6rem;overflow-x:hidden;}
 .screen.active{display:block;}
 
 /* ── ONBOARD ── */
@@ -103,6 +111,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 /* ── NAV ── */
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;}
+@media(min-width:700px){.bottom-nav{max-width:430px;border-radius:0 0 0 0;}}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0;cursor:pointer;}
 .nav-item.active .nav-icon,.nav-item.active .nav-lbl{color:var(--blue-act);}
 .nav-icon{font-size:22px;color:var(--text3);margin-bottom:2px;}
@@ -136,7 +145,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .wb-status{font-size:11px;color:var(--text3);text-align:right;margin-top:6px;}
 
 /* ── ACTION BUTTONS ── */
-.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem;}
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem;width:100%;}
 .action-btn{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1rem;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:all .15s;}
 .action-btn:active{transform:scale(.96);}
 .action-btn-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;}
@@ -199,7 +208,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .chrono-time{font-family:'Inter',monospace;font-size:2.8rem;font-weight:300;color:var(--blue-mid);letter-spacing:.04em;}
 .chrono-wrap.recording .chrono-time{color:var(--green);}
 .chrono-state{font-size:12px;color:var(--text2);margin-top:4px;margin-bottom:12px;}
-.waveform{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:36px;margin:8px 0;}
+.waveform{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:36px;margin:8px 0;overflow:hidden;width:100%;}
 .wbar{width:3px;background:var(--blue-act);border-radius:2px;min-height:3px;transition:height .08s;}
 .chrono-wrap.recording .wbar{background:var(--green);}
 .chrono-btns{display:flex;gap:8px;justify-content:center;}
@@ -211,7 +220,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .mic-banner i{font-size:14px;}
 
 /* ── URGENCY ── */
-.urgency-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
+.urgency-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;width:100%;}
 .urg-btn{padding:10px 3px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:10px;font-weight:600;text-align:center;font-family:inherit;color:var(--text2);transition:all .15s;}
 .urg-btn .un{font-size:1rem;display:block;font-weight:500;margin-bottom:2px;}
 .urg-btn.selected{background:var(--blue-act);color:#fff;border-color:var(--blue-act);}
@@ -306,9 +315,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .toggle.on::after{left:23px;}
 
 /* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(4,44,83,.6);z-index:200;display:none;align-items:flex-end;justify-content:center;}
+.modal-overlay{position:fixed;inset:0;background:rgba(4,44,83,.6);z-index:200;display:none;align-items:flex-end;justify-content:center;overflow:hidden;}
+@media(min-width:700px){.modal-overlay{align-items:center;}.modal{border-radius:var(--radius-xl) !important;max-width:420px !important;margin:0 auto;}.modal-handle{display:none;}}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--surface);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:1.5rem;width:100%;max-width:430px;max-height:92vh;overflow-y:auto;padding-bottom:2rem;}
+.modal{background:var(--surface);border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:1.5rem;width:100%;max-width:min(430px,100vw);max-height:92vh;overflow-y:auto;overflow-x:hidden;padding-bottom:2rem;}
 .modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 1.25rem;}
 .modal-title{font-size:1rem;font-weight:700;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;}
 .modal-title i{font-size:20px;color:var(--blue-act);}
@@ -325,6 +335,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .brand-footer-text .curg{color:var(--blue-act);font-weight:600;}
 
 .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--text3);}
+.date-filter{display:flex;gap:8px;margin-bottom:1rem;overflow-x:auto;padding-bottom:4px;}
+.date-chip{padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;color:var(--text2);}
+.date-chip.active{background:var(--blue-light);border-color:var(--blue-act);color:var(--blue-act);}
+.trend-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1rem;}
+.trend-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.trend-row:last-child{border-bottom:none;}
+.trend-date{font-size:11px;color:var(--text3);font-family:'Inter',monospace;width:68px;flex-shrink:0;}
+.trend-bars{flex:1;display:flex;flex-direction:column;gap:3px;}
+.trend-bar-wrap{display:flex;align-items:center;gap:6px;}
+.trend-bar{height:7px;border-radius:4px;min-width:3px;transition:width .3s;}
+.trend-val{font-size:10px;color:var(--text2);white-space:nowrap;}
+.trend-badge{font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px;}
+.tb-up{background:var(--green-light);color:var(--green);}
+.tb-down{background:var(--red-light);color:var(--red);}
+.tb-same{background:var(--gray-bg);color:var(--text2);}
 .msg-bubble{background:var(--blue-light);border:1px solid var(--blue-act);border-radius:14px 14px 14px 4px;padding:10px 14px;margin-bottom:10px;position:relative;}
 .msg-bubble-doctor{font-size:11px;font-weight:600;color:var(--blue-act);margin-bottom:4px;display:flex;align-items:center;gap:4px;}
 .msg-bubble-text{font-size:13px;color:var(--text);line-height:1.6;}
@@ -344,6 +369,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </style>
 </head>
 <body>
+<div class="app-shell">
 
 <!-- CONSENT -->
 <div id="consentOverlay" class="consent-overlay" style="display:none">
@@ -386,7 +412,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <label class="consent-check"><input type="checkbox" id="ck2" onchange="checkConsent()"><span>Entiendo que el análisis acústico es un apoyo clínico y no reemplaza una evaluación médica profesional.</span></label>
     <label class="consent-check"><input type="checkbox" id="ck3" onchange="checkConsent()"><span>Soy mayor de 18 años o cuento con autorización de mi tutor legal.</span></label>
     <button class="btn-consent" id="btnConsent" onclick="acceptConsent()">Aceptar y continuar</button>
-    <div class="consent-legal">Política v2.0 · junio 2026 · InnoIA · Verificado CURG</div>
+    <div class="consent-legal">Política v2.0 · junio 2026 · InnoIA · Verificado CURG · <a href="/privacidad.html" target="_blank" style="color:var(--blue-act)">Ver política completa</a></div>
   </div>
 </div>
 
@@ -547,7 +573,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="action-btn-label">Fuga</div>
     </div>
   </div>
-  <div class="records-header"><i class="ti ti-list"></i>Registros de hoy</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <div class="records-header" style="margin-bottom:0"><i class="ti ti-list"></i><span id="recordsTitle">Registros de hoy</span></div>
+    <button class="btn btn-sm" id="btnHistorial" onclick="toggleHistorial()" style="font-size:11px"><i class="ti ti-calendar-stats"></i>Ver historial</button>
+  </div>
+  <div class="date-filter" id="dateFilter" style="display:none"></div>
   <div id="recordsList"></div>
 </div>
 
@@ -567,6 +597,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <button class="period-btn" onclick="setPeriod('week',this)">7 días</button>
   </div>
   <div id="analysisContent"></div>
+  <div id="weeklyTrendSection" style="margin-top:1rem"></div>
   <button class="btn btn-pdf btn-full" onclick="genPDF()" style="margin-top:.5rem"><i class="ti ti-file-report"></i>Descargar informe PDF</button>
   <p style="font-size:11px;color:var(--text3);text-align:center;margin-top:8px">Informe clínico completo para llevar a consulta médica</p>
 </div>
@@ -682,7 +713,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.04em">Recordatorios</div>
   <div class="notif-card">
     <div class="notif-row">
-      <div class="notif-left"><div class="notif-icon"><i class="ti ti-sun"></i></div><div class="notif-info"><h4>Hora de despertar</h4><p>Recordatorio 5:00 AM</p></div></div>
+      <div class="notif-left"><div class="notif-icon"><i class="ti ti-sun"></i></div><div class="notif-info"><h4>Hora de despertar</h4><input type="time" id="notifTimeWake" value="05:00" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:12px;color:var(--text);font-family:inherit;margin-top:2px" onchange="saveNotifTime('wake',this.value)"></div></div>
       <button class="toggle" id="togWake" onclick="toggleNotif('wake')"></button>
     </div>
     <div class="notif-row">
@@ -694,7 +725,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <button class="toggle" id="togMiction" onclick="toggleNotif('miction')"></button>
     </div>
     <div class="notif-row">
-      <div class="notif-left"><div class="notif-icon"><i class="ti ti-moon"></i></div><div class="notif-info"><h4>Hora de acostarse</h4><p>Recordatorio 6:00 PM</p></div></div>
+      <div class="notif-left"><div class="notif-icon"><i class="ti ti-moon"></i></div><div class="notif-info"><h4>Hora de acostarse</h4><input type="time" id="notifTimeSleep" value="22:00" style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:12px;color:var(--text);font-family:inherit;margin-top:2px" onchange="saveNotifTime('sleep',this.value)"></div></div>
       <button class="toggle" id="togSleep" onclick="toggleNotif('sleep')"></button>
     </div>
   </div>
@@ -989,6 +1020,20 @@ if('serviceWorker'in navigator) navigator.serviceWorker.register('/sw.js').catch
 const NOTIF_SCHED={wake:{times:['05:00'],msg:'Buenos días — registra tu hora de levantada'},water:{times:['08:00','10:00','12:00','14:00','16:00','18:00'],msg:'Recuerda registrar lo que bebes'},miction:{times:['09:00','12:00','15:00','18:00'],msg:'Momento de registrar tu micción'},sleep:{times:['18:00'],msg:'Recuerda registrar tu hora de dormir'}};
 let notifSettings=JSON.parse(localStorage.getItem('curg_notifs')||'{"wake":false,"water":false,"miction":false,"sleep":false}');
 function renderNotifToggles(){ Object.keys(notifSettings).forEach(k=>{ const id='tog'+k.charAt(0).toUpperCase()+k.slice(1); const el=document.getElementById(id); if(el) el.classList.toggle('on',notifSettings[k]); }); }
+window.saveNotifTime=(key,time)=>{
+  const saved=JSON.parse(localStorage.getItem('curg_notif_times')||'{}');
+  saved[key]=time;
+  localStorage.setItem('curg_notif_times',JSON.stringify(saved));
+  // Update schedule
+  NOTIF_SCHED[key].times=[time];
+};
+// Load custom times on start
+(()=>{
+  const saved=JSON.parse(localStorage.getItem('curg_notif_times')||'{}');
+  if(saved.wake){ NOTIF_SCHED.wake.times=[saved.wake]; const el=document.getElementById('notifTimeWake'); if(el) el.value=saved.wake; }
+  if(saved.sleep){ NOTIF_SCHED.sleep.times=[saved.sleep]; const el=document.getElementById('notifTimeSleep'); if(el) el.value=saved.sleep; }
+})();
+
 window.toggleNotif=async(key)=>{
   if(!('Notification'in window)){ document.getElementById('notifStatus').textContent='Tu navegador no soporta notificaciones'; return; }
   if(notifSettings[key]){ notifSettings[key]=false; localStorage.setItem('curg_notifs',JSON.stringify(notifSettings)); renderNotifToggles(); return; }
@@ -1323,7 +1368,7 @@ async function loadDoctorMessages(){
       if(dot) dot.style.display='none';
       if(banner) banner.style.display='none';
     }
-  }catch(e){ console.log('msg err:',e); }
+  }catch(e){ // msg err suppressed }
 }
 
 // ── EDIT PATIENT PROFILE ──
@@ -1352,6 +1397,117 @@ window.savePatProfile=async()=>{
   }catch(e){ err.querySelector('span').textContent=e.message; err.style.display='flex'; }
 };
 
+// ── HISTORIAL (all days) ──
+let showingHistorial = false;
+let historialRecords = [];
+let selectedDate = null;
+
+window.toggleHistorial = async () => {
+  showingHistorial = !showingHistorial;
+  const btn = document.getElementById('btnHistorial');
+  const title = document.getElementById('recordsTitle');
+  const filterBar = document.getElementById('dateFilter');
+  if(!showingHistorial){
+    btn.innerHTML='<i class="ti ti-calendar-stats"></i>Ver historial';
+    title.textContent='Registros de hoy';
+    filterBar.style.display='none';
+    selectedDate = null;
+    subscribeRecords(); // go back to today live
+    return;
+  }
+  btn.innerHTML='<i class="ti ti-calendar-stats"></i>Ver hoy';
+  title.textContent='Historial completo';
+  filterBar.style.display='flex';
+  // Load all records
+  if(!patient?.id) return;
+  const snap = await getDocs(query(collection(db,'patients',patient.id,'records'), orderBy('timestamp','desc')));
+  historialRecords = snap.docs.map(d=>({id:d.id,...d.data()}));
+  // Build date chips
+  const dates = [...new Set(historialRecords.map(r=>r.date))].sort().reverse();
+  filterBar.innerHTML = dates.map(d=>`<button class="date-chip ${d===dates[0]?'active':''}" onclick="filterByDate('${d}',this)">${d}</button>`).join('');
+  selectedDate = dates[0]||null;
+  renderRecords(historialRecords.filter(r=>r.date===selectedDate));
+};
+
+window.filterByDate = (date, el) => {
+  selectedDate = date;
+  document.querySelectorAll('.date-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderRecords(historialRecords.filter(r=>r.date===date));
+};
+
+// ── WEEKLY TREND ──
+async function renderWeeklyTrend() {
+  const sec = document.getElementById('weeklyTrendSection');
+  if(!sec||!patient?.id) return;
+  const snap = await getDocs(query(collection(db,'patients',patient.id,'records'), orderBy('timestamp','desc')));
+  const all = snap.docs.map(d=>({id:d.id,...d.data()}));
+  // Group by date
+  const byDate = {};
+  all.forEach(r=>{
+    if(!byDate[r.date]) byDate[r.date]={mics:[],drks:[],leaks:[]};
+    if(r.type==='miction') byDate[r.date].mics.push(r);
+    else if(r.type==='drink') byDate[r.date].drks.push(r);
+    else if(r.type==='leak') byDate[r.date].leaks.push(r);
+  });
+  const dates = Object.keys(byDate).sort().reverse().slice(0,14);
+  if(dates.length<2){ sec.innerHTML=''; return; }
+  // Calculate weekly averages
+  const weeks = {};
+  dates.forEach(d=>{
+    const wk = getWeekLabel(d);
+    if(!weeks[wk]) weeks[wk]={days:0,mics:0,vol:0,leaks:0,dates:[]};
+    const day = byDate[d];
+    weeks[wk].days++;
+    weeks[wk].mics+=day.mics.length;
+    weeks[wk].vol+=day.mics.reduce((a,r)=>a+(r.vol||0),0);
+    weeks[wk].leaks+=day.leaks.length;
+    weeks[wk].dates.push(d);
+  });
+  const wkKeys = Object.keys(weeks).sort().reverse().slice(0,4);
+  if(wkKeys.length<1){ sec.innerHTML=''; return; }
+  const maxMics = Math.max(...wkKeys.map(w=>weeks[w].mics/weeks[w].days),1);
+  const maxVol = Math.max(...wkKeys.map(w=>weeks[w].vol/weeks[w].days),1);
+
+  sec.innerHTML=`
+    <div class="trend-card">
+      <div class="chart-lbl" style="margin-bottom:10px"><i class="ti ti-trending-up" style="font-size:14px;color:var(--blue-act)"></i>Tendencia semanal</div>
+      ${wkKeys.map((wk,i)=>{
+        const w=weeks[wk];
+        const avgMics=(w.mics/w.days).toFixed(1);
+        const avgVol=w.days?Math.round(w.vol/w.days):0;
+        const prev=wkKeys[i+1]?weeks[wkKeys[i+1]]:null;
+        const trend=prev?((w.mics/w.days)>(prev.mics/prev.days)?'up':'down'):'same';
+        const trendLabel=trend==='up'?'↑ más':'↓ menos';
+        const barMics=Math.round((w.mics/w.days/maxMics)*120);
+        const barVol=Math.round((w.vol/w.days/maxVol)*120);
+        return `<div class="trend-row">
+          <div class="trend-date">${wk}</div>
+          <div class="trend-bars">
+            <div class="trend-bar-wrap">
+              <div class="trend-bar" style="width:${barMics}px;background:var(--blue-act)"></div>
+              <span class="trend-val">${avgMics} mic/día</span>
+              ${i<wkKeys.length-1?`<span class="trend-badge ${trend==='same'?'tb-same':trend==='up'?'tb-up':'tb-down'}">${trendLabel}</span>`:''}
+            </div>
+            <div class="trend-bar-wrap">
+              <div class="trend-bar" style="width:${barVol}px;background:var(--coral);opacity:.7"></div>
+              <span class="trend-val">${avgVol}ml prom/día</span>
+            </div>
+            ${w.leaks>0?`<div class="trend-bar-wrap"><span class="trend-val" style="color:var(--amber)"><i class="ti ti-alert-triangle" style="font-size:10px"></i>${w.leaks} fuga(s)</span></div>`:''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function getWeekLabel(dateStr){
+  const d=new Date(dateStr+'T12:00:00');
+  const day=d.getDay();
+  const mon=new Date(d); mon.setDate(d.getDate()-(day===0?6:day-1));
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+  return mon.toLocaleDateString('es',{month:'short',day:'numeric'})+' – '+sun.toLocaleDateString('es',{month:'short',day:'numeric'});
+}
+
 // ── PROFILE ──
 function renderProfile(){
   if(!patient) return;
@@ -1374,5 +1530,6 @@ function renderProfile(){
     </div>`;
 }
 </script>
+</div><!-- end app-shell -->
 </body>
 </html>
