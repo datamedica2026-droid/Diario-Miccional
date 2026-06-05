@@ -1440,12 +1440,18 @@ window.sendMsg=async()=>{
 async function loadReceivedConsults(){
   const list=document.getElementById('receivedConsultsList'); if(!list) return;
   try{
+    // Only load consultations where current doctor has added notes
+    // (meaning they accessed it with the code)
     const snap=await getDocs(collection(db,'consultations'));
     const received=[];
     snap.forEach(d=>{
       const c=d.data();
+      // Skip consultations created by current doctor
       if(c.fromDoctorId===curDoc.uid) return;
-      received.push({id:d.id,...c});
+      // Only show if current doctor has left a note (proof they accessed it)
+      const myNotes=(c.notes||[]).filter(n=>n.doctorId===curDoc.uid);
+      if(myNotes.length===0) return;
+      received.push({id:d.id,...c,myNotes});
     });
     if(!received.length){ list.innerHTML='<p style="font-size:12px;color:var(--text2)">No has recibido interconsultas aún.</p>'; return; }
     const badge=document.getElementById('receivedBadge');
