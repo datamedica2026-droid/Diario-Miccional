@@ -1518,35 +1518,37 @@ async function renderWeeklyTrend() {
   const maxMics = Math.max(...wkKeys.map(w=>weeks[w].mics/weeks[w].days),1);
   const maxVol = Math.max(...wkKeys.map(w=>weeks[w].vol/weeks[w].days),1);
 
-  sec.innerHTML=`
-    <div class="trend-card">
-      <div class="chart-lbl" style="margin-bottom:10px"><i class="ti ti-trending-up" style="font-size:14px;color:var(--blue-act)"></i>Tendencia semanal</div>
-      ${wkKeys.map((wk,i)=>{
-        const w=weeks[wk];
-        const avgMics=(w.mics/w.days).toFixed(1);
-        const avgVol=w.days?Math.round(w.vol/w.days):0;
-        const prev=wkKeys[i+1]?weeks[wkKeys[i+1]]:null;
-        const trend=prev?((w.mics/w.days)>(prev.mics/prev.days)?'up':'down'):'same';
-        const trendLabel=trend==='up'?'↑ más':'↓ menos';
-        const barMics=Math.round((w.mics/w.days/maxMics)*120);
-        const barVol=Math.round((w.vol/w.days/maxVol)*120);
-        return `<div class="trend-row">
-          <div class="trend-date">${wk}</div>
-          <div class="trend-bars">
-            <div class="trend-bar-wrap">
-              <div class="trend-bar" style="width:${barMics}px;background:var(--blue-act)"></div>
-              <span class="trend-val">${avgMics} mic/día</span>
-              ${i<wkKeys.length-1?`<span class="trend-badge ${trend==='same'?'tb-same':trend==='up'?'tb-up':'tb-down'}">${trendLabel}</span>`:''}
-            </div>
-            <div class="trend-bar-wrap">
-              <div class="trend-bar" style="width:${barVol}px;background:var(--coral);opacity:.7"></div>
-              <span class="trend-val">${avgVol}ml prom/día</span>
-            </div>
-            ${w.leaks>0?`<div class="trend-bar-wrap"><span class="trend-val" style="color:var(--amber)"><i class="ti ti-alert-triangle" style="font-size:10px"></i>${w.leaks} fuga(s)</span></div>`:''}
-          </div>
-        </div>`;
-      }).join('')}
-    </div>`;
+  const rows = wkKeys.map(function(wk,i){
+    const w=weeks[wk];
+    const avgMics=(w.mics/w.days).toFixed(1);
+    const avgVol=w.days?Math.round(w.vol/w.days):0;
+    const prev=wkKeys[i+1]?weeks[wkKeys[i+1]]:null;
+    const trend=prev?((w.mics/w.days)>(prev.mics/prev.days)?'up':'down'):'same';
+    const trendLabel=trend==='up'?'↑ más':'↓ menos';
+    const barMics=Math.round((w.mics/w.days/maxMics)*120);
+    const barVol=Math.round((w.vol/w.days/maxVol)*120);
+    const badgeClass=trend==='same'?'tb-same':trend==='up'?'tb-up':'tb-down';
+    const badgeHtml=i<wkKeys.length-1?('<span class="trend-badge '+badgeClass+'">'+trendLabel+'</span>'):'';
+    const leakHtml=w.leaks>0?('<div class="trend-bar-wrap"><span class="trend-val" style="color:var(--amber)"><i class="ti ti-alert-triangle" style="font-size:10px"></i>'+w.leaks+' fuga(s)</span></div>'):'';
+    return '<div class="trend-row">'
+      +'<div class="trend-date">'+wk+'</div>'
+      +'<div class="trend-bars">'
+      +'<div class="trend-bar-wrap">'
+      +'<div class="trend-bar" style="width:'+barMics+'px;background:var(--blue-act)"></div>'
+      +'<span class="trend-val">'+avgMics+' mic/día</span>'
+      +badgeHtml
+      +'</div>'
+      +'<div class="trend-bar-wrap">'
+      +'<div class="trend-bar" style="width:'+barVol+'px;background:var(--coral);opacity:.7"></div>'
+      +'<span class="trend-val">'+avgVol+'ml prom/día</span>'
+      +'</div>'
+      +leakHtml
+      +'</div></div>';
+  }).join('');
+  sec.innerHTML='<div class="trend-card">'
+    +'<div class="chart-lbl" style="margin-bottom:10px"><i class="ti ti-trending-up" style="font-size:14px;color:var(--blue-act)"></i>Tendencia semanal</div>'
+    +rows
+    +'</div>';
 }
 
 function getWeekLabel(dateStr){
@@ -1562,21 +1564,30 @@ function renderProfile(){
   if(!patient) return;
   const gLabel=patient.genero==='m'?'Masculino':patient.genero==='f'?'Femenino':'—';
   const initials=(patient.nombre||'P').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  document.getElementById('profileView').innerHTML=`
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:1.25rem">
-      <div class="profile-avatar">${initials}</div>
-      <div>
-        <div style="font-size:1rem;font-weight:600">${patient.nombre||'—'}</div>
-        <div style="font-size:12px;color:var(--text2)">${patient.diagnostico||''}</div>
-        ${patient.accessCode?`<div style="font-size:11px;color:var(--text3);margin-top:2px;font-family:'Inter',monospace;font-weight:600;color:var(--blue-act)">${patient.accessCode}</div>`:(patient.status==='pending'?`<div style="font-size:11px;color:var(--amber);margin-top:2px;display:flex;align-items:center;gap:4px"><i class="ti ti-clock"></i>Pendiente de validación médica</div>`:'')}
-      </div>
-    </div>
-    ${[['Fecha de nac.',patient.fechaNac],['Género',gLabel],['Teléfono',patient.telefono],['Email',patient.email],['Médico',patient.medicoTratante],['Desde',patient.fechaInicio]].filter(([,v])=>v).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--text2)">${k}</span><span style="font-weight:500">${v}</span></div>`).join('')}
-    <div style="margin-top:12px;padding:10px;background:var(--bg);border-radius:8px;font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px">
-      <i class="ti ti-lock" style="font-size:13px"></i>
-      Consentimiento: ${JSON.parse(localStorage.getItem('curg_consent')||'{}').date?.slice(0,10)||'—'} ·
-      <span style="text-decoration:underline;cursor:pointer;color:var(--coral)" onclick="revokeConsent()">Revocar</span>
-    </div>`;
+  const codeDiv = patient.accessCode
+    ? ('<div style="font-size:11px;color:var(--text3);margin-top:2px;font-family:\'Inter\',monospace;font-weight:600;color:var(--blue-act)">'+patient.accessCode+'</div>')
+    : (patient.status==='pending'
+      ? '<div style="font-size:11px;color:var(--amber);margin-top:2px;display:flex;align-items:center;gap:4px"><i class="ti ti-clock"></i>Pendiente de validación médica</div>'
+      : '');
+  const fieldsHtml = [['Fecha de nac.',patient.fechaNac],['Género',gLabel],['Teléfono',patient.telefono],['Email',patient.email],['Médico',patient.medicoTratante],['Desde',patient.fechaInicio]]
+    .filter(function(pair){ return pair[1]; })
+    .map(function(pair){ return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--text2)">'+pair[0]+'</span><span style="font-weight:500">'+pair[1]+'</span></div>'; })
+    .join('');
+  const consentDate = (JSON.parse(localStorage.getItem('curg_consent')||'{}').date||'—').slice(0,10);
+  document.getElementById('profileView').innerHTML=
+    '<div style="display:flex;align-items:center;gap:14px;margin-bottom:1.25rem">'
+    +'<div class="profile-avatar">'+initials+'</div>'
+    +'<div>'
+    +'<div style="font-size:1rem;font-weight:600">'+(patient.nombre||'—')+'</div>'
+    +'<div style="font-size:12px;color:var(--text2)">'+(patient.diagnostico||'')+'</div>'
+    +codeDiv
+    +'</div></div>'
+    +fieldsHtml
+    +'<div style="margin-top:12px;padding:10px;background:var(--bg);border-radius:8px;font-size:11px;color:var(--text3);display:flex;align-items:center;gap:5px">'
+    +'<i class="ti ti-lock" style="font-size:13px"></i>'
+    +' Consentimiento: '+consentDate+' · '
+    +'<span style="text-decoration:underline;cursor:pointer;color:var(--coral)" onclick="revokeConsent()">Revocar</span>'
+    +'</div>';
 }
 // Flush any queued calls that happened before module loaded
 if(window.__flushQueue) window.__flushQueue();
