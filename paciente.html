@@ -1057,11 +1057,51 @@ function enterApp(){
   document.getElementById('screen-onboard').classList.remove('active');
   document.getElementById('topbar').style.display='flex';
   document.getElementById('bottomNav').style.display='flex';
-  showScreen('main',document.querySelector('.nav-item'));
-  renderGreeting(); renderProfile(); loadSleep(); subscribeRecords();
-  updateStreak(); loadWb(); renderNotifToggles(); scheduleNotifs();
+  
+  const mode=patient?.mode||'diary';
+  
+  // Show/hide diary nav items based on mode
+  const diaryNav=document.querySelector('.nav-item[onclick*="main"]');
+  const analysisNav=document.querySelector('.nav-item[onclick*="analysis"]');
+  const progresoNav=document.querySelector('.nav-item[onclick*="progreso"]');
+  if(mode==='scales'){
+    // Solo escalas: hide diary and analysis nav
+    if(diaryNav) diaryNav.style.display='none';
+    if(analysisNav) analysisNav.style.display='none';
+    // Show scales nav always
+    const navScales=document.getElementById('navScales');
+    if(navScales) navScales.style.display='flex';
+    // Show progreso nav
+    const navProgreso=document.querySelector('.nav-item[onclick*="progreso"]');
+    if(navProgreso) navProgreso.style.display='flex';
+    // Start on escalas screen
+    showScreen('scales',navScales||document.querySelector('.nav-item'));
+  } else if(mode==='both'){
+    // Diario + Escalas: show everything
+    if(diaryNav) diaryNav.style.display='flex';
+    if(analysisNav) analysisNav.style.display='flex';
+    const navScales2=document.getElementById('navScales');
+    if(navScales2) navScales2.style.display='flex';
+    showScreen('main',diaryNav||document.querySelector('.nav-item'));
+    subscribeRecords();
+    loadSleep();
+    loadWb();
+  } else {
+    // Solo diario: hide scales nav unless pending
+    if(diaryNav) diaryNav.style.display='flex';
+    if(analysisNav) analysisNav.style.display='flex';
+    showScreen('main',diaryNav||document.querySelector('.nav-item'));
+    subscribeRecords();
+    loadSleep();
+    loadWb();
+  }
+  
+  renderGreeting(); renderProfile(); updateStreak();
+  renderNotifToggles(); scheduleNotifs();
   loadDoctorMessages();
   loadScalesForPatient();
+  // Pre-load profile data so it's ready when user opens profile tab
+  setTimeout(()=>{ loadPatientMedsView(); loadPatientAntsView(); }, 500);
 }
 
 // ── ONBOARD ──
@@ -1124,10 +1164,14 @@ window.logout=()=>{ if(unsub) unsub(); localStorage.removeItem('dm_patient'); pa
 window.showScreen=(name,el)=>{
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('screen-'+name).classList.add('active');
-  if(el) el.closest('.nav-item').classList.add('active');
+  const screenEl=document.getElementById('screen-'+name);
+  if(screenEl) screenEl.classList.add('active');
+  if(el){
+    const navItem=el.classList?.contains('nav-item')?el:el.closest?.('.nav-item');
+    if(navItem){ navItem.style.display='flex'; navItem.classList.add('active'); }
+  }
   if(name==='analysis') renderAnalysis();
-  if(name==='profile'){ renderProfile(); renderNotifToggles(); }
+  if(name==='profile'){ renderProfile(); renderNotifToggles(); loadPatientMedsView(); loadPatientAntsView(); }
   if(name==='messages') loadDoctorMessages();
   if(name==='scales') loadScalesForPatient();
   if(name==='progreso') loadMiProgreso();
@@ -1296,7 +1340,10 @@ async function startMicAndChrono(){
   wrap.classList.add('calibrating');
   document.getElementById('chronoLabel').textContent='CALIBRANDO...';
   document.getElementById('chronoLabelIcon').className='ti ti-loader-2';
-  document.getElementById('chronoState').textContent='Midiendo ruido ambiente (2 seg)...';
+  document.getElementById('chronoState').textContent='Midiendo ruido ambiente (3 seg)...';
+  document.getElementById('chronoDisplay').textContent='3';
+  let _cc=3;
+  const _cInterval=setInterval(()=>{ _cc--; if(_cc>0) document.getElementById('chronoDisplay').textContent=String(_cc); else clearInterval(_cInterval); },1000);
   startWaveAnim();
   const ci=setInterval(()=>calibSamples.push(getDB()),100);
   setTimeout(()=>{
@@ -2112,7 +2159,10 @@ async function startFillScales(requestId){
   const scales=currentRequest.scales||[];
   document.getElementById('scaleProgressDots').innerHTML=scales.map((_,i)=>`<div class="scale-prog-dot ${i===0?'active':''}" id="scaleDot${i}"></div>`).join('');
   
-  showScreen('scales',document.getElementById('navScales'));
+  // Ensure scales nav is visible
+  const nsEl=document.getElementById('navScales');
+  if(nsEl) nsEl.style.display='flex';
+  showScreen('scales',nsEl);
   document.getElementById('scalesHomeView').style.display='none';
   document.getElementById('scalesFillView').style.display='block';
   
@@ -2279,7 +2329,13 @@ async function submitScaleResults(){
 
 // ── PATIENT MEDS VIEW ──
 async function loadPatientMedsView(){
-  const el=document.getElementById('patMedsView'); if(!el||!patient?.id) return;
+  const el=document.getElementById('patMedsView');
+  if(!el) return;
+  // Re-read patient from localStorage in case it was updated
+  if(!patient?.id){
+    const cached=JSON.parse(localStorage.getItem('dm_patient')||'null');
+    if(cached?.id) patient=cached; else { el.innerHTML='<p style="font-size:12px;color:var(--text2)">Conecta con tu médico para ver esta información.</p>'; return; }
+  }
   try{
     const snap=await getDocs(collection(db,'patients',patient.id,'medications'));
     const meds=snap.docs.map(d=>({id:d.id,...d.data()})).filter(m=>m.activo!==false);
@@ -2292,7 +2348,12 @@ async function loadPatientMedsView(){
 }
 
 async function loadPatientAntsView(){
-  const el=document.getElementById('patAntView'); if(!el||!patient?.id) return;
+  const el=document.getElementById('patAntView');
+  if(!el) return;
+  if(!patient?.id){
+    const cached=JSON.parse(localStorage.getItem('dm_patient')||'null');
+    if(cached?.id) patient=cached; else { el.innerHTML='<p style="font-size:12px;color:var(--text2)">Conecta con tu médico para ver esta información.</p>'; return; }
+  }
   try{
     // Use cached patient data first, then fetch to get latest
     const ants=patient.antecedentes||[];
