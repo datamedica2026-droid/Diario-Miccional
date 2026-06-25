@@ -310,6 +310,45 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .trend-arrow-same{color:var(--text3);}
 .activate-scale-btn{background:var(--blue-act);border:none;color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit;}
 
+/* ── CLINICAL TIMELINE ── */
+.timeline{position:relative;padding-left:24px;}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border);}
+.tl-event{position:relative;margin-bottom:14px;}
+.tl-dot{position:absolute;left:-20px;width:12px;height:12px;border-radius:50%;border:2px solid var(--bg);top:3px;}
+.tl-dot-med{background:var(--blue-act);}
+.tl-dot-surgery{background:var(--coral);}
+.tl-dot-scale{background:var(--green);}
+.tl-dot-disc{background:var(--text3);}
+.tl-dot-alert{background:var(--amber);}
+.tl-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;}
+.tl-date{font-size:10px;color:var(--text3);font-family:'Inter',monospace;margin-bottom:2px;}
+.tl-title{font-size:13px;font-weight:600;}
+.tl-sub{font-size:11px;color:var(--text2);margin-top:2px;}
+.tl-delta{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;margin-top:4px;}
+.tl-better{background:var(--green-dim);color:var(--green);}
+.tl-worse{background:var(--red-dim);color:var(--red);}
+.tl-same{background:var(--card);color:var(--text3);border:1px solid var(--border);}
+.global-score{display:flex;align-items:center;gap:12px;background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1rem;}
+.global-score-circle{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;flex-shrink:0;}
+.gs-improve{background:var(--green-dim);color:var(--green);border:2px solid var(--green);}
+.gs-stable{background:var(--amber-dim);color:var(--amber);border:2px solid var(--amber);}
+.gs-worse{background:var(--red-dim);color:var(--red);border:2px solid var(--red);}
+.gs-neutral{background:var(--card);color:var(--text2);border:2px solid var(--border);}
+.smart-alert{background:var(--amber-dim);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12px;color:var(--amber);margin-bottom:8px;display:flex;align-items:flex-start;gap:8px;}
+.smart-alert i{font-size:14px;flex-shrink:0;margin-top:1px;}
+.event-form{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:12px;}
+
+/* ── HISTORIA CLÍNICA ── */
+.hc-modal{max-width:700px;}
+.hc-field{margin-bottom:.875rem;}
+.hc-field label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px;}
+.hc-field textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--text);font-family:inherit;resize:vertical;min-height:60px;}
+.hc-field textarea:focus{outline:none;border-color:var(--blue-act);}
+.hc-output{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:1rem;font-size:12px;font-family:'Courier New',monospace;white-space:pre-wrap;line-height:1.6;max-height:400px;overflow-y:auto;color:var(--text);}
+.copy-btn{background:var(--green);border:none;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;transition:all .15s;}
+.copy-btn:active{transform:scale(.97);}
+.copy-success{background:var(--blue-act);}
+
 /* ── COMPARATIVE ── */
 .comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:1rem;}
 .comp-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:.875rem;}
@@ -531,7 +570,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="sidebar-filters">
         <select id="fClinica" onchange="filterPats()"><option value="">Todas las clínicas</option></select>
         <select id="fYear" onchange="filterPats()"><option value="">Todos los años</option></select>
-        <input type="text" id="fSearch" placeholder="Buscar paciente..." oninput="filterPats()">
+        <input type="text" id="fSearch" placeholder="Buscar por nombre..." oninput="filterPats()">
+        <input type="text" id="fCode" placeholder="Buscar por código (XXXX-XXXX)..." oninput="filterPats()" style="text-transform:uppercase;letter-spacing:.05em">
       </div>
       <div class="sidebar-list" id="patList">
         <div class="empty"><i class="ti ti-user-circle"></i><p style="font-size:12px">Sin pacientes</p></div>
@@ -683,109 +723,113 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <!-- MODAL NUEVO PACIENTE -->
 <div class="modal-overlay" id="modalNewPat">
-  <div class="modal">
+  <div class="modal" style="max-width:600px">
     <div class="modal-title"><i class="ti ti-user-plus"></i>Nuevo paciente</div>
-    <div class="form-row">
-      <div class="form-group"><label>Nombre completo *</label><input type="text" id="npN" placeholder="María López"></div>
-      <div class="form-group"><label>Fecha de nacimiento</label><input type="date" id="npFN"></div>
+    <div style="display:flex;gap:4px;margin-bottom:1.25rem">
+      <div style="flex:1;height:4px;border-radius:2px;background:var(--blue-act)" id="npStep1bar"></div>
+      <div style="flex:1;height:4px;border-radius:2px;background:var(--border)" id="npStep2bar"></div>
+      <div style="flex:1;height:4px;border-radius:2px;background:var(--border)" id="npStep3bar"></div>
+      <div style="flex:1;height:4px;border-radius:2px;background:var(--border)" id="npStep4bar"></div>
     </div>
-    <div class="form-row">
-      <div class="form-group"><label>Género</label><select id="npG"><option value="">—</option><option value="f">Femenino</option><option value="m">Masculino</option><option value="o">Otro</option></select></div>
-      <div class="form-group"><label>Año inicio seguimiento *</label><input type="number" id="npY" min="2020" max="2099"></div>
+    <!-- STEP 1 -->
+    <div id="npStepBasic">
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:1rem"><i class="ti ti-user" style="color:var(--blue-act)"></i> Paso 1 de 4 — Datos del paciente</div>
+      <div class="form-row">
+        <div class="form-group"><label>Nombre completo *</label><input type="text" id="npN" placeholder="María López"></div>
+        <div class="form-group"><label>Fecha de nacimiento</label><input type="date" id="npFN"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Género</label><select id="npG"><option value="">—</option><option value="f">Femenino</option><option value="m">Masculino</option><option value="o">Otro</option></select></div>
+        <div class="form-group"><label>Año inicio *</label><input type="number" id="npY" min="2020" max="2099"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Clínica *</label><select id="npC"><option value="">Selecciona clínica...</option></select></div>
+        <div class="form-group"><label>Teléfono</label><input type="tel" id="npT" placeholder="+57 300..."></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Email</label><input type="email" id="npE" placeholder="paciente@email.com"></div>
+        <div class="form-group"><label>Diagnóstico principal</label><input type="text" id="npD" placeholder="STUI, OAB..."></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Médico tratante</label><input type="text" id="npM"></div>
+        <div class="form-group"><label>Notas iniciales</label><input type="text" id="npNo" placeholder="Observaciones..."></div>
+      </div>
     </div>
-    <div class="form-group"><label>Clínica / Institución *</label><select id="npC"><option value="">Selecciona clínica...</option></select></div>
-    <div class="form-row">
-      <div class="form-group"><label>Teléfono</label><input type="tel" id="npT" placeholder="+57 300 000 0000"></div>
-      <div class="form-group"><label>Email del paciente</label><input type="email" id="npE"></div>
-    </div>
-    <div class="form-group"><label>Diagnóstico principal</label><input type="text" id="npD" placeholder="Vejiga hiperactiva..."></div>
-    <div class="form-group"><label>Médico tratante</label><input type="text" id="npM"></div>
-    <div class="form-group"><label>Notas iniciales</label><textarea id="npNo" rows="2" placeholder="Observaciones iniciales..."></textarea></div>
-    </div><!-- end npStepBasic -->
-
-    <!-- STEP 2: Modo y escalas -->
+    <!-- STEP 2 -->
     <div id="npStepMode" style="display:none">
-      <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:1rem;display:flex;align-items:center;gap:6px"><i class="ti ti-adjustments" style="color:var(--blue-act)"></i>Paso 2 de 4 — Modo de seguimiento</div>
-      <div class="form-group"><label>Tipo de seguimiento *</label></div>
-      <div class="mode-selector" id="npModeSelector">
-        <div class="mode-card selected" onclick="selectMode('diary',this)">
-          <i class="ti ti-clipboard-list"></i>
-          <div class="mode-card-label">Solo Diario</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:3px">Diario miccional completo</div>
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:1rem"><i class="ti ti-adjustments" style="color:var(--blue-act)"></i> Paso 2 de 4 — Modo de seguimiento</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem">
+        <div id="modeCardDiary" onclick="selectMode('diary',this)" style="border:2px solid var(--blue-act);border-radius:10px;padding:12px;cursor:pointer;text-align:center;background:var(--blue-light)">
+          <i class="ti ti-clipboard-list" style="font-size:22px;display:block;margin-bottom:6px;color:var(--blue-act)"></i>
+          <div style="font-size:12px;font-weight:600;color:var(--blue-act)">Solo Diario</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">Diario miccional</div>
         </div>
-        <div class="mode-card" onclick="selectMode('scales',this)">
-          <i class="ti ti-chart-bar"></i>
-          <div class="mode-card-label">Solo Escalas</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:3px">Escalas sin diario</div>
+        <div id="modeCardScales" onclick="selectMode('scales',this)" style="border:2px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;text-align:center">
+          <i class="ti ti-chart-bar" style="font-size:22px;display:block;margin-bottom:6px;color:var(--text3)"></i>
+          <div style="font-size:12px;font-weight:600;color:var(--text2)">Solo Escalas</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">Sin diario miccional</div>
         </div>
-        <div class="mode-card" onclick="selectMode('both',this)">
-          <i class="ti ti-layout-grid"></i>
-          <div class="mode-card-label">Diario + Escalas</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:3px">Seguimiento completo</div>
+        <div id="modeCardBoth" onclick="selectMode('both',this)" style="border:2px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;text-align:center">
+          <i class="ti ti-layout-grid" style="font-size:22px;display:block;margin-bottom:6px;color:var(--text3)"></i>
+          <div style="font-size:12px;font-weight:600;color:var(--text2)">Diario + Escalas</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">Seguimiento completo</div>
         </div>
       </div>
       <div id="npScalesSection">
-        <div class="form-group" style="margin-top:1rem"><label>Escalas a aplicar</label></div>
-        <div id="npScalesList">
-          ${renderScaleCheckboxes()}
-        </div>
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px">Escalas a aplicar (selecciona todas las que apliquen)</div>
+        <div id="npScalesList"></div>
       </div>
-    </div><!-- end npStepMode -->
-
-    <!-- STEP 3: Antecedentes -->
+    </div>
+    <!-- STEP 3 -->
     <div id="npStepAnt" style="display:none">
-      <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:1rem;display:flex;align-items:center;gap:6px"><i class="ti ti-notes-medical" style="color:var(--blue-act)"></i>Paso 3 de 4 — Antecedentes urológicos</div>
-      <div class="ant-section">
-        <div class="ant-section-title">Comorbilidades</div>
-        <div class="ant-chips" id="antComorbilidades">
-          ${['Diabetes Mellitus','Hipertensión','Dislipidemia','Enfermedad Coronaria','Cáncer','Obesidad','EPOC','IRC','Depresión'].map(a=>`<div class="ant-chip" onclick="toggleAntChip(this)">${a}</div>`).join('')}
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:1rem"><i class="ti ti-notes-medical" style="color:var(--blue-act)"></i> Paso 3 de 4 — Antecedentes urológicos</div>
+      <div style="margin-bottom:.75rem">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Comorbilidades</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px" id="antComorbilidades">
+          <div class="ant-chip" onclick="this.classList.toggle('selected')">Diabetes Mellitus</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Hipertensión</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Dislipidemia</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Enf. Coronaria</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Cáncer</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Obesidad</div><div class="ant-chip" onclick="this.classList.toggle('selected')">EPOC</div><div class="ant-chip" onclick="this.classList.toggle('selected')">IRC</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Depresión</div>
         </div>
       </div>
-      <div class="ant-section">
-        <div class="ant-section-title">Exposiciones</div>
-        <div class="ant-chips" id="antExposiciones">
-          ${['Radiación pélvica','Braquiterapia','Tabaquismo activo','Ant. tabaquismo','Trauma perineal','Alcohol'].map(a=>`<div class="ant-chip" onclick="toggleAntChip(this)">${a}</div>`).join('')}
+      <div style="margin-bottom:.75rem">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Exposiciones</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px" id="antExposiciones">
+          <div class="ant-chip" onclick="this.classList.toggle('selected')">Radiación pélvica</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Braquiterapia</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Tabaquismo activo</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Ant. tabaquismo</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Trauma perineal</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Alcohol</div>
         </div>
       </div>
-      <div class="ant-section">
-        <div class="ant-section-title">Antecedentes urológicos</div>
-        <div class="ant-chips" id="antUrologicos">
-          ${['RTU Próstata','Adenomectomía retro','Adenomectomía trans','Prostatectomía radical','Uretroplastia','Cistostomía','Bacteriuria asintomática','Cálculos renales','Cistitis recurrente','Incontinencia previa','Cirugía piso pélvico'].map(a=>`<div class="ant-chip" onclick="toggleAntChip(this)">${a}</div>`).join('')}
+      <div style="margin-bottom:.75rem">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Antecedentes urológicos</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px" id="antUrologicos">
+          <div class="ant-chip" onclick="this.classList.toggle('selected')">RTU Próstata</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Adenomectomía retro</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Adenomectomía trans</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Prostatectomía radical</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Uretroplastia</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Cistostomía</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Bacteriuria asintomática</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Cálculos renales</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Cistitis recurrente</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Incontinencia previa</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Cirugía piso pélvico</div>
         </div>
       </div>
-      <div class="ant-section">
-        <div class="ant-section-title">Antecedentes quirúrgicos generales</div>
-        <div class="ant-chips" id="antQuirurgicos">
-          ${['Cirugía abdominal previa','Cirugía pélvica','Hernia inguinal','Apendicectomía','Colostomía'].map(a=>`<div class="ant-chip" onclick="toggleAntChip(this)">${a}</div>`).join('')}
+      <div style="margin-bottom:.75rem">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Quirúrgicos generales</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px" id="antQuirurgicos">
+          <div class="ant-chip" onclick="this.classList.toggle('selected')">Cirugía abdominal previa</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Cirugía pélvica</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Hernia inguinal</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Apendicectomía</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Colostomía</div>
         </div>
       </div>
-      <div class="form-group" style="margin-top:10px">
-        <label>Otros antecedentes relevantes</label>
-        <textarea id="npAntOtros" rows="2" placeholder="Antecedentes familiares, alergias, otras condiciones..."></textarea>
-      </div>
-    </div><!-- end npStepAnt -->
-
-    <!-- STEP 4: Medicamentos -->
+      <div class="form-group"><label>Otros antecedentes (alergias, familiares...)</label><textarea id="npAntOtros" rows="2" placeholder="Antecedentes familiares, alergias, otras condiciones..."></textarea></div>
+    </div>
+    <!-- STEP 4 -->
     <div id="npStepMeds" style="display:none">
-      <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:1rem;display:flex;align-items:center;gap:6px"><i class="ti ti-pill" style="color:var(--blue-act)"></i>Paso 4 de 4 — Medicamentos actuales</div>
-      <div id="npMedsList" style="margin-bottom:12px"></div>
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:12px">
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:1rem"><i class="ti ti-pill" style="color:var(--blue-act)"></i> Paso 4 de 4 — Medicamentos actuales</div>
+      <div id="npMedsList" style="margin-bottom:12px"><p style="font-size:12px;color:var(--text2)">Sin medicamentos agregados. Puedes continuar sin agregar.</p></div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px">
         <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px">Agregar medicamento</div>
         <div class="form-row">
           <div class="form-group" style="margin:0"><label>Nombre *</label><input type="text" id="medNombre" placeholder="Solifenacina 5mg"></div>
           <div class="form-group" style="margin:0"><label>Dosis</label><input type="text" id="medDosis" placeholder="5mg"></div>
         </div>
         <div class="form-row" style="margin-top:8px">
-          <div class="form-group" style="margin:0"><label>Frecuencia</label><select id="medFrec"><option>Cada 24h (una vez/día)</option><option>Cada 12h (dos veces/día)</option><option>Cada 8h (tres veces/día)</option><option>Cada 6h (cuatro veces/día)</option><option>Solo en la noche</option><option>Solo en la mañana</option><option>Según necesidad</option></select></div>
+          <div class="form-group" style="margin:0"><label>Frecuencia</label><select id="medFrec"><option>Cada 24h (una vez/día)</option><option>Cada 12h (dos veces/día)</option><option>Cada 8h (tres veces/día)</option><option>Solo en la noche</option><option>Solo en la mañana</option><option>Según necesidad</option></select></div>
           <div class="form-group" style="margin:0"><label>Tipo</label><select id="medTipo"><option value="uro">Urológico</option><option value="comorbilidad">Comorbilidad</option><option value="otro">Otro</option></select></div>
         </div>
         <div class="form-row" style="margin-top:8px">
           <div class="form-group" style="margin:0"><label>Fecha inicio</label><input type="date" id="medFechaInicio"></div>
-          <div class="form-group" style="margin:0"><label>Prescrito por (opcional)</label><input type="text" id="medPrescriptor" placeholder="Dr. García"></div>
+          <div class="form-group" style="margin:0"><label>Prescriptor (opcional)</label><input type="text" id="medPrescriptor" placeholder="Dr. García"></div>
         </div>
-        <button class="btn btn-green btn-sm" onclick="addMedToList()" style="margin-top:10px;width:100%;justify-content:center"><i class="ti ti-plus"></i>Agregar medicamento</button>
+        <button class="btn btn-green btn-sm" onclick="addMedToList()" style="margin-top:10px;width:100%;justify-content:center"><i class="ti ti-plus"></i>Agregar a la lista</button>
       </div>
-    </div><!-- end npStepMeds -->
+    </div>
 
     <div id="npErr" class="msg-err" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
     <div class="modal-footer">
@@ -883,6 +927,53 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="form-group"><label>Diagnóstico</label><input type="text" id="enpD"></div>
     <div class="form-group"><label>Médico tratante</label><input type="text" id="enpM"></div>
     <div class="form-group"><label>Notas iniciales</label><textarea id="enpNo" rows="2"></textarea></div>
+
+    <!-- Modo de seguimiento -->
+    <div class="form-group">
+      <label>Modo de seguimiento</label>
+      <select id="enpMode" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;color:var(--text);font-family:inherit">
+        <option value="diary">Solo Diario miccional</option>
+        <option value="scales">Solo Escalas</option>
+        <option value="both">Diario + Escalas</option>
+      </select>
+    </div>
+
+    <!-- Escalas asignadas -->
+    <div class="form-group" id="enpScalesGroup">
+      <label>Escalas asignadas</label>
+      <div id="enpScalesList" style="display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto;padding:4px 0"></div>
+    </div>
+
+    <!-- Antecedentes -->
+    <div class="form-group">
+      <label>Antecedentes</label>
+      <div style="margin-bottom:.5rem">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Comorbilidades</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px" id="enpAntComorbilidades">
+          <div class="ant-chip" onclick="this.classList.toggle('selected')">Diabetes Mellitus</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Hipertensión</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Dislipidemia</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Enf. Coronaria</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Cáncer</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Obesidad</div><div class="ant-chip" onclick="this.classList.toggle('selected')">EPOC</div><div class="ant-chip" onclick="this.classList.toggle('selected')">IRC</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Depresión</div>
+        </div>
+      </div>
+      <div style="margin-bottom:.5rem">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Exposiciones</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px" id="enpAntExposiciones">
+          <div class="ant-chip" onclick="this.classList.toggle('selected')">Radiación pélvica</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Braquiterapia</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Tabaquismo activo</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Ant. tabaquismo</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Trauma perineal</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Alcohol</div>
+        </div>
+      </div>
+      <div style="margin-bottom:.5rem">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Antecedentes urológicos</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px" id="enpAntUrologicos">
+          <div class="ant-chip" onclick="this.classList.toggle('selected')">RTU Próstata</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Adenomectomía retro</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Adenomectomía trans</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Prostatectomía radical</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Uretroplastia</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Cistostomía</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Bacteriuria asintomática</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Cálculos renales</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Cistitis recurrente</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Incontinencia previa</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Cirugía piso pélvico</div>
+        </div>
+      </div>
+      <div style="margin-bottom:.5rem">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Quirúrgicos generales</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px" id="enpAntQuirurgicos">
+          <div class="ant-chip" onclick="this.classList.toggle('selected')">Cirugía abdominal previa</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Cirugía pélvica</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Hernia inguinal</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Apendicectomía</div><div class="ant-chip" onclick="this.classList.toggle('selected')">Colostomía</div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:6px;margin-bottom:0"><label>Otros antecedentes</label><textarea id="enpAntOtros" rows="2" placeholder="Antecedentes familiares, alergias..."></textarea></div>
+    </div>
+
     <div id="enpErr" class="msg-err" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
     <div class="modal-footer">
       <button class="btn" onclick="closeM('EditPat')"><i class="ti ti-x"></i>Cancelar</button>
@@ -974,6 +1065,39 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </div>
 
+<!-- MODAL HISTORIA CLÍNICA -->
+<div class="modal-overlay" id="modalHistoriaClinica">
+  <div class="modal hc-modal">
+    <div class="modal-title"><i class="ti ti-clipboard-text"></i>Nota para Historia Clínica</div>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:1rem">Completa los campos clínicos. El resumen se genera listo para copiar y pegar en la historia clínica del paciente.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="hc-field"><label>Motivo de consulta</label><textarea id="hcMotivo" placeholder="Síntomas principales por los que consulta..."></textarea></div>
+      <div class="hc-field"><label>Enfermedad actual</label><textarea id="hcEnfermedad" placeholder="Evolución cronológica de los síntomas..."></textarea></div>
+    </div>
+    <div class="hc-field"><label>Diagnóstico(s)</label><textarea id="hcDiagnostico" rows="2" placeholder="Diagnóstico principal y secundarios (CIE-10 si aplica)..."></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="hc-field"><label>Plan de manejo</label><textarea id="hcPlan" placeholder="Tratamiento, seguimiento, estudios solicitados..."></textarea></div>
+      <div class="hc-field"><label>Observaciones clínicas</label><textarea id="hcObservaciones" placeholder="Hallazgos al examen, notas adicionales..."></textarea></div>
+    </div>
+    <div class="hc-field"><label>Próxima cita / instrucciones al paciente</label><textarea id="hcSiguiente" rows="2" placeholder="Control en X semanas, instrucciones de cuidado..."></textarea></div>
+
+    <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="generarNotaHC()"><i class="ti ti-wand"></i>Generar nota</button>
+      <button class="btn btn-sm" onclick="closeM('HistoriaClinica')"><i class="ti ti-x"></i>Cancelar</button>
+    </div>
+
+    <div id="hcOutputSection" style="display:none">
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Nota generada — lista para copiar</div>
+      <div class="hc-output" id="hcOutput"></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="copy-btn" id="hcCopyBtn" onclick="copiarNotaHC()"><i class="ti ti-copy"></i>Copiar nota completa</button>
+        <button class="btn btn-sm" onclick="generarNotaHC()"><i class="ti ti-refresh"></i>Regenerar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- PRINT AREA -->
 <div id="printArea" style="display:none"></div>
 
@@ -1049,10 +1173,11 @@ function buildCharts(mics,drks,wbMap,sleepMap){
 
 window.ptab=(el,id)=>{
   el.closest('.ptabs').querySelectorAll('.ptab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
-  ['pd-diary','pd-charts','pd-acoustic','pd-notes','pd-profile'].forEach(n=>{ const e=document.getElementById(n); if(e) e.style.display=n===id?'block':'none'; });
+  ['pd-diary','pd-charts','pd-acoustic','pd-scales','pd-meds','pd-timeline','pd-notes','pd-profile'].forEach(n=>{
+    const e=document.getElementById(n); if(e) e.style.display=n===id?'block':'none';
+  });
   if(id==='pd-charts'){
     destroyCharts();
-    // Rebuild charts from cached data without reloading entire patient view
     setTimeout(async()=>{
       if(!selPatId) return;
       const [rSnap,slSnap,wbSnap]=await Promise.all([
@@ -1063,11 +1188,13 @@ window.ptab=(el,id)=>{
       const recs=rSnap.docs.map(d=>({id:d.id,...d.data()}));
       const sleepMap={}; slSnap.docs.forEach(d=>{sleepMap[d.id]=d.data();});
       const wbMap={}; wbSnap.docs.forEach(d=>{wbMap[d.id]=d.data();});
-      const mics=recs.filter(r=>r.type==='miction');
-      const drks=recs.filter(r=>r.type==='drink');
-      buildCharts(mics,drks,wbMap,sleepMap);
+      buildCharts(recs.filter(r=>r.type==='miction'),recs.filter(r=>r.type==='drink'),wbMap,sleepMap);
     },50);
   }
+  if(id==='pd-scales'&&selPatId){ const p=patsCache[selPatId]; if(p) loadPatScales(selPatId,p); }
+  if(id==='pd-meds'&&selPatId) loadPatMeds(selPatId);
+  if(id==='pd-profile'&&selPatId) loadPatMeds(selPatId,true);
+  if(id==='pd-timeline'&&selPatId){ const p=patsCache[selPatId]; if(p) loadClinicalTimeline(selPatId,p); }
 };
 
 // ── AUTH + PATIENT SYSTEM ──
@@ -1167,12 +1294,15 @@ window.filterPats=()=>{
   const cl=document.getElementById('fClinica')?.value||'';
   const yr=document.getElementById('fYear')?.value||'';
   const s=(document.getElementById('fSearch')?.value||'').toLowerCase();
+  const code=(document.getElementById('fCode')?.value||'').toUpperCase().trim();
   let pats=Object.values(patsCache);
   if(cl) pats=pats.filter(p=>p.clinica===cl);
   if(yr) pats=pats.filter(p=>String(p.yearInicio)===String(yr));
-  if(s) pats=pats.filter(p=>(p.nombre||'').toLowerCase().includes(s));
+  if(s) pats=pats.filter(p=>(p.nombre||'').toLowerCase().includes(s)||(p.email||'').toLowerCase().includes(s)||(p.diagnostico||'').toLowerCase().includes(s));
+  if(code) pats=pats.filter(p=>(p.accessCode||'').includes(code));
   pats.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
   renderPatList(pats);
+  checkInactivityOnLoad();
 };
 
 function getPatStatus(p){ if(!p.lastRecord) return 'dot-gray'; const d=(Date.now()-p.lastRecord)/86400000; return d<1?'dot-green':d<3?'dot-amber':'dot-red'; }
@@ -1197,14 +1327,29 @@ function renderPatList(pats){
 window.selectPat=async(id)=>{
   selPatId=id; filterPats();
   const p=patsCache[id]; if(!p) return;
-  const [rSnap,slSnap,wbSnap]=await Promise.all([
+  const [rSnap,slSnap,wbSnap,medSnap,scaleReqSnap,scaleResSnap]=await Promise.all([
     getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc'))),
     getDocs(collection(db,'patients',id,'sleep')),
-    getDocs(collection(db,'patients',id,'wellbeing'))
+    getDocs(collection(db,'patients',id,'wellbeing')),
+    getDocs(collection(db,'patients',id,'medications')),
+    getDocs(collection(db,'patients',id,'scaleRequests')),
+    getDocs(collection(db,'patients',id,'scaleResults'))
   ]);
+  const meds=medSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const scaleReqs=scaleReqSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const scaleRes=scaleResSnap.docs.map(d=>({id:d.id,...d.data()}));
   const recs=rSnap.docs.map(d=>({id:d.id,...d.data()}));
   const sleepMap={}; slSnap.docs.forEach(d=>{sleepMap[d.id]=d.data();});
   const wbMap={}; wbSnap.docs.forEach(d=>{wbMap[d.id]=d.data();});
+  // Load medications, scales
+  const [medSnap2,scaleReqSnap2,scaleResSnap2]=await Promise.all([
+    getDocs(collection(db,'patients',id,'medications')),
+    getDocs(collection(db,'patients',id,'scaleRequests')),
+    getDocs(collection(db,'patients',id,'scaleResults'))
+  ]);
+  const patMeds2=medSnap2.docs.map(d=>({id:d.id,...d.data()}));
+  const patScaleReqs=scaleReqSnap2.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.status==='completed').sort((a,b)=>(a.requestedAt?.seconds||0)-(b.requestedAt?.seconds||0));
+  const patScaleRes=scaleResSnap2.docs.map(d=>({id:d.id,...d.data()}));
   renderPatView(p,recs,sleepMap,wbMap);
 };
 
@@ -1323,6 +1468,7 @@ function renderPatView(p, recs, sleepMap, wbMap){
         <button class="btn btn-sm" onclick="openEditPat('${p.id}')"><i class="ti ti-pencil"></i>Editar</button>
         <button class="btn btn-sm btn-green" onclick="openNoteModal('${p.id}')"><i class="ti ti-notes"></i>Nota</button>
         <button class="btn btn-sm btn-primary" onclick="genFullReport('${p.id}')"><i class="ti ti-file-report"></i>Informe</button>
+        <button class="btn btn-sm" style="background:var(--purple-dim);color:var(--purple);border:1px solid var(--purple)" onclick="openHistoriaClinica('${p.id}')"><i class="ti ti-clipboard-text"></i>Historia clínica</button>
         <button class="btn btn-sm btn-amber" onclick="generateConsultCode('${p.id}')"><i class="ti ti-arrows-exchange"></i>Interconsulta</button>
         <button class="btn btn-sm btn-danger" onclick="confirmDeletePat('${p.id}','${(p.nombre||'').replace(/'/g,'&apos;')}')"><i class="ti ti-trash"></i>Eliminar</button>
       </div>
@@ -1347,6 +1493,7 @@ function renderPatView(p, recs, sleepMap, wbMap){
       <div class="ptab" onclick="ptab(this,'pd-acoustic')"><i class="ti ti-microphone"></i>Acústico</div>
       <div class="ptab" onclick="ptab(this,'pd-scales')"><i class="ti ti-chart-bar-off"></i>Escalas</div>
       <div class="ptab" onclick="ptab(this,'pd-meds')"><i class="ti ti-pill"></i>Medicamentos</div>
+      <div class="ptab" onclick="ptab(this,'pd-timeline')"><i class="ti ti-timeline"></i>Evolución</div>
       <div class="ptab" onclick="ptab(this,'pd-notes')"><i class="ti ti-notes"></i>Notas</div>
       <div class="ptab" onclick="ptab(this,'pd-profile')"><i class="ti ti-user-circle"></i>Perfil</div>
     </div>
@@ -1385,6 +1532,12 @@ function renderPatView(p, recs, sleepMap, wbMap){
       </div>
     </div>
 
+    <div id="pd-timeline" style="display:none">
+      <div id="pd-timeline-content-${p.id}">
+        <div style="font-size:12px;color:var(--text2)">Cargando línea de tiempo...</div>
+      </div>
+    </div>
+
     <div id="pd-notes" style="display:none">
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
         <button class="btn btn-green" onclick="openNoteModal('${p.id}')"><i class="ti ti-plus"></i>Nota clínica</button>
@@ -1401,8 +1554,20 @@ function renderPatView(p, recs, sleepMap, wbMap){
     </div>
     <div id="pd-profile" style="display:none">
       <div class="card"><table style="width:100%;font-size:12px;border-collapse:collapse">
-        ${[['Nombre',p.nombre],['Fecha nac.',p.fechaNac],['Género',p.genero==='m'?'Masculino':p.genero==='f'?'Femenino':p.genero||'—'],['Edad',age?age+' años':'—'],['Teléfono',p.telefono],['Email',p.email],['Diagnóstico',p.diagnostico],['Médico',p.medicoTratante],['Clínica',p.clinica],['Año inicio',p.yearInicio],['Código',p.accessCode]].map(([k,v])=>`<tr><td style="padding:8px 0;color:var(--text2);width:40%">${k}</td><td style="padding:8px 0;font-weight:500">${v||'—'}</td></tr>`).join('')}
+        ${[['Nombre',p.nombre],['Fecha nac.',p.fechaNac],['Género',p.genero==='m'?'Masculino':p.genero==='f'?'Femenino':p.genero||'—'],['Edad',age?age+' años':'—'],['Teléfono',p.telefono],['Email',p.email],['Diagnóstico',p.diagnostico],['Médico tratante',p.medicoTratante],['Clínica',p.clinica],['Año inicio',p.yearInicio],['Modo',p.mode==='scales'?'Solo Escalas':p.mode==='both'?'Diario + Escalas':'Solo Diario'],['Código',p.accessCode]].map(([k,v])=>`<tr><td style="padding:8px 0;color:var(--text2);width:40%">${k}</td><td style="padding:8px 0;font-weight:500">${v||'—'}</td></tr>`).join('')}
       </table></div>
+      ${(p.antecedentes&&p.antecedentes.length)?`
+      <div class="card" style="margin-top:8px">
+        <div class="card-label"><i class="ti ti-notes-medical"></i>Antecedentes</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:${p.antOtros?'8px':'0'}">
+          ${(p.antecedentes||[]).map(a=>`<span style="padding:3px 10px;border-radius:20px;background:var(--blue-light);color:var(--blue-act);font-size:11px;font-weight:500">${a}</span>`).join('')}
+        </div>
+        ${p.antOtros?`<p style="font-size:12px;color:var(--text2);margin-top:4px">${p.antOtros}</p>`:''}
+      </div>`:''}
+      <div id="pd-meds-inline-${p.id}" style="margin-top:8px">
+        <div class="card-label" style="margin-bottom:8px;display:flex;align-items:center;justify-content:space-between"><span><i class="ti ti-pill"></i>Medicamentos</span><button class="btn btn-sm btn-green" onclick="openAddMedModal('${p.id}')"><i class="ti ti-plus"></i>Agregar</button></div>
+        <div id="pd-meds-profile-${p.id}"><div style="font-size:12px;color:var(--text2)">Cargando...</div></div>
+      </div>
     </div>
   `;
   setTimeout(()=>buildCharts(mics,drks,wbMap,sleepMap),150);
@@ -1426,7 +1591,51 @@ window.filterDiaryDate=(date,el)=>{
 
 
 // ── NEW PATIENT ──
-window.openNewPat=()=>{ document.getElementById('npN').value=''; document.getElementById('npFN').value=''; document.getElementById('npG').value=''; document.getElementById('npY').value=new Date().getFullYear(); document.getElementById('npC').value=''; document.getElementById('npT').value=''; document.getElementById('npE').value=''; document.getElementById('npD').value=''; document.getElementById('npM').value=curDocData?.nombre||''; document.getElementById('npNo').value=''; document.getElementById('npErr').style.display='none'; document.getElementById('modalNewPat').classList.add('open'); };
+window.openNewPat=()=>{
+  // Reset wizard state
+  npCurrentStep=1; npMode='diary'; npMeds=[];
+  // Show step 1, hide rest
+  ['npStepBasic','npStepMode','npStepAnt','npStepMeds'].forEach((id,i)=>{
+    const el=document.getElementById(id); if(el) el.style.display=i===0?'block':'none';
+  });
+  // Reset progress bars
+  ['npStep1bar','npStep2bar','npStep3bar','npStep4bar'].forEach((id,i)=>{
+    const el=document.getElementById(id); if(el) el.style.background=i===0?'var(--blue-act)':'var(--border)';
+  });
+  // Reset buttons
+  const prev=document.getElementById('npBtnPrev'); if(prev) prev.style.display='none';
+  const next=document.getElementById('npBtnNext'); if(next) next.style.display='';
+  const save=document.getElementById('npBtnSave'); if(save) save.style.display='none';
+  // Clear fields
+  ['npN','npFN','npT','npE','npD','npNo','npAntOtros'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const npG=document.getElementById('npG'); if(npG) npG.value='';
+  const npM=document.getElementById('npM'); if(npM) npM.value=curDocData?.nombre||'';
+  const npY=document.getElementById('npY'); if(npY) npY.value=new Date().getFullYear();
+  const npC=document.getElementById('npC'); if(npC) npC.value='';
+  // Reset mode cards
+  ['modeCardDiary','modeCardScales','modeCardBoth'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.style.border='2px solid var(--border)'; el.style.background=''; el.querySelectorAll('i,div').forEach(c=>{if(c.tagName==='I')c.style.color='var(--text3)';else if(c.style)c.style.color='var(--text2)';}); }
+  });
+  // Default diary mode selected
+  const diary=document.getElementById('modeCardDiary');
+  if(diary){ diary.style.border='2px solid var(--blue-act)'; diary.style.background='var(--blue-light)'; }
+  const npScalesSection=document.getElementById('npScalesSection');
+  if(npScalesSection) npScalesSection.style.display='none';
+  // Reset chips
+  document.querySelectorAll('.ant-chip').forEach(c=>c.classList.remove('selected'));
+  // Reset meds list
+  const npMedsList=document.getElementById('npMedsList');
+  if(npMedsList) npMedsList.innerHTML='<p style="font-size:12px;color:var(--text2)">Sin medicamentos agregados. Puedes continuar sin agregar.</p>';
+  // Reset err
+  const npErr=document.getElementById('npErr'); if(npErr) npErr.style.display='none';
+  // Populate clinicas
+  const npC2=document.getElementById('npC');
+  if(npC2){ npC2.innerHTML='<option value="">Selecciona clínica...</option>'; (curDocData?.clinicas||[]).forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;npC2.appendChild(o);}); }
+  // Refresh scale list
+  refreshScaleList();
+  document.getElementById('modalNewPat').classList.add('open');
+};
 window.closeM=(name)=>document.getElementById('modal'+name).classList.remove('open');
 
 window.saveNewPat=async()=>{
@@ -1509,19 +1718,52 @@ window.openEditPat=(id)=>{
   document.getElementById('enpD').value=p.diagnostico||'';
   document.getElementById('enpM').value=p.medicoTratante||'';
   document.getElementById('enpNo').value=p.notasIniciales||'';
+  // Populate clinica
+  const enpC=document.getElementById('enpC');
+  if(enpC){ enpC.innerHTML='<option value="">Selecciona...</option>'; (curDocData?.clinicas||[]).forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;if(c===p.clinica)o.selected=true;enpC.appendChild(o);}); }
+  // Mode
+  const enpMode=document.getElementById('enpMode');
+  if(enpMode) enpMode.value=p.mode||'diary';
+  // Toggle scales section
+  const sg=document.getElementById('enpScalesGroup');
+  if(sg) sg.style.display=(p.mode==='scales'||p.mode==='both')?'block':'none';
+  // Populate scales checkboxes
+  const sl=document.getElementById('enpScalesList');
+  if(sl) sl.innerHTML=SCALES_CATALOG.map(s=>`<label style="display:flex;align-items:flex-start;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--bg)">
+    <input type="checkbox" name="enpScale" value="${s.id}" ${(p.assignedScales||[]).includes(s.id)?'checked':''} style="width:14px;height:14px;accent-color:var(--blue-act);flex-shrink:0;margin-top:2px">
+    <div><div style="font-size:11px;font-weight:600">${s.name} — ${s.full}</div><div style="font-size:10px;color:var(--text2)">${s.desc}</div></div>
+  </label>`).join('');
+  // Antecedentes chips — reset then select
+  ['enpAntComorbilidades','enpAntExposiciones','enpAntUrologicos','enpAntQuirurgicos'].forEach(gid=>{
+    const g=document.getElementById(gid); if(!g) return;
+    g.querySelectorAll('.ant-chip').forEach(c=>{
+      c.classList.toggle('selected',(p.antecedentes||[]).includes(c.textContent.trim()));
+    });
+  });
+  const enpAntOtros=document.getElementById('enpAntOtros');
+  if(enpAntOtros) enpAntOtros.value=p.antOtros||'';
   document.getElementById('enpErr').style.display='none';
-  // Populate clinic select
-  const sel=document.getElementById('enpC');
-  sel.innerHTML='<option value="">Selecciona...</option>';
-  (curDocData?.clinicas||[]).forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;if(c===p.clinica)o.selected=true;sel.appendChild(o);});
   document.getElementById('modalEditPat').classList.add('open');
 };
+// Toggle scales section when mode changes in edit modal
+document.getElementById('enpMode')?.addEventListener('change',function(){
+  const sg=document.getElementById('enpScalesGroup');
+  if(sg) sg.style.display=(this.value==='scales'||this.value==='both')?'block':'none';
+});
 window.saveEditPat=async()=>{
   if(!editPatId) return;
   const err=document.getElementById('enpErr');
   const nombre=document.getElementById('enpNombre').value.trim();
   if(!nombre){err.querySelector('span').textContent='El nombre es obligatorio';err.style.display='flex';return;}
   try{
+    // Collect antecedentes from all chip groups
+    const ants=[];
+    ['enpAntComorbilidades','enpAntExposiciones','enpAntUrologicos','enpAntQuirurgicos'].forEach(gid=>{
+      const g=document.getElementById(gid); if(!g) return;
+      g.querySelectorAll('.ant-chip.selected').forEach(c=>ants.push(c.textContent.trim()));
+    });
+    const mode=document.getElementById('enpMode')?.value||'diary';
+    const assignedScales=[...document.querySelectorAll('input[name="enpScale"]:checked')].map(i=>i.value);
     const updates={
       nombre,
       fechaNac:document.getElementById('enpFN').value,
@@ -1532,11 +1774,13 @@ window.saveEditPat=async()=>{
       email:document.getElementById('enpE').value.trim(),
       diagnostico:document.getElementById('enpD').value.trim(),
       medicoTratante:document.getElementById('enpM').value.trim(),
-      notasIniciales:document.getElementById('enpNo').value.trim()
+      notasIniciales:document.getElementById('enpNo').value.trim(),
+      mode, assignedScales,
+      antecedentes:ants,
+      antOtros:document.getElementById('enpAntOtros')?.value.trim()||''
     };
     await updateDoc(doc(db,'patients',editPatId),updates);
     closeM('EditPat');
-    // Refresh patient view
     selectPat(editPatId);
   }catch(e){err.querySelector('span').textContent=e.message;err.style.display='flex';}
 };
@@ -1854,6 +2098,42 @@ window.genFullReport=async(id)=>{
   ${drks.sort((a,b)=>a.date.localeCompare(b.date)).map(r=>`
   <tr><td>${r.date}</td><td>${r.hora}</td><td>${r.tipo}</td><td>${r.vol||0} ml</td><td>${r.notas||'—'}</td></tr>`).join('')}
   </table>
+
+  ${(p.antecedentes&&p.antecedentes.length)?`<h2 style="font-size:13px;color:#042C53;margin:1.5rem 0 .5rem;border-bottom:2px solid #e2e8f0;padding-bottom:4px">Antecedentes urológicos</h2><div style="margin-bottom:8px">${(p.antecedentes||[]).map(a=>`<span style="display:inline-block;padding:2px 10px;border-radius:20px;background:#e6f1fb;color:#185FA5;font-size:11px;font-weight:500;margin:2px">${a}</span>`).join('')}</div>${p.antOtros?`<p style="font-size:12px;color:#4a5675">${p.antOtros}</p>`:''}`:''}
+
+  ${patMeds2.length?`<h2 style="font-size:13px;color:#042C53;margin:1.5rem 0 .5rem;border-bottom:2px solid #e2e8f0;padding-bottom:4px">Medicamentos</h2><table style="width:100%;border-collapse:collapse;margin-bottom:1rem;font-size:12px"><tr style="background:#f0f4f8"><th style="padding:6px 8px;text-align:left;border:1px solid #e2e8f0">Medicamento</th><th style="padding:6px;border:1px solid #e2e8f0">Dosis</th><th style="padding:6px;border:1px solid #e2e8f0">Frecuencia</th><th style="padding:6px;border:1px solid #e2e8f0">Tipo</th><th style="padding:6px;border:1px solid #e2e8f0">Desde</th><th style="padding:6px;border:1px solid #e2e8f0">Estado</th></tr>${patMeds2.map(m=>`<tr><td style="padding:6px 8px;border:1px solid #eee;font-weight:500">${m.nombre} ${m.dosis||''}</td><td style="padding:6px;border:1px solid #eee">${m.frecuencia||'—'}</td><td style="padding:6px;border:1px solid #eee">${m.tipo==='uro'?'Urológico':'Comorbilidad'}</td><td style="padding:6px;border:1px solid #eee">${m.fechaInicio||'—'}</td><td style="padding:6px;border:1px solid #eee">${m.activo===false?'<span style="color:#c62828">Discontinuado</span>':'<span style="color:#2e7d32">Activo</span>'}</td></tr>`).join('')}</table>`:''}
+
+  ${patScaleReqs.length?`<h2 style="font-size:13px;color:#042C53;margin:1.5rem 0 .5rem;border-bottom:2px solid #e2e8f0;padding-bottom:4px">Escalas clínicas — Seguimiento comparativo</h2><p style="font-size:11px;color:#64748b;margin-bottom:8px">ICS 2019, EAU Guidelines 2023.</p>${(p.assignedScales||[]).map(scaleId=>{const def=SCALES_CATALOG.find(s=>s.id===scaleId);if(!def)return '';const res=patScaleReqs.map(req=>{const r=patScaleRes.find(r=>r.requestId===req.id&&r.scaleId===scaleId);if(!r)return null;const t=r.scores?.reduce((a,b)=>a+b,0)||0;return {t,date:req.type==='baseline'?'Línea base':req.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'—',interp:def.scoring(r.scores)};}).filter(Boolean);if(!res.length)return '';const maxS=def.questions.reduce((a,q)=>a+(q.max||0),0);return `<div style="margin-bottom:10px;border:1px solid #e2e8f0;border-radius:8px;padding:10px"><div style="font-weight:600;font-size:12px;margin-bottom:6px">${def.name} — ${def.full}</div><table style="width:100%;border-collapse:collapse;font-size:11px"><tr style="background:#f0f4f8"><td style="padding:4px 8px;font-weight:600">Evaluación</td>${res.map(r=>`<td style="padding:4px 8px;text-align:center;font-weight:600">${r.date}</td>`).join('')}</tr><tr><td style="padding:4px 8px;color:#64748b">Score (/${maxS})</td>${res.map(r=>`<td style="padding:4px 8px;text-align:center;font-weight:700;font-family:monospace">${r.t}</td>`).join('')}</tr><tr><td style="padding:4px 8px;color:#64748b">Interpretación</td>${res.map(r=>`<td style="padding:4px 8px;text-align:center"><span style="padding:2px 6px;border-radius:8px;font-size:10px;font-weight:700;background:${r.interp.interpretation.includes('Leve')||r.interp.interpretation.includes('Normal')?'#e8f5e9;color:#2e7d32':r.interp.interpretation.includes('Moderado')?'#fff3e0;color:#e65100':'#ffebee;color:#c62828'}">${r.interp.interpretation}</span></td>`).join('')}</tr></table></div>`;}).join('')}`:''}
+
+  ${(()=>{
+    // Med-scale comparison for report
+    if(!patMeds2.length||!patScaleReqs.length||!(p.assignedScales?.length)) return '';
+    const comparisons=patMeds2.filter(m=>m.fechaInicio).map(m=>{
+      const before=patScaleReqs.filter(r=>{const d=r.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'';return d<m.fechaInicio;});
+      const after=patScaleReqs.filter(r=>{const d=r.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'';return d>=m.fechaInicio;});
+      if(!before.length||!after.length) return null;
+      const bReq=before[before.length-1],aReq=after[0];
+      const deltas=(p.assignedScales||[]).map(scaleId=>{
+        const def=SCALES_CATALOG.find(s=>s.id===scaleId);if(!def)return null;
+        const bR=patScaleRes.find(r=>r.requestId===bReq.id&&r.scaleId===scaleId);
+        const aR=patScaleRes.find(r=>r.requestId===aReq.id&&r.scaleId===scaleId);
+        if(!bR||!aR)return null;
+        const bT=bR.scores?.reduce((a,b)=>a+b,0)||0,aT=aR.scores?.reduce((a,b)=>a+b,0)||0;
+        return {name:def.name,before:bT,after:aT,delta:bT-aT};
+      }).filter(Boolean);
+      return deltas.length?{med:m,deltas}:null;
+    }).filter(Boolean);
+    if(!comparisons.length) return '';
+    return `<h2 style="font-size:13px;color:#042C53;margin:1.5rem 0 .5rem;border-bottom:2px solid #e2e8f0;padding-bottom:4px">Impacto de medicamentos en escalas clínicas</h2>
+    <p style="font-size:11px;color:#64748b;margin-bottom:8px">Comparación de scores antes y después de iniciar cada medicamento.</p>
+    ${comparisons.map(c=>`<div style="margin-bottom:10px;border:1px solid #e2e8f0;border-radius:8px;padding:10px">
+      <div style="font-weight:600;font-size:12px;margin-bottom:6px">${c.med.nombre} ${c.med.dosis||''} — desde ${c.med.fechaInicio}</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <tr style="background:#f0f4f8"><th style="padding:4px 8px">Escala</th><th style="padding:4px 8px;text-align:center">Antes</th><th style="padding:4px 8px;text-align:center">Después</th><th style="padding:4px 8px;text-align:center">Cambio</th><th style="padding:4px 8px;text-align:center">Impacto</th></tr>
+        ${c.deltas.map(d=>`<tr><td style="padding:4px 8px;font-weight:500">${d.name}</td><td style="padding:4px 8px;text-align:center;font-family:monospace">${d.before}</td><td style="padding:4px 8px;text-align:center;font-family:monospace">${d.after}</td><td style="padding:4px 8px;text-align:center;font-family:monospace;color:${d.delta>0?'#2e7d32':d.delta<0?'#c62828':'#64748b'};font-weight:700">${d.delta>0?'-'+d.delta:d.delta<0?'+'+Math.abs(d.delta):'0'}</td><td style="padding:4px 8px;text-align:center"><span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:${d.delta>0?'#e8f5e9;color:#2e7d32':d.delta<0?'#ffebee;color:#c62828':'#f0f4f8;color:#64748b'}">${d.delta>0?'Mejoría':d.delta<0?'Empeoramiento':'Sin cambio'}</span></td></tr>`).join('')}
+      </table>
+    </div>`).join('')}`;
+  })()}
 
   <div class="footer">
     Diario Miccional v2.0 · by <strong>InnoIA</strong> · verificado <strong>CURG</strong> (Colombian Urology Research Group)<br>
@@ -2343,8 +2623,18 @@ function renderScaleCheckboxes(selectedScales=[], gender=''){
 // Render scale checkboxes on modal open
 function refreshScaleList(){
   const el=document.getElementById('npScalesList');
+  if(!el) return;
   const gender=document.getElementById('npG')?.value||'';
-  if(el) el.innerHTML=renderScaleCheckboxes([],gender);
+  el.innerHTML=SCALES_CATALOG.map(s=>{
+    const compat=s.gender==='all'||!gender||s.gender===gender;
+    return `<label style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;background:var(--bg)">
+      <input type="checkbox" name="npScale" value="${s.id}" ${compat?'checked':''} style="width:16px;height:16px;accent-color:var(--blue-act);flex-shrink:0;margin-top:1px">
+      <div>
+        <div style="font-size:12px;font-weight:600">${s.name} — ${s.full}</div>
+        <div style="font-size:11px;color:var(--text2)">${s.desc}${!compat?' <span style="color:var(--amber)">(Verificar género)</span>':''}</div>
+      </div>
+    </label>`;
+  }).join('');
 }
 
 // ── WIZARD STEPS ──
@@ -2354,9 +2644,19 @@ let npMeds=[];
 
 window.selectMode=(mode,el)=>{
   npMode=mode;
-  document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-  document.getElementById('npScalesSection').style.display=mode==='diary'?'none':'block';
+  ['modeCardDiary','modeCardScales','modeCardBoth'].forEach(id=>{
+    const card=document.getElementById(id);
+    if(!card) return;
+    card.style.border='2px solid var(--border)';
+    card.style.background='';
+    card.querySelectorAll('i').forEach(i=>i.style.color='var(--text3)');
+    card.querySelectorAll('div').forEach(d=>{if(d.style) d.style.color='var(--text2)';});
+  });
+  el.style.border='2px solid var(--blue-act)';
+  el.style.background='var(--blue-light)';
+  el.querySelectorAll('i').forEach(i=>i.style.color='var(--blue-act)');
+  const sec=document.getElementById('npScalesSection');
+  if(sec) sec.style.display=mode==='diary'?'none':'block';
 };
 
 window.npNextStep=()=>{
@@ -2480,6 +2780,15 @@ window.saveNewPat=async()=>{
     // Save medications as subcollection
     for(const med of npMeds){
       await addDoc(collection(db,'patients',ref.id,'medications'),{...med,createdAt:serverTimestamp()});
+    }
+    // Log clinical events for each initial medication
+    for(const m of npMeds){
+      await addDoc(collection(db,'patients',ref.id,'clinicalEvents'),{
+        type:'med_start', date:m.fechaInicio||new Date().toISOString().slice(0,10),
+        title:`Inicio: ${m.nombre} ${m.dosis||''}`,
+        detail:`${m.frecuencia||''} · ${m.tipo==='uro'?'Urológico':'Comorbilidad'}${m.prescriptor?' · '+m.prescriptor:''}`,
+        medId:null, createdAt:serverTimestamp()
+      });
     }
     // If scales assigned, create baseline scale request
     if(selectedScales.length && npMode!=='diary'){
@@ -2646,7 +2955,15 @@ async function loadPatMeds(patId){
 }
 
 window.discontinueMed=async(patId,medId)=>{
-  await updateDoc(doc(db,'patients',patId,'medications',medId),{activo:false,fechaFin:new Date().toISOString().slice(0,10)});
+  const medSnap=await getDoc(doc(db,'patients',patId,'medications',medId));
+  const mData=medSnap.exists()?medSnap.data():{nombre:'Medicamento'};
+  const today=new Date().toISOString().slice(0,10);
+  await updateDoc(doc(db,'patients',patId,'medications',medId),{activo:false,fechaFin:today});
+  await addDoc(collection(db,'patients',patId,'clinicalEvents'),{
+    type:'med_stop', date:today,
+    title:`Discontinuado: ${mData.nombre} ${mData.dosis||''}`,
+    detail:mData.motivo||'Discontinuado', medId, createdAt:serverTimestamp()
+  });
   loadPatMeds(patId);
 };
 
@@ -2666,7 +2983,14 @@ window.saveAddMed=async()=>{
     activo:true,fechaAgregado:new Date().toISOString().slice(0,10),
     createdAt:serverTimestamp()
   };
-  await addDoc(collection(db,'patients',addMedTargetId,'medications'),med);
+  const medRef=await addDoc(collection(db,'patients',addMedTargetId,'medications'),med);
+  // Log clinical event
+  await addDoc(collection(db,'patients',addMedTargetId,'clinicalEvents'),{
+    type:'med_start', date:med.fechaInicio||new Date().toISOString().slice(0,10),
+    title:`Inicio: ${med.nombre} ${med.dosis||''}`,
+    detail:`${med.frecuencia||''} · ${med.tipo==='uro'?'Urológico':'Comorbilidad'}${med.prescriptor?' · '+med.prescriptor:''}`,
+    motivo:med.motivo||'', medId:medRef.id, createdAt:serverTimestamp()
+  });
   closeM('AddMed');
   loadPatMeds(addMedTargetId);
 };
@@ -2728,6 +3052,431 @@ window.ptab=(el,id)=>{
   }
   if(id==='pd-scales'&&selPatId){ const p=patsCache[selPatId]; if(p) loadPatScales(selPatId,p); }
   if(id==='pd-meds'&&selPatId) loadPatMeds(selPatId);
+  if(id==='pd-profile'&&selPatId) loadPatMeds(selPatId,true);
+  if(id==='pd-timeline'&&selPatId){ const p=patsCache[selPatId]; if(p) loadClinicalTimeline(selPatId,p); }
+};
+
+
+// ── CLINICAL TIMELINE + COMPARISONS ──
+async function loadClinicalTimeline(patId, p){
+  const el=document.getElementById(`pd-timeline-content-${patId}`);
+  if(!el) return;
+  el.innerHTML='<div style="font-size:12px;color:var(--text2)">Cargando...</div>';
+  
+  try{
+    // Load all data in parallel
+    const [evtSnap,medSnap,scaleReqSnap,scaleResSnap]=await Promise.all([
+      getDocs(collection(db,'patients',patId,'clinicalEvents')),
+      getDocs(collection(db,'patients',patId,'medications')),
+      getDocs(collection(db,'patients',patId,'scaleRequests')),
+      getDocs(collection(db,'patients',patId,'scaleResults'))
+    ]);
+    
+    const meds=medSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const scaleReqs=scaleReqSnap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.status==='completed');
+    const scaleRes=scaleResSnap.docs.map(d=>({id:d.id,...d.data()}));
+    
+    // Build events list from clinicalEvents + scale completions + antecedentes
+    let events=evtSnap.docs.map(d=>({id:d.id,...d.data()}));
+    
+    // Add scale completion events
+    scaleReqs.forEach(req=>{
+      const date=req.requestedAt?.toDate?.()?.toISOString().slice(0,10)||req.completedAt?.toDate?.()?.toISOString().slice(0,10)||'—';
+      const scaleNames=(req.scales||[]).map(id=>SCALES_CATALOG.find(s=>s.id===id)?.name||id).join(', ');
+      events.push({type:'scale', date, title:`Escalas completadas`, detail:scaleNames, reqId:req.id, _ts:req.requestedAt?.seconds||0});
+    });
+    
+    // Add antecedentes as historical events (date unknown = before follow-up)
+    if(p.antecedentes?.length){
+      p.antecedentes.forEach(ant=>{
+        if(!events.find(e=>e.title?.includes(ant))){
+          events.push({type:'surgery', date:'Previa', title:ant, detail:'Antecedente registrado al inicio', _ts:-1});
+        }
+      });
+    }
+    
+    // Sort by date desc (most recent first), historical last
+    events.sort((a,b)=>{
+      if(a.date==='Previa') return 1;
+      if(b.date==='Previa') return -1;
+      return (b.date||'').localeCompare(a.date||'');
+    });
+    
+    // ── COMPUTE GLOBAL IMPROVEMENT SCORE ──
+    let globalScore=null;
+    const assignedScales=p.assignedScales||[];
+    if(scaleReqs.length>=2 && assignedScales.length){
+      const baseline=scaleReqs[0];
+      const latest=scaleReqs[scaleReqs.length-1];
+      let totalDelta=0; let scaleCount=0;
+      assignedScales.forEach(scaleId=>{
+        const def=SCALES_CATALOG.find(s=>s.id===scaleId);
+        if(!def) return;
+        const baseRes=scaleRes.find(r=>r.requestId===baseline.id&&r.scaleId===scaleId);
+        const lastRes=scaleRes.find(r=>r.requestId===latest.id&&r.scaleId===scaleId);
+        if(!baseRes||!lastRes) return;
+        const baseT=baseRes.scores?.reduce((a,b)=>a+b,0)||0;
+        const lastT=lastRes.scores?.reduce((a,b)=>a+b,0)||0;
+        const maxS=def.questions.reduce((a,q)=>a+(q.max||0),0);
+        const pct=maxS>0?((baseT-lastT)/maxS)*100:0; // positive = improvement
+        totalDelta+=pct; scaleCount++;
+      });
+      if(scaleCount>0) globalScore=totalDelta/scaleCount;
+    }
+    
+    // ── SMART ALERTS ──
+    const smartAlerts=[];
+    assignedScales.forEach(scaleId=>{
+      const def=SCALES_CATALOG.find(s=>s.id===scaleId);
+      if(!def||scaleReqs.length<2) return;
+      for(let i=1;i<scaleReqs.length;i++){
+        const prev=scaleRes.find(r=>r.requestId===scaleReqs[i-1].id&&r.scaleId===scaleId);
+        const curr=scaleRes.find(r=>r.requestId===scaleReqs[i].id&&r.scaleId===scaleId);
+        if(!prev||!curr) continue;
+        const prevT=prev.scores?.reduce((a,b)=>a+b,0)||0;
+        const currT=curr.scores?.reduce((a,b)=>a+b,0)||0;
+        if(currT-prevT>=5){
+          const date=scaleReqs[i].requestedAt?.toDate?.()?.toISOString().slice(0,10)||'—';
+          smartAlerts.push(`<div class="smart-alert"><i class="ti ti-alert-triangle"></i><div><strong>${def.name}</strong> subió ${currT-prevT} puntos el ${date} — posible empeoramiento. Considerar reevaluación.</div></div>`);
+        }
+      }
+    });
+    
+    // ── MED-SCALE COMPARISON ──
+    // For each medication, find scale scores before and after start date
+    const medComparisons=[];
+    meds.forEach(m=>{
+      if(!m.fechaInicio||!assignedScales.length||scaleReqs.length<1) return;
+      const before=scaleReqs.filter(r=>{
+        const d=r.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'';
+        return d < m.fechaInicio;
+      });
+      const after=scaleReqs.filter(r=>{
+        const d=r.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'';
+        return d >= m.fechaInicio;
+      });
+      if(!before.length||!after.length) return;
+      const beforeReq=before[before.length-1];
+      const afterReq=after[0];
+      const scaleDeltas=[];
+      assignedScales.forEach(scaleId=>{
+        const def=SCALES_CATALOG.find(s=>s.id===scaleId);
+        if(!def) return;
+        const bRes=scaleRes.find(r=>r.requestId===beforeReq.id&&r.scaleId===scaleId);
+        const aRes=scaleRes.find(r=>r.requestId===afterReq.id&&r.scaleId===scaleId);
+        if(!bRes||!aRes) return;
+        const bT=bRes.scores?.reduce((a,b)=>a+b,0)||0;
+        const aT=aRes.scores?.reduce((a,b)=>a+b,0)||0;
+        scaleDeltas.push({name:def.name, before:bT, after:aT, delta:bT-aT});
+      });
+      if(scaleDeltas.length) medComparisons.push({med:m, deltas:scaleDeltas});
+    });
+    
+    // ── RENDER HTML ──
+    let html='';
+    
+    // Global score banner
+    if(globalScore!==null){
+      const cls=globalScore>5?'gs-improve':globalScore<-5?'gs-worse':'gs-stable';
+      const icon=globalScore>5?'↑':globalScore<-5?'↓':'→';
+      const label=globalScore>5?'Mejoría global':globalScore<-5?'Empeoramiento':'Estable';
+      html+=`<div class="global-score">
+        <div class="global-score-circle ${cls}">${icon}</div>
+        <div>
+          <div style="font-size:13px;font-weight:700">${label}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">Cambio promedio: ${globalScore>0?'+':''}${globalScore.toFixed(1)}% en todas las escalas</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">Línea base vs evaluación más reciente</div>
+        </div>
+      </div>`;
+    }
+    
+    // Smart alerts
+    if(smartAlerts.length){
+      html+=`<div style="margin-bottom:1rem">${smartAlerts.join('')}</div>`;
+    }
+    
+    // Med-Scale comparisons
+    if(medComparisons.length){
+      html+=`<div class="card" style="margin-bottom:1rem">
+        <div class="card-label"><i class="ti ti-pill"></i>Impacto de medicamentos en escalas</div>
+        ${medComparisons.map(mc=>{
+          const improved=mc.deltas.filter(d=>d.delta>0).length;
+          const total=mc.deltas.length;
+          return `<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+            <div style="font-size:13px;font-weight:600;margin-bottom:6px">
+              ${mc.med.nombre} ${mc.med.dosis||''} 
+              <span style="font-size:11px;font-weight:400;color:var(--text2)">desde ${mc.med.fechaInicio}</span>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              ${mc.deltas.map(d=>{
+                const cls=d.delta>0?'tl-better':d.delta<0?'tl-worse':'tl-same';
+                const icon=d.delta>0?'↓ mejor':d.delta<0?'↑ peor':'→ igual';
+                return `<div class="tl-delta ${cls}"><i class="ti ti-chart-bar-off" style="font-size:11px"></i>${d.name}: ${d.before}→${d.after} ${icon}</div>`;
+              }).join('')}
+            </div>
+            <div style="font-size:11px;color:var(--text2);margin-top:4px">${improved}/${total} escalas mejoraron después de iniciar este medicamento</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    }
+    
+    // Clinical timeline
+    if(events.length){
+      html+=`<div class="card-label" style="margin-bottom:12px"><i class="ti ti-timeline"></i>Línea de tiempo clínica</div>`;
+      html+=`<div class="timeline">`;
+      events.forEach(evt=>{
+        const dotClass=evt.type==='med_start'?'tl-dot-med':evt.type==='med_stop'?'tl-dot-disc':evt.type==='surgery'?'tl-dot-surgery':evt.type==='scale'?'tl-dot-scale':'tl-dot-alert';
+        const typeLabel=evt.type==='med_start'?'Inicio medicamento':evt.type==='med_stop'?'Discontinuado':evt.type==='surgery'?'Antecedente':evt.type==='scale'?'Escalas completadas':'Evento';
+        
+        // For scale events, show score delta if available
+        let scaleInfo='';
+        if(evt.type==='scale'&&evt.reqId){
+          const reqRes=scaleRes.filter(r=>r.requestId===evt.reqId);
+          if(reqRes.length){
+            scaleInfo=reqRes.map(r=>{
+              const def=SCALES_CATALOG.find(s=>s.id===r.scaleId);
+              if(!def) return '';
+              const t=r.scores?.reduce((a,b)=>a+b,0)||0;
+              const interp=def.scoring(r.scores);
+              const cls=interp.interpretation.includes('Leve')||interp.interpretation.includes('Normal')||interp.interpretation.includes('Mejoría')?'tl-better':interp.interpretation.includes('Moderado')?'':' tl-worse';
+              return `<span class="tl-delta${cls}" style="margin-right:4px">${def.name}: ${t} — ${interp.interpretation}</span>`;
+            }).join('');
+          }
+        }
+        
+        html+=`<div class="tl-event">
+          <div class="tl-dot ${dotClass}"></div>
+          <div class="tl-card">
+            <div class="tl-date">${evt.date==='Previa'?'⏮ Previo al seguimiento':evt.date} · ${typeLabel}</div>
+            <div class="tl-title">${evt.title}</div>
+            ${evt.detail?`<div class="tl-sub">${evt.detail}</div>`:''}
+            ${scaleInfo?`<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">${scaleInfo}</div>`:''}
+          </div>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+    
+    // Add clinical event button
+    html+=`<div style="margin-top:1rem">
+      <button class="btn btn-sm btn-green" onclick="openAddClinicalEvent('${patId}')"><i class="ti ti-plus"></i>Registrar evento clínico</button>
+    </div>
+    <div id="addEventForm-${patId}" style="display:none" class="event-form">
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px">Nuevo evento clínico</div>
+      <div class="form-row">
+        <div class="form-group" style="margin:0"><label>Tipo</label>
+          <select id="evtType-${patId}">
+            <option value="surgery">Procedimiento quirúrgico</option>
+            <option value="med_start">Inicio medicamento</option>
+            <option value="med_stop">Discontinuación</option>
+            <option value="other">Otro evento</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0"><label>Fecha</label><input type="date" id="evtDate-${patId}"></div>
+      </div>
+      <div class="form-group" style="margin-top:8px"><label>Descripción *</label><input type="text" id="evtTitle-${patId}" placeholder="RTU de próstata, Inicio Tamsulosina..."></div>
+      <div class="form-group"><label>Detalles / notas</label><input type="text" id="evtDetail-${patId}" placeholder="Observaciones clínicas..."></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-sm" onclick="document.getElementById('addEventForm-${patId}').style.display='none'"><i class="ti ti-x"></i>Cancelar</button>
+        <button class="btn btn-sm btn-primary" onclick="saveClinicalEvent('${patId}')"><i class="ti ti-device-floppy"></i>Guardar evento</button>
+      </div>
+    </div>`;
+    
+    if(!events.length&&!smartAlerts.length&&globalScore===null){
+      html='<div class="empty"><i class="ti ti-timeline"></i><p style="font-size:12px">Sin eventos clínicos registrados aún. Los medicamentos, escalas y procedimientos aparecerán aquí automáticamente.</p></div>';
+      html+=`<button class="btn btn-sm btn-green" style="margin-top:8px" onclick="openAddClinicalEvent('${patId}')"><i class="ti ti-plus"></i>Registrar primer evento</button>`;
+    }
+    
+    el.innerHTML=html;
+  }catch(e){ el.innerHTML=`<div style="color:var(--red);font-size:12px">Error: ${e.message}</div>`; }
+}
+
+window.openAddClinicalEvent=(patId)=>{
+  const form=document.getElementById(`addEventForm-${patId}`);
+  if(form) form.style.display=form.style.display==='none'?'block':'none';
+};
+
+window.saveClinicalEvent=async(patId)=>{
+  const title=document.getElementById(`evtTitle-${patId}`)?.value.trim();
+  if(!title) return;
+  const evt={
+    type:document.getElementById(`evtType-${patId}`)?.value||'other',
+    date:document.getElementById(`evtDate-${patId}`)?.value||new Date().toISOString().slice(0,10),
+    title, detail:document.getElementById(`evtDetail-${patId}`)?.value.trim()||'',
+    createdAt:serverTimestamp()
+  };
+  await addDoc(collection(db,'patients',patId,'clinicalEvents'),evt);
+  const form=document.getElementById(`addEventForm-${patId}`);
+  if(form) form.style.display='none';
+  const p=patsCache[patId];
+  if(p) loadClinicalTimeline(patId,p);
+};
+
+
+// ── HISTORIA CLÍNICA ──
+let hcPatientId=null;
+
+window.openHistoriaClinica=async(id)=>{
+  hcPatientId=id;
+  const p=patsCache[id]; if(!p) return;
+  
+  // Pre-fill from patient data
+  document.getElementById('hcDiagnostico').value=p.diagnostico||'';
+  document.getElementById('hcMotivo').value='';
+  document.getElementById('hcEnfermedad').value='';
+  document.getElementById('hcPlan').value='';
+  document.getElementById('hcObservaciones').value='';
+  document.getElementById('hcSiguiente').value='';
+  document.getElementById('hcOutputSection').style.display='none';
+  document.getElementById('modalHistoriaClinica').classList.add('open');
+};
+
+window.generarNotaHC=async()=>{
+  const p=patsCache[hcPatientId]; if(!p) return;
+  const btn=document.querySelector('#modalHistoriaClinica .btn-primary');
+  if(btn){ btn.disabled=true; btn.innerHTML='<i class="ti ti-loader-2"></i> Generando...'; }
+  
+  try{
+    // Load all clinical data
+    const [rSnap,medSnap,scaleReqSnap,scaleResSnap]=await Promise.all([
+      getDocs(query(collection(db,'patients',hcPatientId,'records'),orderBy('timestamp','desc'))),
+      getDocs(collection(db,'patients',hcPatientId,'medications')),
+      getDocs(collection(db,'patients',hcPatientId,'scaleRequests')),
+      getDocs(collection(db,'patients',hcPatientId,'scaleResults'))
+    ]);
+    
+    const recs=rSnap.docs.map(d=>d.data());
+    const meds=medSnap.docs.map(d=>d.data());
+    const scaleReqs=scaleResSnap.docs.length?scaleReqSnap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.status==='completed').sort((a,b)=>(a.requestedAt?.seconds||0)-(b.requestedAt?.seconds||0)):[];
+    const scaleRes=scaleResSnap.docs.map(d=>d.data());
+    
+    const mics=recs.filter(r=>r.type==='miction');
+    const leaks=recs.filter(r=>r.type==='leak');
+    const drks=recs.filter(r=>r.type==='drink');
+    const days=[...new Set(recs.map(r=>r.date))];
+    const avgVol=mics.length?Math.round(mics.reduce((a,r)=>a+(r.vol||0),0)/mics.length):0;
+    const avgFlow=mics.filter(r=>r.flow).length?(mics.filter(r=>r.flow).reduce((a,r)=>a+r.flow,0)/mics.filter(r=>r.flow).length).toFixed(1):'ND';
+    const age=p.fechaNac?Math.floor((Date.now()-new Date(p.fechaNac))/(365.25*86400000)):null;
+    const today=new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
+    const urgHigh=mics.filter(r=>r.urgency!=null&&r.urgency>=3).length;
+    const acRecs=mics.filter(r=>r.acoustics);
+    const avgDB=acRecs.length?(acRecs.reduce((a,r)=>a+(r.acoustics?.avgDB||0),0)/acRecs.length).toFixed(1):'ND';
+    const fD={weak:0,low:0,normal:0,strong:0}; acRecs.forEach(r=>{if(r.acoustics?.classification)fD[r.acoustics.classification]++;});
+    
+    const activeMeds=meds.filter(m=>m.activo!==false);
+    const ants=p.antecedentes||[];
+    
+    // Scale scores
+    let scalesSummary='';
+    if(scaleReqs.length){
+      const assignedScales=p.assignedScales||[];
+      const baseline=scaleReqs[0];
+      const latest=scaleReqs[scaleReqs.length-1];
+      scalesSummary='\nESCALAS CL\u00cdNICAS:\n';
+      assignedScales.forEach(scaleId=>{
+        const def=SCALES_CATALOG.find(s=>s.id===scaleId);
+        if(!def) return;
+        const bR=scaleRes.find(r=>r.requestId===baseline.id&&r.scaleId===scaleId);
+        const lR=scaleRes.find(r=>r.requestId===latest.id&&r.scaleId===scaleId);
+        if(!lR) return;
+        const lT=lR.scores?.reduce((a,b)=>a+b,0)||0;
+        const maxS=def.questions.reduce((a,q)=>a+(q.max||0),0);
+        const interp=def.scoring(lR.scores);
+        let line=`  • ${def.name}: ${lT}/${maxS} — ${interp.interpretation}`;
+        if(bR&&scaleReqs.length>1){const bT=bR.scores?.reduce((a,b)=>a+b,0)||0;line+=` (línea base: ${bT}, Δ${lT-bT>0?'+':''}${lT-bT})`;}
+        scalesSummary+=line+'\n';
+      });
+    }
+    
+    const motivo=document.getElementById('hcMotivo').value.trim();
+    const enfermedad=document.getElementById('hcEnfermedad').value.trim();
+    const diagnostico=document.getElementById('hcDiagnostico').value.trim();
+    const plan=document.getElementById('hcPlan').value.trim();
+    const obs=document.getElementById('hcObservaciones').value.trim();
+    const siguiente=document.getElementById('hcSiguiente').value.trim();
+    
+    const nota=`NOTA DE CONSULTA — UROLOGÍA
+Fecha: ${today}
+Médico: ${curDocData?.nombre||'—'} | Especialidad: ${curDocData?.especialidad||'Urología'}
+Institución: ${p.clinica||'—'}
+──────────────────────────────────────────────
+IDENTIFICACIÓN DEL PACIENTE:
+Nombre: ${p.nombre||'—'}
+${age?'Edad: '+age+' años':''}${p.fechaNac?' | Fecha nac.: '+p.fechaNac:''}${p.genero?' | Género: '+(p.genero==='m'?'Masculino':p.genero==='f'?'Femenino':'Otro'):''}
+${p.telefono?'Tel: '+p.telefono:''} ${p.email?'| Email: '+p.email:''}
+──────────────────────────────────────────────
+${motivo?'MOTIVO DE CONSULTA:\n'+motivo+'\n──────────────────────────────────────────────\n':''}${enfermedad?'ENFERMEDAD ACTUAL:\n'+enfermedad+'\n──────────────────────────────────────────────\n':''}ANTECEDENTES:${ants.length?'\n  Urológicos/quirúrgicos: '+ants.join(', '):''}
+${p.antOtros?'  Otros: '+p.antOtros:''}
+──────────────────────────────────────────────
+DIARIO MICCIONAL — RESUMEN OBJETIVO:
+Período registrado: ${days.length} día(s) | Total micciones: ${mics.length}
+Frecuencia promedio: ${days.length?+(mics.length/days.length).toFixed(1):0} micciones/día (normal: 4-7/día)
+Volumen promedio por micción: ${avgVol} ml (normal: 250-400 ml)
+Flujo promedio estimado: ${avgFlow} ml/s
+Volumen total orina registrado: ${mics.reduce((a,r)=>a+(r.vol||0),0)} ml
+Líquido total ingerido: ${drks.reduce((a,r)=>a+(r.vol||0),0)} ml
+Fugas de orina: ${leaks.length} episodio(s)
+Urgencia severa (U3-U4): ${urgHigh} episodio(s) (${mics.length?Math.round(urgHigh/mics.length*100):0}%)
+${acRecs.length?'Análisis acústico del flujo (Tsui et al. 2006):\n  dB promedio: '+avgDB+' | Débil: '+fD.weak+' | Bajo: '+fD.low+' | Normal: '+fD.normal+' | Fuerte: '+fD.strong:''}${scalesSummary}──────────────────────────────────────────────
+${activeMeds.length?'MEDICAMENTOS ACTUALES:\n'+activeMeds.map(m=>`  • ${m.nombre} ${m.dosis||''} — ${m.frecuencia||''} (${m.tipo==='uro'?'Urológico':'Comorbilidad'})${m.fechaInicio?' desde '+m.fechaInicio:''}`).join('\n')+'\n──────────────────────────────────────────────\n':''}${diagnostico?'DIAGNÓSTICO:\n'+diagnostico+'\n──────────────────────────────────────────────\n':''}${obs?'HALLAZGOS / EXAMEN FÍSICO:\n'+obs+'\n──────────────────────────────────────────────\n':''}${plan?'PLAN DE MANEJO:\n'+plan+'\n──────────────────────────────────────────────\n':''}${siguiente?'PRÓXIMA CITA / INSTRUCCIONES:\n'+siguiente+'\n──────────────────────────────────────────────\n':''}Nota generada con Diario Miccional v2.0 · by InnoIA · verificado CURG
+Referencia científica: ICS 2019, EAU Guidelines 2023, Tsui et al. 2006`;
+    
+    document.getElementById('hcOutput').textContent=nota;
+    document.getElementById('hcOutputSection').style.display='block';
+    document.getElementById('hcOutputSection').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){
+    document.getElementById('hcOutput').textContent='Error generando nota: '+e.message;
+    document.getElementById('hcOutputSection').style.display='block';
+  }finally{
+    if(btn){ btn.disabled=false; btn.innerHTML='<i class="ti ti-wand"></i>Generar nota'; }
+  }
+};
+
+window.copiarNotaHC=()=>{
+  const text=document.getElementById('hcOutput').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.getElementById('hcCopyBtn');
+    btn.classList.add('copy-success');
+    btn.innerHTML='<i class="ti ti-check"></i>¡Copiado!';
+    setTimeout(()=>{ btn.classList.remove('copy-success'); btn.innerHTML='<i class="ti ti-copy"></i>Copiar nota completa'; },2500);
+  }).catch(()=>{
+    // Fallback for older browsers
+    const ta=document.createElement('textarea');
+    ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    const btn=document.getElementById('hcCopyBtn');
+    btn.innerHTML='<i class="ti ti-check"></i>¡Copiado!';
+    setTimeout(()=>{ btn.innerHTML='<i class="ti ti-copy"></i>Copiar nota completa'; },2500);
+  });
+};
+
+// ── CRITICAL FIX: Edit patient — add antecedentes + mode + scales ──
+const _origOpenEditPat=window.openEditPat;
+window.openEditPat=(id)=>{
+  if(_origOpenEditPat) _origOpenEditPat(id);
+  // After original opens, also populate new fields
+  setTimeout(()=>{
+    const p=patsCache[id]; if(!p) return;
+    // Mode
+    const modeSelect=document.getElementById('epMode');
+    if(modeSelect) modeSelect.value=p.mode||'diary';
+    // Render antecedentes chips
+    const antEl=document.getElementById('epAntChips');
+    if(antEl){
+      antEl.querySelectorAll('.ant-chip').forEach(c=>{
+        if((p.antecedentes||[]).includes(c.textContent.trim())) c.classList.add('selected');
+        else c.classList.remove('selected');
+      });
+    }
+    // Antecedentes otros
+    const antOtrosEl=document.getElementById('epAntOtros');
+    if(antOtrosEl) antOtrosEl.value=p.antOtros||'';
+    // Assigned scales
+    if(document.querySelectorAll('input[name="epScale"]').length){
+      document.querySelectorAll('input[name="epScale"]').forEach(cb=>{
+        cb.checked=(p.assignedScales||[]).includes(cb.value);
+      });
+    }
+  },100);
 };
 
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
