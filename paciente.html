@@ -1511,7 +1511,50 @@ window.genPDF=async()=>{
     return s>w?(r>=s||r<w):(r>=s&&r<w);
   }
 
-  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+  // Build scales section
+  let scalesHtmlForPDF='';
+  if(pdfScaleReqs.length){
+    scalesHtmlForPDF='<h2>Escalas cl\u00ednicas \u2014 Seguimiento comparativo</h2>';
+    scalesHtmlForPDF+='<p style="font-size:11px;color:#64748b;margin-bottom:8px">Referencia: ICS 2019, EAU Guidelines 2023.</p>';
+    (patient.assignedScales||[]).forEach(scaleId=>{
+      const def=PAC_SCALES_CATALOG.find(s=>s.id===scaleId); if(!def) return;
+      const realQs=def.questions.filter(q=>!q.section);
+      const maxS=realQs.reduce((a,q)=>a+(q.max||0),0);
+      const results=pdfScaleReqs.map(req=>{
+        const r=pdfScaleRes.find(r=>r.requestId===req.id&&r.scaleId===scaleId); if(!r) return null;
+        const t=r.scores?.reduce((a,b)=>a+b,0)||0;
+        const label=req.type==='baseline'?'L\u00ednea base':(req.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'Seguimiento');
+        return {t,maxS,label};
+      }).filter(Boolean);
+      if(!results.length) return;
+      const delta=results.length>1?results[results.length-1].t-results[0].t:0;
+      const trendColor=delta<0?'#2e7d32':delta>0?'#c62828':'#64748b';
+      const trend=results.length>1?(delta<0?'Mejor\u00eda':'Empeoramiento'):'';
+      scalesHtmlForPDF+='<div style="margin-bottom:12px;border:1px solid #e2e8f0;border-radius:8px;padding:10px">';
+      scalesHtmlForPDF+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
+      scalesHtmlForPDF+='<div style="font-weight:700;font-size:12px">'+def.name+' \u2014 '+(def.full||def.name)+'</div>';
+      if(results.length>1) scalesHtmlForPDF+='<span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:'+trendColor+'22;color:'+trendColor+'">'+trend+' ('+(delta>0?'+':'')+delta+' pts)</span>';
+      scalesHtmlForPDF+='</div><table style="width:100%;border-collapse:collapse;font-size:11px">';
+      scalesHtmlForPDF+='<tr style="background:#f0f4f8"><td style="padding:4px 8px;font-weight:600">Evaluaci\u00f3n</td>';
+      results.forEach(r=>{ scalesHtmlForPDF+='<td style="padding:4px 8px;text-align:center;font-weight:600">'+r.label+'</td>'; });
+      scalesHtmlForPDF+='</tr><tr><td style="padding:4px 8px;color:#64748b">Score (/'+maxS+')</td>';
+      results.forEach((r,i)=>{
+        const isLast=i===results.length-1;
+        const c=isLast&&delta<0?'#2e7d32':isLast&&delta>0?'#c62828':'#1e2a3a';
+        scalesHtmlForPDF+='<td style="padding:4px 8px;text-align:center;font-weight:700;font-family:monospace;color:'+c+'">'+r.t+'</td>';
+      });
+      scalesHtmlForPDF+='</tr><tr><td style="padding:4px 8px;color:#64748b">Interpretaci\u00f3n</td>';
+      results.forEach(r=>{
+        const pct=maxS>0?r.t/maxS:0;
+        const bg=pct<=.35?'#e8f5e9':pct<=.65?'#fff3e0':'#ffebee';
+        const fc=pct<=.35?'#2e7d32':pct<=.65?'#e65100':'#c62828';
+        const lbl=pct<=.35?'Leve':pct<=.65?'Moderado':'Severo';
+        scalesHtmlForPDF+='<td style="padding:4px 8px;text-align:center"><span style="padding:2px 6px;border-radius:8px;font-size:10px;font-weight:700;background:'+bg+';color:'+fc+'">'+lbl+'</span></td>';
+      });
+      scalesHtmlForPDF+='</tr></table></div>';
+    });
+  }
+    const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
   <title>Informe Clínico — ${patient.nombre||'Paciente'}</title>
   <style>${styles}</style></head><body>
   <div class="hdr">
@@ -1594,7 +1637,7 @@ window.genPDF=async()=>{
 
   ${pdfMeds.length?`<h2>Medicamentos</h2><table><tr style="background:#f0f4f8"><th>Medicamento</th><th>Dosis</th><th>Frecuencia</th><th>Tipo</th><th>Desde</th><th>Estado</th></tr>${pdfMeds.map(m=>`<tr><td style="font-weight:500">${m.nombre} ${m.dosis||''}</td><td>${m.frecuencia||'—'}</td><td>${m.tipo==='uro'?'Urológico':'Comorbilidad'}</td><td>${m.fechaInicio||'—'}</td><td>${m.activo===false?'<span style="color:#c62828">Discontinuado</span>':'<span style="color:#2e7d32">Activo</span>'}</td></tr>`).join('')}</table>`:''}
 
-  ${pdfScaleReqs.length?`<h2>Escalas clínicas — Seguimiento comparativo</h2><p style="font-size:11px;color:#64748b;margin-bottom:8px">ICS 2019, EAU Guidelines 2023.</p>${(patient.assignedScales||[]).map(scaleId=>{const def=PAC_SCALES_CATALOG.find(s=>s.id===scaleId);if(!def)return '';const results=pdfScaleReqs.map(req=>{const r=pdfScaleRes.find(r=>r.requestId===req.id&&r.scaleId===scaleId);if(!r)return null;const t=r.scores?.reduce((a,b)=>a+b,0)||0;return {t,label:req.type==='baseline'?'Línea base':req.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'Seguimiento'};}).filter(Boolean);if(!results.length)return '';const maxS=def.questions.reduce((a,q)=>a+(q.max||0),0);return `<div style="margin-bottom:10px;border:1px solid #e2e8f0;border-radius:8px;padding:10px"><div style="font-weight:600;font-size:12px;margin-bottom:6px">${def.name} — ${def.full}</div><table><tr style="background:#f0f4f8"><td style="font-weight:600;padding:4px 8px">Evaluación</td>${results.map(r=>`<td style="padding:4px 8px;text-align:center;font-weight:600">${r.label}</td>`).join('')}</tr><tr><td style="padding:4px 8px;color:#64748b">Score (/${maxS})</td>${results.map(r=>`<td style="padding:4px 8px;text-align:center;font-weight:700;font-family:monospace">${r.t}</td>`).join('')}</tr></table></div>`;}).join('')}`:''}
+  ${scalesHtmlForPDF}
 
   \${(()=>{
     if(!pdfMeds.filter(m=>m.fechaInicio).length||!pdfScaleReqs.length||!(patient.assignedScales?.length)) return '';
@@ -1838,44 +1881,85 @@ function getWeekLabel(dateStr){
 // ── SCALES ENGINE (PATIENT) ──
 // Same catalog as doctor (duplicated for offline support)
 const PAC_SCALES_CATALOG = [
-  {id:'ipss',name:'IPSS',full:'Síntomas del Tracto Urinario Inferior',questions:[
-    {q:'¿Con qué frecuencia ha tenido sensación de no vaciar completamente la vejiga?',labels:['Nunca','Rara vez (1 de cada 5 veces)','A veces (1 de cada 3 veces)','La mitad de las veces','Casi siempre (2 de cada 3 veces)','Casi siempre (más de 2 de cada 3)'],max:5},
-    {q:'¿Con qué frecuencia ha tenido que orinar de nuevo menos de 2 horas después?',labels:['Nunca','Rara vez','A veces','La mitad de las veces','Casi siempre','Siempre'],max:5},
-    {q:'¿Con qué frecuencia ha tenido que interrumpir y reanudar el chorro al orinar?',labels:['Nunca','Rara vez','A veces','La mitad de las veces','Casi siempre','Siempre'],max:5},
-    {q:'¿Con qué frecuencia le ha resultado difícil aguantarse las ganas de orinar?',labels:['Nunca','Rara vez','A veces','La mitad de las veces','Casi siempre','Siempre'],max:5},
-    {q:'¿Con qué frecuencia ha tenido un chorro de orina débil?',labels:['Nunca','Rara vez','A veces','La mitad de las veces','Casi siempre','Siempre'],max:5},
-    {q:'¿Con qué frecuencia ha tenido que hacer fuerza para empezar a orinar?',labels:['Nunca','Rara vez','A veces','La mitad de las veces','Casi siempre','Siempre'],max:5},
-    {q:'¿Cuántas veces suele levantarse a orinar desde que se acuesta hasta que se levanta?',labels:['Ninguna','1 vez','2 veces','3 veces','4 veces','5 o más veces'],max:5},
-    {q:'Si tuviera que pasar el resto de su vida con los síntomas urinarios tal como los tiene ahora, ¿cómo se sentiría?',labels:['Encantado','Satisfecho','Bastante satisfecho','Indiferente','Bastante insatisfecho','Disgustado','Fatal'],max:6,isQoL:true}
+  {id:'ipss', name:'IPSS', full:'S\u00edntomas Urinarios (Pr\u00f3stata)',
+   questions:[
+    {q:'Sensaci\u00f3n de no vaciar completamente la vejiga',sub:'Cuando termina de orinar, \u00bfsiente que qued\u00f3 orina adentro?',labels:['Nunca','Rara vez (menos de 1 en 5)','Algunas veces (menos de la mitad)','La mitad de las veces','La mayor\u00eda de las veces','Casi siempre'],max:5},
+    {q:'Necesidad de orinar de nuevo en menos de 2 horas',labels:['Nunca','Rara vez','Algunas veces','La mitad de las veces','La mayor\u00eda de las veces','Casi siempre'],max:5},
+    {q:'Chorro que se detiene y reinicia varias veces',labels:['Nunca','Rara vez','Algunas veces','La mitad de las veces','La mayor\u00eda de las veces','Casi siempre'],max:5},
+    {q:'Ganas urgentes dif\u00edciles de aguantar',labels:['Nunca','Rara vez','Algunas veces','La mitad de las veces','La mayor\u00eda de las veces','Casi siempre'],max:5},
+    {q:'Chorro de orina d\u00e9bil',labels:['Nunca','Rara vez','Algunas veces','La mitad de las veces','La mayor\u00eda de las veces','Casi siempre'],max:5},
+    {q:'Necesidad de hacer fuerza para empezar a orinar',labels:['Nunca','Rara vez','Algunas veces','La mitad de las veces','La mayor\u00eda de las veces','Casi siempre'],max:5},
+    {q:'\u00bfCu\u00e1ntas veces se levanta a orinar durante la noche?',labels:['Ninguna','1 vez','2 veces','3 veces','4 veces','5 o m\u00e1s'],max:5},
+    {q:'\u00bfC\u00f3mo se siente con sus s\u00edntomas urinarios actuales?',isQoL:true,labels:['Muy bien','Bien','Bastante bien','Ni bien ni mal','Bastante mal','Mal','Muy mal'],max:6}
   ]},
-  {id:'oabq',name:'OAB-q SF',full:'Vejiga Hiperactiva — Molestia por Síntomas',questions:[
-    {q:'¿Cuánto le ha molestado orinar con mucha frecuencia durante el día?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Muchísimo'],max:6},
-    {q:'¿Cuánto le ha molestado sentir una necesidad repentina e intensa de orinar?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Muchísimo'],max:6},
-    {q:'¿Cuánto le ha molestado que esa necesidad llegue de repente, sin aviso?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Muchísimo'],max:6},
-    {q:'¿Cuánto le ha molestado perder pequeñas cantidades de orina de forma accidental?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Muchísimo'],max:6},
-    {q:'¿Cuánto le ha molestado levantarse a orinar durante la noche?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Muchísimo'],max:6},
-    {q:'¿Cuánto le ha molestado sentir que moja la ropa antes de llegar al baño?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Muchísimo'],max:6}
+  {id:'oabq', name:'OAB-q SF', full:'Vejiga Hiperactiva',
+   questions:[
+    {q:'\u00bfCu\u00e1nto le ha molestado orinar con mucha frecuencia durante el d\u00eda?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Much\u00edsimo'],max:6},
+    {q:'\u00bfCu\u00e1nto le ha molestado sentir una necesidad repentina e intensa de orinar?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Much\u00edsimo'],max:6},
+    {q:'\u00bfCu\u00e1nto le ha molestado que esa necesidad llegue de repente, sin aviso?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Much\u00edsimo'],max:6},
+    {q:'\u00bfCu\u00e1nto le ha molestado perder peque\u00f1as cantidades de orina accidentalmente?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Much\u00edsimo'],max:6},
+    {q:'\u00bfCu\u00e1nto le ha molestado levantarse a orinar durante la noche?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Much\u00edsimo'],max:6},
+    {q:'\u00bfCu\u00e1nto le ha molestado sentir que moja la ropa antes de llegar al ba\u00f1o?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Much\u00edsimo'],max:6}
   ]},
-  {id:'iciqn',name:'ICIQ-N',full:'Nocturia',questions:[
-    {q:'¿Cuántas veces se levanta a orinar en una noche típica?',labels:['Ninguna','1 vez','2 veces','3 veces','4 o más veces'],max:4},
-    {q:'¿Cuánto le molesta levantarse a orinar durante la noche?',labels:['Nada','Un poco','Moderadamente','Bastante','Muchísimo'],max:4},
-    {q:'¿Estas visitas nocturnas al baño afectan su vida diaria?',labels:['Nada','Un poco','Moderadamente','Bastante','Muchísimo'],max:4}
+  {id:'iciqn', name:'ICIQ-N', full:'Nocturia',
+   questions:[
+    {q:'\u00bfCu\u00e1ntas veces se levanta a orinar en una noche t\u00edpica?',labels:['Ninguna','1 vez','2 veces','3 veces','4 o m\u00e1s veces'],max:4},
+    {q:'\u00bfCu\u00e1nto le molesta levantarse a orinar durante la noche?',labels:['Nada','Un poco','Moderadamente','Bastante','Much\u00edsimo'],max:4},
+    {q:'\u00bfEstas visitas nocturnas al ba\u00f1o afectan su vida diaria?',sub:'(cansancio, dificultad para concentrarse, etc.)',labels:['Nada','Un poco','Moderadamente','Bastante','Much\u00edsimo'],max:4}
   ]},
-  {id:'udi6',name:'UDI-6',full:'Inventario de Molestias Urogenitales',questions:[
-    {q:'¿Tiene con frecuencia ganas de orinar?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
-    {q:'¿Pierde orina con una sensación de urgencia?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
-    {q:'¿Pierde orina al toser, estornudar o reírse?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
-    {q:'¿Tiene pérdidas pequeñas de orina (gotitas)?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
-    {q:'¿Siente que no vacía completamente la vejiga al orinar?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
-    {q:'¿Siente dolor o malestar en la parte baja del abdomen o zona genital?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3}
+  {id:'udi6', name:'UDI-6', full:'Molestias Urogenitales',
+   questions:[
+    {q:'\u00bfTiene con frecuencia ganas de orinar?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
+    {q:'\u00bfPierde orina con sensaci\u00f3n de urgencia?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
+    {q:'\u00bfPierde orina al toser, estornudar o re\u00edrse?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
+    {q:'\u00bfTiene p\u00e9rdidas peque\u00f1as de orina (gotitas)?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
+    {q:'\u00bfSiente que no vac\u00eda completamente la vejiga al orinar?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
+    {q:'\u00bfSiente dolor o malestar en la parte baja del abdomen o zona genital?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3}
   ]},
-  {id:'iciqsf',name:'ICIQ-UI SF',full:'Incontinencia Urinaria',questions:[
-    {q:'¿Con qué frecuencia pierde orina?',labels:['Nunca','Una vez a la semana o menos','2 o 3 veces a la semana','Una vez al día','Varias veces al día','Continuamente'],max:5},
-    {q:'¿Qué cantidad de orina pierde habitualmente?',labels:['No pierdo nada','Muy poca cantidad (gotitas)','Una cantidad pequeña','Una cantidad moderada','Una cantidad grande','Mucha cantidad'],max:5},
-    {q:'¿Cuánto afectan estas pérdidas a su vida diaria? (0=nada, 10=muchísimo)',isSlider:true,max:10}
+  {id:'iciqsf', name:'ICIQ-UI SF', full:'Incontinencia Urinaria',
+   questions:[
+    {q:'\u00bfCon qu\u00e9 frecuencia pierde orina?',labels:['Nunca','Una vez a la semana o menos','2 o 3 veces a la semana','Una vez al d\u00eda','Varias veces al d\u00eda','Continuamente'],values:[0,1,2,3,4,5],max:5},
+    {q:'\u00bfQu\u00e9 cantidad de orina pierde habitualmente?',labels:['No pierdo nada','Muy poca cantidad (gotitas)','Una cantidad moderada','Mucha cantidad'],values:[0,2,4,6],max:6},
+    {q:'\u00bfCu\u00e1nto afectan estas p\u00e9rdidas a su vida diaria? (0=nada, 10=much\u00edsimo)',isSlider:true,max:10},
+    {q:'\u00bfCu\u00e1ndo pierde orina? (puede marcar varias)',isCheckboxMulti:true,checkboxOptions:['Antes de llegar al ba\u00f1o','Al toser o estornudar','Durmiendo','Al hacer esfuerzo f\u00edsico','Cuando termina de orinar','Sin motivo evidente','Continuamente'],max:0}
   ]},
-  {id:'pgii',name:'PGI-I',full:'Impresión Global de Mejoría',questions:[
-    {q:'¿Cómo describiría su condición urinaria ahora, comparada con ANTES de empezar el tratamiento?',labels:['Muchísimo mejor','Mucho mejor','Un poco mejor','Sin cambio — igual que antes','Un poco peor','Mucho peor','Muchísimo peor'],max:6}
+  {id:'pgii', name:'PGI-I', full:'Impresi\u00f3n Global de Mejor\u00eda',
+   questions:[
+    {q:'\u00bfC\u00f3mo describir\u00eda su condici\u00f3n urinaria ahora, comparada con c\u00f3mo estaba ANTES de empezar el tratamiento?',labels:['Much\u00edsimo mejor','Mucho mejor','Un poco mejor','Sin cambio \u2014 igual que antes','Un poco peor','Mucho peor','Much\u00edsimo peor'],values:[1,2,3,4,5,6,7],max:7}
+  ]},
+  {id:'shim', name:'SHIM / IIEF-5', full:'Funci\u00f3n Er\u00e9ctil',
+   questions:[
+    {q:'\u00bfC\u00f3mo calificar\u00eda su confianza en lograr y mantener una erecci\u00f3n?',labels:['Sin actividad sexual','Muy baja','Baja','Moderada','Alta','Muy alta'],values:[0,1,2,3,4,5],max:5},
+    {q:'Cuando tuvo erecciones, \u00bfcon qu\u00e9 frecuencia fueron suficientemente r\u00edgidas para la penetraci\u00f3n?',labels:['Sin actividad sexual','Casi nunca','Pocas veces','A veces','La mayor\u00eda de las veces','Casi siempre'],values:[0,1,2,3,4,5],max:5},
+    {q:'Despu\u00e9s de la penetraci\u00f3n, \u00bfcon qu\u00e9 frecuencia pudo mantener la erecci\u00f3n?',labels:['Sin actividad sexual','Casi nunca','Pocas veces','A veces','La mayor\u00eda de las veces','Casi siempre'],values:[0,1,2,3,4,5],max:5},
+    {q:'\u00bfQu\u00e9 tan dif\u00edcil fue mantener la erecci\u00f3n hasta completar el acto?',labels:['Sin actividad sexual','Extremadamente dif\u00edcil','Muy dif\u00edcil','Dif\u00edcil','Un poco dif\u00edcil','Sin dificultad'],values:[0,1,2,3,4,5],max:5},
+    {q:'\u00bfCon qu\u00e9 frecuencia las relaciones sexuales resultaron satisfactorias?',labels:['Sin actividad sexual','Casi nunca','Pocas veces','A veces','La mayor\u00eda de las veces','Casi siempre'],values:[0,1,2,3,4,5],max:5}
+  ]},
+  {id:'pfdi20', name:'PFDI-20', full:'Inventario Disfunci\u00f3n Piso P\u00e9lvico',
+   questions:[
+    {section:'POPDI-6 \u2014 Prolapso'},
+    {q:'\u00bfSiente presi\u00f3n en la parte baja del abdomen o pelvis?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfSiente pesadez o que algo se cae en la zona p\u00e9lvica?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfSiente o ve un bulto saliendo por la vagina?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfNecesita empujar la vagina para orinar o defecar?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfSiente vaciado incompleto de vejiga o intestino?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfNecesita empujar hacia abajo para defecar?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {section:'CRADI-8 \u2014 Intestino'},
+    {q:'\u00bfTiene que hacer mucho esfuerzo para defecar?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfSiente que algo bloquea el recto al defecar?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfSiente evacuaci\u00f3n incompleta del intestino?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfTiene urgencia para defecar dif\u00edcil de controlar?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfPierde gases sin querer?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfPierde heces l\u00edquidas o s\u00f3lidas sin querer?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfSiente dolor anal o rectal?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfSiente un bulto saliendo por el recto?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {section:'UDI-6 \u2014 Urinario'},
+    {q:'\u00bfTiene frecuencia urinaria excesiva?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfTiene urgencia urinaria dif\u00edcil de controlar?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfPierde orina al toser, estornudar o re\u00edrse?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfTiene peque\u00f1os escapes de orina?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfTiene dificultad para vaciar la vejiga completamente?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4},
+    {q:'\u00bfSiente dolor al orinar o en la zona p\u00e9lvica?',labels:['No','Poco','Regular','Bastante','Mucho'],max:4}
   ]}
 ];
 
@@ -2045,7 +2129,9 @@ function fillCurrentScale(){
   const def=PAC_SCALES_CATALOG.find(s=>s.id===scaleId);
   if(!def){ currentScaleIndex++; fillCurrentScale(); return; }
   
-  currentScaleAnswers=new Array(def.questions.length).fill(null);
+  // Filter out section-header objects
+  const realQs=def.questions.filter(q=>!q.section);
+  currentScaleAnswers=new Array(realQs.length).fill(null);
   
   document.getElementById('scaleFillTitle').textContent=def.name+' — '+def.full;
   
@@ -2056,28 +2142,41 @@ function fillCurrentScale(){
   });
   
   const el=document.getElementById('scaleFillContent');
+  let qIdx=0; // real question index (skipping section headers)
+  
   el.innerHTML=`<div class="scale-card">
-    <div style="font-size:12px;color:var(--text2);margin-bottom:1rem">${def.questions.length} pregunta(s) · Toca la respuesta que mejor te describe</div>
-    ${def.questions.map((q,qi)=>`
-      <div class="scale-q">
+    <div style="font-size:12px;color:var(--text2);margin-bottom:1rem">${realQs.length} pregunta(s) · Toca la respuesta que mejor te describe</div>
+    ${def.questions.map((q)=>{
+      if(q.section) return `<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin:1rem 0 6px;padding-top:8px;border-top:1px solid var(--border)">${q.section}</div>`;
+      const qi=qIdx++;
+      const vals=q.values||q.labels?.map((_,i)=>i)||[];
+      if(q.isCheckboxMulti) return `<div class="scale-q">
         <div class="scale-q-text"><span class="scale-q-num">${qi+1}</span>${q.q}</div>
-        ${q.isSlider?`
-          <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:11px;color:var(--text2)">0 = Nada</span>
-            <input type="range" class="scale-slider" id="scaleSlider${qi}" min="0" max="10" value="5" oninput="document.getElementById('sliderVal${qi}').textContent=this.value;currentScaleAnswers[${qi}]=parseInt(this.value)">
-            <span style="font-size:11px;color:var(--text2)">10 = Muchísimo</span>
-          </div>
-          <div style="text-align:center;font-size:1.1rem;font-weight:700;color:var(--blue-act)" id="sliderVal${qi}">5</div>
-        `:`
-          <div class="scale-opts">
-            ${(q.labels||[]).map((label,li)=>`
-              <div class="scale-opt" id="scaleOpt${qi}_${li}" onclick="selectScaleOpt(${qi},${li})">
-                <div class="scale-opt-label">${label}</div>
-                <div class="scale-opt-val">${li}</div>
-              </div>`).join('')}
-          </div>
-        `}
-      </div>`).join('')}
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${(q.checkboxOptions||[]).map((opt,oi)=>`<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer">
+            <input type="checkbox" id="scaleCB${qi}_${oi}" onchange="updateCheckboxAnswer(${qi})" style="width:16px;height:16px;accent-color:var(--blue-act)">
+            <span style="font-size:13px">${opt}</span></label>`).join('')}
+        </div></div>`;
+      if(q.isSlider) return `<div class="scale-q">
+        <div class="scale-q-text"><span class="scale-q-num">${qi+1}</span>${q.q}</div>
+        ${q.sub?`<div style="font-size:12px;color:var(--text2);margin-bottom:8px">${q.sub}</div>`:''}
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:11px;color:var(--text2)">0 = Nada</span>
+          <input type="range" class="scale-slider" id="scaleSlider${qi}" min="0" max="10" value="5" oninput="document.getElementById('sliderVal${qi}').textContent=this.value;currentScaleAnswers[${qi}]=parseInt(this.value)">
+          <span style="font-size:11px;color:var(--text2)">10 = Mucho</span>
+        </div>
+        <div style="text-align:center;font-size:1.1rem;font-weight:700;color:var(--blue-act)" id="sliderVal${qi}">5</div>
+      </div>`;
+      return `<div class="scale-q">
+        <div class="scale-q-text"><span class="scale-q-num">${qi+1}</span>${q.q}</div>
+        ${q.sub?`<div style="font-size:12px;color:var(--text2);margin-bottom:8px">${q.sub}</div>`:''}
+        <div class="scale-opts">
+          ${(q.labels||[]).map((label,li)=>`<div class="scale-opt" id="scaleOpt${qi}_${li}" onclick="selectScaleOpt(${qi},${q.values?q.values[li]:li})">
+            <div class="scale-opt-label">${label}</div>
+            <div class="scale-opt-val">${q.values?q.values[li]:li}</div>
+          </div>`).join('')}
+        </div></div>`;
+    }).join('')}
     <div style="margin-top:1.5rem;display:flex;gap:10px">
       ${currentScaleIndex>0?`<button class="btn" onclick="currentScaleIndex--;fillCurrentScale()"><i class="ti ti-arrow-left"></i>Anterior</button>`:''}
       <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="nextScale()">
@@ -2087,29 +2186,53 @@ function fillCurrentScale(){
   </div>`;
   
   // Initialize slider answers
-  def.questions.forEach((q,qi)=>{ if(q.isSlider) currentScaleAnswers[qi]=5; });
+  const realQs2=def.questions.filter(q=>!q.section);
+  realQs2.forEach((q,qi)=>{ if(q.isSlider) currentScaleAnswers[qi]=5; });
 }
 
-window.selectScaleOpt=(qi,li)=>{
+window.updateCheckboxAnswer=(qi)=>{
+  const def=PAC_SCALES_CATALOG.find(s=>s.id===currentRequest?.scales?.[currentScaleIndex]);
+  if(!def) return;
+  const realQs=def.questions.filter(q=>!q.section);
+  const q=realQs[qi];
+  if(!q||!q.checkboxOptions) return;
+  const checked=q.checkboxOptions.filter((_,oi)=>document.getElementById(`scaleCB${qi}_${oi}`)?.checked);
+  currentScaleAnswers[qi]=checked; // store as array
+};
+
+window.selectScaleOpt=(qi,val)=>{
   document.querySelectorAll(`[id^="scaleOpt${qi}_"]`).forEach(el=>el.classList.remove('selected'));
-  document.getElementById(`scaleOpt${qi}_${li}`)?.classList.add('selected');
-  currentScaleAnswers[qi]=li;
+  // Find the option element with this value
+  document.querySelectorAll(`[id^="scaleOpt${qi}_"]`).forEach(el=>{ if(el.querySelector('.scale-opt-val')?.textContent==String(val)) el.classList.add('selected'); });
+  currentScaleAnswers[qi]=val;
 };
 
 window.nextScale=()=>{
   const scales=currentRequest?.scales||[];
   const def=PAC_SCALES_CATALOG.find(s=>s.id===scales[currentScaleIndex]);
   if(!def) return;
+  const realQs=def.questions.filter(q=>!q.section);
   
-  // Validate all questions answered
-  const unanswered=currentScaleAnswers.findIndex(a=>a===null);
+  // Validate all non-checkbox questions answered (checkboxMulti can be empty)
+  const unanswered=currentScaleAnswers.findIndex((a,i)=>{
+    const q=realQs[i];
+    if(!q||q.isCheckboxMulti) return false; // optional
+    return a===null;
+  });
   if(unanswered>=0){
-    document.querySelectorAll('.scale-q')[unanswered]?.scrollIntoView({behavior:'smooth',block:'center'});
-    document.querySelectorAll('.scale-q')[unanswered]?.style && (document.querySelectorAll('.scale-q')[unanswered].style.borderLeft='3px solid var(--coral)');
+    const qEls=document.querySelectorAll('.scale-q');
+    if(qEls[unanswered]) qEls[unanswered].scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
   
-  currentAnswers[scales[currentScaleIndex]]=[...currentScaleAnswers];
+  // Store answers - compute total for scoring (use numeric values only)
+  const numericScores=currentScaleAnswers.map((a,i)=>{
+    if(Array.isArray(a)) return 0; // checkboxMulti doesn't add to score
+    return typeof a==='number'?a:0;
+  });
+  currentAnswers[scales[currentScaleIndex]]=numericScores;
+  // Also store raw for display
+  currentAnswers[scales[currentScaleIndex]+'_raw']=currentScaleAnswers;
   currentScaleIndex++;
   
   if(currentScaleIndex>=scales.length){
@@ -2165,21 +2288,33 @@ async function loadPatientMedsView(){
       <h4>${m.nombre} ${m.dosis||''}</h4>
       <p>${m.frecuencia||''} · ${m.tipo==='uro'?'Urológico':'Comorbilidad'}${m.fechaInicio?' · desde '+m.fechaInicio:''}</p>
     </div>`).join('');
-  }catch(e){ el.innerHTML=''; }
+  }catch(e){ el.innerHTML='<p style="font-size:12px;color:var(--text2)">Sin medicamentos registrados por tu m\u00e9dico.</p>'; }
 }
 
 async function loadPatientAntsView(){
   const el=document.getElementById('patAntView'); if(!el||!patient?.id) return;
   try{
-    const snap=await getDoc(doc(db,'patients',patient.id));
-    if(!snap.exists()){ el.innerHTML=''; return; }
-    const data=snap.data();
-    const ants=data.antecedentes||[];
-    const otros=data.antOtros||'';
-    if(!ants.length&&!otros){ el.innerHTML='<p style="font-size:12px;color:var(--text2)">Sin antecedentes registrados.</p>'; return; }
-    el.innerHTML=(ants.map(a=>`<span class="ant-view-chip">${a}</span>`).join(''))+
-      (otros?`<p style="font-size:12px;color:var(--text2);margin-top:8px">${otros}</p>`:'');
-  }catch(e){ el.innerHTML=''; }
+    // Use cached patient data first, then fetch to get latest
+    const ants=patient.antecedentes||[];
+    const otros=patient.antOtros||'';
+    if(ants.length||otros){
+      el.innerHTML=(ants.map(a=>`<span class="ant-view-chip">${a}</span>`).join(''))+
+        (otros?`<p style="font-size:12px;color:var(--text2);margin-top:8px">${otros}</p>`:'');
+    } else {
+      // Try fetching from Firestore
+      const snap=await getDoc(doc(db,'patients',patient.id));
+      if(!snap.exists()){ el.innerHTML='<p style="font-size:12px;color:var(--text2)">Sin antecedentes registrados.</p>'; return; }
+      const data=snap.data();
+      const ants2=data.antecedentes||[];
+      const otros2=data.antOtros||'';
+      if(!ants2.length&&!otros2){ el.innerHTML='<p style="font-size:12px;color:var(--text2)">Sin antecedentes registrados.</p>'; return; }
+      // Update local cache
+      patient={...patient,...data};
+      localStorage.setItem('dm_patient',JSON.stringify(patient));
+      el.innerHTML=(ants2.map(a=>`<span class="ant-view-chip">${a}</span>`).join(''))+
+        (otros2?`<p style="font-size:12px;color:var(--text2);margin-top:8px">${otros2}</p>`:'');
+    }
+  }catch(e){ el.innerHTML='<p style="font-size:12px;color:var(--text2)">Sin antecedentes registrados.</p>'; }
 }
 
 // ── MI PROGRESO ──
