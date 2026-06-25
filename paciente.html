@@ -335,6 +335,45 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .brand-footer-text .curg{color:var(--blue-act);font-weight:600;}
 
 .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--text3);}
+/* ── MI PROGRESO ── */
+.progreso-hero{background:linear-gradient(135deg,var(--blue-deep) 0%,#185FA5 100%);border-radius:var(--radius-xl);padding:1.25rem;margin-bottom:1rem;color:#fff;}
+.progreso-hero-title{font-size:14px;font-weight:600;opacity:.8;margin-bottom:.5rem;}
+.progreso-global{display:flex;align-items:center;gap:12px;}
+.progreso-circle{width:64px;height:64px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;flex-shrink:0;border:3px solid rgba(255,255,255,.3);}
+.pc-improve{background:rgba(67,217,140,.2);color:#43d98c;}
+.pc-stable{background:rgba(255,183,77,.2);color:#ffb74d;}
+.pc-worse{background:rgba(239,83,80,.2);color:#ef5350;}
+.pc-neutral{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);}
+.progreso-global-label{font-size:1rem;font-weight:600;}
+.progreso-global-sub{font-size:12px;opacity:.75;margin-top:2px;}
+.prog-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:.875rem;}
+.prog-card-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;display:flex;align-items:center;gap:6px;}
+.prog-scale-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);}
+.prog-scale-row:last-child{border-bottom:none;}
+.prog-scale-name{font-size:13px;font-weight:500;}
+.prog-scale-scores{display:flex;align-items:center;gap:6px;}
+.prog-score-pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;font-family:'Inter',monospace;}
+.psp-base{background:var(--card2);color:var(--text2);}
+.psp-current-better{background:var(--green-dim);color:var(--green);}
+.psp-current-same{background:var(--card2);color:var(--text2);}
+.psp-current-worse{background:var(--red-dim);color:var(--red);}
+.prog-arrow{font-size:14px;color:var(--text3);}
+.prog-trend{font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;}
+.pt-better{background:var(--green-dim);color:var(--green);}
+.pt-same{background:var(--card2);color:var(--text3);}
+.pt-worse{background:var(--red-dim);color:var(--red);}
+.prog-med-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
+.prog-med-row:last-child{border-bottom:none;}
+.prog-med-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.pmd-uro{background:var(--blue-act);}
+.pmd-combo{background:var(--amber);}
+.prog-med-info{flex:1;}
+.prog-med-name{font-size:13px;font-weight:600;}
+.prog-med-detail{font-size:11px;color:var(--text2);margin-top:1px;}
+.prog-diario-stat{text-align:center;padding:10px 0;}
+.prog-diario-num{font-size:1.4rem;font-weight:700;color:var(--blue-act);font-family:'Inter',monospace;}
+.prog-diario-lbl{font-size:11px;color:var(--text2);margin-top:2px;}
+.prog-ant-chip{display:inline-flex;padding:3px 10px;border-radius:20px;background:var(--blue-light);color:var(--blue-act);font-size:11px;font-weight:500;margin:2px;}
 /* ── SCALES PATIENT ── */
 .scale-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
 .scale-q{margin-bottom:1.25rem;}
@@ -609,6 +648,13 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 </div>
 
 
+<!-- MI PROGRESO -->
+<div class="screen" id="screen-progreso">
+  <div id="progresoContent">
+    <div style="text-align:center;padding:2rem;color:var(--text2)"><i class="ti ti-loader-2" style="font-size:1.5rem"></i><p style="margin-top:8px;font-size:13px">Cargando tu progreso...</p></div>
+  </div>
+</div>
+
 <!-- ESCALAS CLÍNICAS -->
 <div class="screen" id="screen-scales">
   <div id="scalesHomeView">
@@ -803,6 +849,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="bottom-nav" id="bottomNav" style="display:none">
   <div class="nav-item active" onclick="showScreen('main',this)"><i class="ti ti-clipboard-list nav-icon"></i><span class="nav-lbl">Diario</span></div>
   <div class="nav-item" onclick="showScreen('analysis',this)"><i class="ti ti-chart-bar nav-icon"></i><span class="nav-lbl">Análisis</span></div>
+  <div class="nav-item" onclick="showScreen('progreso',this)"><i class="ti ti-heart-rate-monitor nav-icon"></i><span class="nav-lbl">Progreso</span></div>
   <div class="nav-item" id="navScales" onclick="showScreen('scales',this)" style="position:relative;display:none"><i class="ti ti-chart-bar-off nav-icon"></i><span class="nav-lbl">Escalas</span><span id="scalesDot" style="display:none;position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--coral)"></span></div>
   <div class="nav-item" onclick="showScreen('messages',this)" style="position:relative"><i class="ti ti-message-circle nav-icon"></i><span class="nav-lbl">Mensajes</span><span id="msgDot" style="display:none;position:absolute;top:6px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--coral)"></span></div>
   <div class="nav-item" onclick="showScreen('profile',this)"><i class="ti ti-user-circle nav-icon"></i><span class="nav-lbl">Perfil</span></div>
@@ -1083,6 +1130,7 @@ window.showScreen=(name,el)=>{
   if(name==='profile'){ renderProfile(); renderNotifToggles(); }
   if(name==='messages') loadDoctorMessages();
   if(name==='scales') loadScalesForPatient();
+  if(name==='progreso') loadMiProgreso();
 };
 
 // ── GREETING ──
@@ -1423,11 +1471,19 @@ window.genPDF=async()=>{
   const avgDB=acRecs.length?(acRecs.reduce((a,r)=>a+(r.acoustics?.avgDB||0),0)/acRecs.length).toFixed(1):'—';
   const urgC=[0,0,0,0,0]; mics.forEach(r=>{if(r.urgency!=null)urgC[r.urgency]++;});
 
-  // Load sleep and wellbeing data
-  const sleepSnap=await getDocs(collection(db,'patients',patient.id,'sleep'));
-  const wbSnap=await getDocs(collection(db,'patients',patient.id,'wellbeing'));
+  // Load sleep, wellbeing, meds, scales
+  const [sleepSnap,wbSnap,medSnapPDF,scaleReqSnapPDF,scaleResSnapPDF]=await Promise.all([
+    getDocs(collection(db,'patients',patient.id,'sleep')),
+    getDocs(collection(db,'patients',patient.id,'wellbeing')),
+    getDocs(collection(db,'patients',patient.id,'medications')),
+    getDocs(collection(db,'patients',patient.id,'scaleRequests')),
+    getDocs(collection(db,'patients',patient.id,'scaleResults'))
+  ]);
   const sleepMap={}; sleepSnap.docs.forEach(d=>{sleepMap[d.id]=d.data();});
   const wbMap={}; wbSnap.docs.forEach(d=>{wbMap[d.id]=d.data();});
+  const pdfMeds=medSnapPDF.docs.map(d=>d.data());
+  const pdfScaleReqs=scaleReqSnapPDF.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.status==='completed').sort((a,b)=>(a.requestedAt?.seconds||0)-(b.requestedAt?.seconds||0));
+  const pdfScaleRes=scaleResSnapPDF.docs.map(d=>d.data());
 
   const styles=`body{font-family:Arial,sans-serif;max-width:900px;margin:0 auto;padding:2rem;color:#1e2a3a;font-size:12px;}
   .hdr{background:#042C53;color:#fff;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;}
@@ -1533,6 +1589,39 @@ window.genPDF=async()=>{
   <table><tr><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Volumen</th><th>Notas</th></tr>
   ${drks.sort((a,b)=>a.date.localeCompare(b.date)).map(r=>`<tr><td>${r.date}</td><td>${r.hora}</td><td>${r.tipo}</td><td>${r.vol||0} ml</td><td>${r.notas||'—'}</td></tr>`).join('')}
   </table>
+
+  ${(patient.antecedentes&&patient.antecedentes.length)?`<h2>Antecedentes urológicos</h2><div style="margin-bottom:8px">${(patient.antecedentes||[]).map(a=>`<span style="display:inline-block;padding:2px 10px;border-radius:20px;background:#e6f1fb;color:#185FA5;font-size:11px;font-weight:500;margin:2px">${a}</span>`).join('')}</div>${patient.antOtros?`<p style="font-size:12px;color:#4a5675">${patient.antOtros}</p>`:''}`:''}
+
+  ${pdfMeds.length?`<h2>Medicamentos</h2><table><tr style="background:#f0f4f8"><th>Medicamento</th><th>Dosis</th><th>Frecuencia</th><th>Tipo</th><th>Desde</th><th>Estado</th></tr>${pdfMeds.map(m=>`<tr><td style="font-weight:500">${m.nombre} ${m.dosis||''}</td><td>${m.frecuencia||'—'}</td><td>${m.tipo==='uro'?'Urológico':'Comorbilidad'}</td><td>${m.fechaInicio||'—'}</td><td>${m.activo===false?'<span style="color:#c62828">Discontinuado</span>':'<span style="color:#2e7d32">Activo</span>'}</td></tr>`).join('')}</table>`:''}
+
+  ${pdfScaleReqs.length?`<h2>Escalas clínicas — Seguimiento comparativo</h2><p style="font-size:11px;color:#64748b;margin-bottom:8px">ICS 2019, EAU Guidelines 2023.</p>${(patient.assignedScales||[]).map(scaleId=>{const def=PAC_SCALES_CATALOG.find(s=>s.id===scaleId);if(!def)return '';const results=pdfScaleReqs.map(req=>{const r=pdfScaleRes.find(r=>r.requestId===req.id&&r.scaleId===scaleId);if(!r)return null;const t=r.scores?.reduce((a,b)=>a+b,0)||0;return {t,label:req.type==='baseline'?'Línea base':req.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'Seguimiento'};}).filter(Boolean);if(!results.length)return '';const maxS=def.questions.reduce((a,q)=>a+(q.max||0),0);return `<div style="margin-bottom:10px;border:1px solid #e2e8f0;border-radius:8px;padding:10px"><div style="font-weight:600;font-size:12px;margin-bottom:6px">${def.name} — ${def.full}</div><table><tr style="background:#f0f4f8"><td style="font-weight:600;padding:4px 8px">Evaluación</td>${results.map(r=>`<td style="padding:4px 8px;text-align:center;font-weight:600">${r.label}</td>`).join('')}</tr><tr><td style="padding:4px 8px;color:#64748b">Score (/${maxS})</td>${results.map(r=>`<td style="padding:4px 8px;text-align:center;font-weight:700;font-family:monospace">${r.t}</td>`).join('')}</tr></table></div>`;}).join('')}`:''}
+
+  \${(()=>{
+    if(!pdfMeds.filter(m=>m.fechaInicio).length||!pdfScaleReqs.length||!(patient.assignedScales?.length)) return '';
+    const comparisons=pdfMeds.filter(m=>m.fechaInicio).map(m=>{
+      const before=pdfScaleReqs.filter(r=>{const d=r.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'';return d<m.fechaInicio;});
+      const after=pdfScaleReqs.filter(r=>{const d=r.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'';return d>=m.fechaInicio;});
+      if(!before.length||!after.length) return null;
+      const bReq=before[before.length-1],aReq=after[0];
+      const deltas=(patient.assignedScales||[]).map(scaleId=>{
+        const def=PAC_SCALES_CATALOG.find(s=>s.id===scaleId);if(!def)return null;
+        const bR=pdfScaleRes.find(r=>r.requestId===bReq.id&&r.scaleId===scaleId);
+        const aR=pdfScaleRes.find(r=>r.requestId===aReq.id&&r.scaleId===scaleId);
+        if(!bR||!aR)return null;
+        const bT=bR.scores?.reduce((a,b)=>a+b,0)||0,aT=aR.scores?.reduce((a,b)=>a+b,0)||0;
+        return {name:def.name,before:bT,after:aT,delta:bT-aT};
+      }).filter(Boolean);
+      return deltas.length?{med:m,deltas}:null;
+    }).filter(Boolean);
+    if(!comparisons.length) return '';
+    return \`<h2>Impacto de medicamentos en escalas clínicas</h2>
+    <p style="font-size:11px;color:#64748b;margin-bottom:8px">Comparación de scores antes y después de iniciar cada medicamento.</p>
+    \${comparisons.map(c=>\`<div style="margin-bottom:10px;border:1px solid #e2e8f0;border-radius:8px;padding:10px">
+      <div style="font-weight:600;font-size:12px;margin-bottom:6px">\${c.med.nombre} \${c.med.dosis||''} — desde \${c.med.fechaInicio}</div>
+      <table><tr style="background:#f0f4f8"><th>Escala</th><th>Antes</th><th>Después</th><th>Cambio</th><th>Impacto</th></tr>
+      \${c.deltas.map(d=>\`<tr><td style="font-weight:500">\${d.name}</td><td style="text-align:center;font-family:monospace">\${d.before}</td><td style="text-align:center;font-family:monospace">\${d.after}</td><td style="text-align:center;font-family:monospace;color:\${d.delta>0?'#2e7d32':d.delta<0?'#c62828':'#64748b'};font-weight:700">\${d.delta>0?'-'+d.delta:d.delta<0?'+'+Math.abs(d.delta):'0'}</td><td style="text-align:center"><span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:\${d.delta>0?'#e8f5e9;color:#2e7d32':d.delta<0?'#ffebee;color:#c62828':'#f0f4f8;color:#64748b'}">\${d.delta>0?'Mejoría':d.delta<0?'Empeoramiento':'Sin cambio'}</span></td></tr>\`).join('')}
+      </table></div>\`).join('')}\`;
+  })()}
 
   <div class="footer">
     Diario Miccional v2.0 · by <strong>InnoIA</strong> · verificado <strong>CURG</strong> (Colombian Urology Research Group)<br>
@@ -1831,10 +1920,14 @@ async function loadScalesForPatient(){
     const banner=document.getElementById('pendingScalesBanner');
     if(banner && pending.length>0){
       banner.style.display='block';
-      banner.innerHTML=`<div class="pending-scales-banner" onclick="showScreen('scales',document.getElementById('navScales'))">
+      // Make sure scales nav is visible when there are pending scales
+      if(navTab) navTab.style.display='flex';
+      banner.innerHTML=`<div class="pending-scales-banner" onclick="openScalesDirectly()">
         <h3><i class="ti ti-clipboard-check" style="margin-right:6px"></i>Tienes ${pending.length} escala(s) pendiente(s)</h3>
         <p>Tu médico solicita que completes estas escalas · Toca para completar</p>
       </div>`;
+    } else if(banner) {
+      banner.style.display='none';
     }
     
     // Also show on main screen as action banner
@@ -2088,6 +2181,208 @@ async function loadPatientAntsView(){
       (otros?`<p style="font-size:12px;color:var(--text2);margin-top:8px">${otros}</p>`:'');
   }catch(e){ el.innerHTML=''; }
 }
+
+// ── MI PROGRESO ──
+async function loadMiProgreso(){
+  const el=document.getElementById('progresoContent');
+  if(!el||!patient?.id) return;
+  el.innerHTML='<div style="text-align:center;padding:2rem;color:var(--text2)"><i class="ti ti-loader-2" style="font-size:1.5rem"></i></div>';
+  
+  try{
+    // Load everything in parallel
+    const [patSnap,recSnap,slSnap,medSnap,scaleReqSnap,scaleResSnap]=await Promise.all([
+      getDoc(doc(db,'patients',patient.id)),
+      getDocs(query(collection(db,'patients',patient.id,'records'),orderBy('timestamp','desc'))),
+      getDocs(collection(db,'patients',patient.id,'sleep')),
+      getDocs(collection(db,'patients',patient.id,'medications')),
+      getDocs(collection(db,'patients',patient.id,'scaleRequests')),
+      getDocs(collection(db,'patients',patient.id,'scaleResults'))
+    ]);
+    
+    const patData=patSnap.exists()?patSnap.data():{};
+    const recs=recSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const meds=medSnap.docs.map(d=>({id:d.id,...d.data()})).filter(m=>m.activo!==false);
+    const scaleReqs=scaleReqSnap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.status==='completed')
+      .sort((a,b)=>(a.requestedAt?.seconds||0)-(b.requestedAt?.seconds||0));
+    const scaleRes=scaleResSnap.docs.map(d=>({id:d.id,...d.data()}));
+    
+    const mics=recs.filter(r=>r.type==='miction');
+    const drks=recs.filter(r=>r.type==='drink');
+    const leaks=recs.filter(r=>r.type==='leak');
+    const last7=new Date(); last7.setDate(last7.getDate()-6);
+    const from7=last7.toISOString().slice(0,10);
+    const mics7=mics.filter(r=>r.date>=from7);
+    const avgVol=mics7.length?Math.round(mics7.reduce((a,r)=>a+(r.vol||0),0)/mics7.length):0;
+    const days7=[...new Set(mics7.map(r=>r.date))].length||1;
+    const avgMic7=mics7.length?+(mics7.length/days7).toFixed(1):0;
+    
+    // ── GLOBAL IMPROVEMENT ──
+    const assignedScales=patData.assignedScales||patient.assignedScales||[];
+    let globalPct=null;
+    if(scaleReqs.length>=2 && assignedScales.length){
+      const baseline=scaleReqs[0];
+      const latest=scaleReqs[scaleReqs.length-1];
+      let total=0; let count=0;
+      assignedScales.forEach(id=>{
+        const def=PAC_SCALES_CATALOG.find(s=>s.id===id);
+        if(!def) return;
+        const bR=scaleRes.find(r=>r.requestId===baseline.id&&r.scaleId===id);
+        const lR=scaleRes.find(r=>r.requestId===latest.id&&r.scaleId===id);
+        if(!bR||!lR) return;
+        const bT=bR.scores?.reduce((a,b)=>a+b,0)||0;
+        const lT=lR.scores?.reduce((a,b)=>a+b,0)||0;
+        const maxS=def.questions.reduce((a,q)=>a+(q.max||0),0);
+        if(maxS>0){ total+=((bT-lT)/maxS)*100; count++; }
+      });
+      if(count>0) globalPct=total/count;
+    }
+    
+    // ── RENDER ──
+    let html='';
+    
+    // Hero card - global score
+    const heroIcon=globalPct===null?'→':globalPct>5?'↑':globalPct<-5?'↓':'→';
+    const heroClass=globalPct===null?'pc-neutral':globalPct>5?'pc-improve':globalPct<-5?'pc-worse':'pc-stable';
+    const heroLabel=globalPct===null?'Seguimiento en curso':globalPct>5?'Mejorando':globalPct<-5?'Empeoramiento':'Estable';
+    const heroSub=globalPct===null?'Completa más evaluaciones para ver tu tendencia':`${globalPct>0?'+':''}${globalPct.toFixed(0)}% de cambio promedio en tus síntomas`;
+    
+    html+=`<div class="progreso-hero">
+      <div class="progreso-hero-title">Mi progreso clínico</div>
+      <div class="progreso-global">
+        <div class="progreso-circle ${heroClass}">${heroIcon}<span style="font-size:10px;font-weight:400;margin-top:1px">${globalPct!==null?Math.abs(globalPct).toFixed(0)+'%':''}</span></div>
+        <div>
+          <div class="progreso-global-label">${heroLabel}</div>
+          <div class="progreso-global-sub">${heroSub}</div>
+          ${scaleReqs.length?`<div style="font-size:11px;opacity:.6;margin-top:4px">${scaleReqs.length} evaluacion(es) completada(s)</div>`:''}
+        </div>
+      </div>
+    </div>`;
+    
+    // ── ESCALAS SECTION ──
+    if(assignedScales.length && scaleReqs.length>=1){
+      html+=`<div class="prog-card">
+        <div class="prog-card-title"><i class="ti ti-chart-bar-off" style="font-size:14px"></i>Mis síntomas (escalas)</div>`;
+      
+      assignedScales.forEach(scaleId=>{
+        const def=PAC_SCALES_CATALOG.find(s=>s.id===scaleId);
+        if(!def) return;
+        const results=scaleReqs.map(req=>{
+          const r=scaleRes.find(r=>r.requestId===req.id&&r.scaleId===scaleId);
+          if(!r) return null;
+          return {t:r.scores?.reduce((a,b)=>a+b,0)||0, date:req.type==='baseline'?'Inicio':req.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'—'};
+        }).filter(Boolean);
+        if(!results.length) return;
+        
+        const first=results[0];
+        const last=results[results.length-1];
+        const maxS=def.questions.reduce((a,q)=>a+(q.max||0),0);
+        const interp=pacScaleInterpret(scaleId,last.t);
+        const trend=results.length>1?(last.t<first.t?'better':last.t>first.t?'worse':'same'):'same';
+        const trendLabel=trend==='better'?'↓ Mejora':trend==='worse'?'↑ Empeora':'→ Igual';
+        const scoreClass=trend==='better'?'psp-current-better':trend==='worse'?'psp-current-worse':'psp-current-same';
+        const trendClass=trend==='better'?'pt-better':trend==='worse'?'pt-worse':'pt-same';
+        
+        html+=`<div class="prog-scale-row">
+          <div>
+            <div class="prog-scale-name">${def.name}</div>
+            <div style="font-size:11px;color:var(--text2)">${def.full}</div>
+          </div>
+          <div class="prog-scale-scores">
+            ${results.length>1?`<span class="prog-score-pill psp-base" title="Línea base">${first.t}</span><span class="prog-arrow">→</span>`:''}
+            <span class="prog-score-pill ${scoreClass}">${last.t}<span style="font-size:9px;opacity:.7">/${maxS}</span></span>
+            ${results.length>1?`<span class="prog-trend ${trendClass}">${trendLabel}</span>`:''}
+          </div>
+        </div>`;
+      });
+      html+='</div>';
+    } else if(assignedScales.length && !scaleReqs.length){
+      html+=`<div class="prog-card">
+        <div class="prog-card-title"><i class="ti ti-chart-bar-off" style="font-size:14px"></i>Mis síntomas (escalas)</div>
+        <div style="font-size:13px;color:var(--text2);text-align:center;padding:1rem">Tu médico ha asignado escalas. Las completarás en tu próxima visita.</div>
+      </div>`;
+    }
+    
+    // ── DIARIO MICCIONAL RESUMEN ──
+    const mode=patData.mode||patient.mode||'diary';
+    if(mode!=='scales'){
+      html+=`<div class="prog-card">
+        <div class="prog-card-title"><i class="ti ti-droplets" style="font-size:14px"></i>Mi diario miccional (últimos 7 días)</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div class="prog-diario-stat">
+            <div class="prog-diario-num">${avgMic7}</div>
+            <div class="prog-diario-lbl">mic/día</div>
+            <div style="font-size:10px;color:${avgMic7>8?'var(--red)':avgMic7<4&&avgMic7>0?'var(--amber)':'var(--green)'};margin-top:2px">${avgMic7>8?'Alta frecuencia':avgMic7<4&&avgMic7>0?'Baja frecuencia':avgMic7===0?'Sin datos':'Normal'}</div>
+          </div>
+          <div class="prog-diario-stat">
+            <div class="prog-diario-num">${avgVol}<span style="font-size:12px">ml</span></div>
+            <div class="prog-diario-lbl">volumen prom.</div>
+            <div style="font-size:10px;color:${avgVol>0&&avgVol<150?'var(--red)':avgVol>400?'var(--amber)':'var(--green)'};margin-top:2px">${avgVol>0&&avgVol<150?'Volumen bajo':avgVol>400?'Volumen alto':avgVol===0?'Sin datos':'Normal'}</div>
+          </div>
+          <div class="prog-diario-stat">
+            <div class="prog-diario-num" style="color:${leaks.length>0?'var(--amber)':'var(--green)'}">${leaks.length}</div>
+            <div class="prog-diario-lbl">fugas totales</div>
+            <div style="font-size:10px;color:${leaks.length>0?'var(--amber)':'var(--green)'};margin-top:2px">${leaks.length>0?'Registradas':'Sin fugas'}</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;color:var(--text2)">
+          <span><i class="ti ti-droplet" style="font-size:12px"></i> Líquidos: ${drks.filter(r=>r.date>=from7).reduce((a,r)=>a+(r.vol||0),0)}ml</span>
+          <span><i class="ti ti-moon" style="font-size:12px"></i> Días registrados: ${days7}/${Math.min(7,[...new Set(recs.map(r=>r.date))].length||0)}</span>
+        </div>
+      </div>`;
+    }
+    
+    // ── MEDICAMENTOS ──
+    if(meds.length){
+      html+=`<div class="prog-card">
+        <div class="prog-card-title"><i class="ti ti-pill" style="font-size:14px"></i>Mis medicamentos activos</div>
+        ${meds.map(m=>`<div class="prog-med-row">
+          <div class="prog-med-dot ${m.tipo==='uro'?'pmd-uro':'pmd-combo'}"></div>
+          <div class="prog-med-info">
+            <div class="prog-med-name">${m.nombre} ${m.dosis||''}</div>
+            <div class="prog-med-detail">${m.frecuencia||''}${m.fechaInicio?' · desde '+m.fechaInicio:''}</div>
+          </div>
+        </div>`).join('')}
+      </div>`;
+    }
+    
+    // ── ANTECEDENTES ──
+    const ants=patData.antecedentes||patient.antecedentes||[];
+    const antOtros=patData.antOtros||patient.antOtros||'';
+    if(ants.length||antOtros){
+      html+=`<div class="prog-card">
+        <div class="prog-card-title"><i class="ti ti-notes-medical" style="font-size:14px"></i>Mis antecedentes</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">
+          ${ants.map(a=>`<span class="prog-ant-chip">${a}</span>`).join('')}
+        </div>
+        ${antOtros?`<p style="font-size:12px;color:var(--text2);margin-top:8px">${antOtros}</p>`:''}
+      </div>`;
+    }
+    
+    // ── PENDING SCALES REMINDER ──
+    const pendingReqs=scaleReqSnap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.status==='pending');
+    if(pendingReqs.length){
+      html+=`<div style="background:var(--coral-light);border:1px solid var(--coral);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1rem;cursor:pointer" onclick="openScalesDirectly()">
+        <div style="font-size:13px;font-weight:600;color:var(--coral-dark)"><i class="ti ti-clipboard-check" style="margin-right:6px"></i>Tienes ${pendingReqs.length} evaluación(es) pendiente(s)</div>
+        <div style="font-size:12px;color:var(--coral-dark);opacity:.8;margin-top:3px">Toca aquí para completarlas · Tu médico las está esperando</div>
+      </div>`;
+    }
+    
+    if(!ants.length&&!meds.length&&!scaleReqs.length&&mics7.length===0){
+      html='<div class="empty-state"><i class="ti ti-heart-rate-monitor" style="font-size:2rem;margin-bottom:.5rem;display:block"></i><p>Tu progreso aparecerá aquí cuando registres datos y completes tus evaluaciones.</p></div>';
+    }
+    
+    el.innerHTML=html;
+  }catch(e){
+    el.innerHTML=`<div style="color:var(--red);font-size:12px;padding:1rem">Error cargando progreso: ${e.message}</div>`;
+  }
+}
+
+window.openScalesDirectly=()=>{
+  const navEl=document.getElementById('navScales');
+  if(navEl) navEl.style.display='flex';
+  showScreen('scales', navEl||document.querySelector('.nav-item'));
+  loadScalesForPatient();
+};
 
 window.backToScalesHome=()=>{
   document.getElementById('scalesHomeView').style.display='block';
