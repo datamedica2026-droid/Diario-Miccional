@@ -335,6 +335,33 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .brand-footer-text .curg{color:var(--blue-act);font-weight:600;}
 
 .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--text3);}
+/* ── SCALES PATIENT ── */
+.scale-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
+.scale-q{margin-bottom:1.25rem;}
+.scale-q-text{font-size:14px;font-weight:500;margin-bottom:.75rem;line-height:1.5;}
+.scale-q-num{display:inline-flex;width:26px;height:26px;border-radius:50%;background:var(--blue-act);color:#fff;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-right:8px;flex-shrink:0;}
+.scale-opts{display:flex;flex-direction:column;gap:6px;}
+.scale-opt{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s;}
+.scale-opt:active{transform:scale(.98);}
+.scale-opt.selected{border-color:var(--blue-act);background:var(--blue-light);}
+.scale-opt input{display:none;}
+.scale-opt-label{font-size:13px;color:var(--text);}
+.scale-opt-val{margin-left:auto;font-size:11px;font-weight:700;color:var(--text3);font-family:'Inter',monospace;}
+.scale-slider{width:100%;accent-color:var(--blue-act);height:6px;margin:10px 0;}
+.scale-progress{display:flex;gap:3px;margin-bottom:1rem;}
+.scale-prog-dot{flex:1;height:4px;border-radius:2px;background:var(--border);}
+.scale-prog-dot.done{background:var(--blue-act);}
+.scale-prog-dot.active{background:var(--coral);}
+.scale-result-banner{background:var(--blue-light);border:1px solid var(--blue-act);border-radius:var(--radius-lg);padding:1.25rem;text-align:center;margin-bottom:1rem;}
+.scale-result-score{font-size:2rem;font-weight:700;color:var(--blue-act);font-family:'Inter',monospace;}
+.scale-result-interp{font-size:13px;font-weight:600;margin-top:4px;}
+.ant-view-chip{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;background:var(--blue-light);color:var(--blue-act);font-size:11px;font-weight:500;margin:3px;}
+.med-pac-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:8px;}
+.med-pac-item h4{font-size:14px;font-weight:600;}
+.med-pac-item p{font-size:12px;color:var(--text2);margin-top:3px;}
+.pending-scales-banner{background:linear-gradient(135deg,var(--blue-deep),#185FA5);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;cursor:pointer;}
+.pending-scales-banner h3{font-size:14px;font-weight:600;color:#fff;margin-bottom:4px;}
+.pending-scales-banner p{font-size:12px;color:#B5D4F4;}
 .date-filter{display:flex;gap:8px;margin-bottom:1rem;overflow-x:auto;padding-bottom:4px;}
 .date-chip{padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;color:var(--text2);}
 .date-chip.active{background:var(--blue-light);border-color:var(--blue-act);color:var(--blue-act);}
@@ -581,6 +608,28 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div id="recordsList"></div>
 </div>
 
+
+<!-- ESCALAS CLÍNICAS -->
+<div class="screen" id="screen-scales">
+  <div id="scalesHomeView">
+    <div style="font-size:1rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:8px">
+      <i class="ti ti-chart-bar-off" style="color:var(--blue-act);font-size:20px"></i>Mis escalas
+    </div>
+    <div id="pendingScalesBanner" style="display:none"></div>
+    <div id="scalesHistoryContent">
+      <div class="empty-state"><i class="ti ti-chart-bar-off"></i><p>Sin escalas asignadas.</p></div>
+    </div>
+  </div>
+  <div id="scalesFillView" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+      <button class="btn btn-sm" onclick="backToScalesHome()"><i class="ti ti-arrow-left"></i>Volver</button>
+      <div style="font-size:1rem;font-weight:600" id="scaleFillTitle">Completando escalas</div>
+    </div>
+    <div class="scale-progress" id="scaleProgressDots"></div>
+    <div id="scaleFillContent"></div>
+  </div>
+</div>
+
 <!-- MENSAJES -->
 <div class="screen" id="screen-messages">
   <div style="font-size:1rem;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px">
@@ -730,6 +779,18 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
   </div>
   <div id="notifStatus" style="font-size:11px;color:var(--text2);text-align:center;margin-bottom:1rem"></div>
+  <!-- Antecedentes -->
+  <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.04em;margin-top:.5rem">Antecedentes</div>
+  <div id="patAntView" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1rem">
+    <div style="font-size:12px;color:var(--text2)">Cargando...</div>
+  </div>
+
+  <!-- Medicamentos -->
+  <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:.04em">Medicamentos activos</div>
+  <div id="patMedsView" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;margin-bottom:1rem">
+    <div style="font-size:12px;color:var(--text2)">Cargando...</div>
+  </div>
+
   <button class="btn btn-danger btn-full" style="margin-bottom:10px" onclick="revokeConsent()"><i class="ti ti-trash"></i>Revocar consentimiento y eliminar datos</button>
   <button class="btn btn-full" onclick="logout()" style="border-color:var(--border2)"><i class="ti ti-logout"></i>Cerrar sesión</button>
   <div class="brand-footer" style="margin-top:1rem;flex-direction:column;gap:4px">
@@ -742,8 +803,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 <div class="bottom-nav" id="bottomNav" style="display:none">
   <div class="nav-item active" onclick="showScreen('main',this)"><i class="ti ti-clipboard-list nav-icon"></i><span class="nav-lbl">Diario</span></div>
   <div class="nav-item" onclick="showScreen('analysis',this)"><i class="ti ti-chart-bar nav-icon"></i><span class="nav-lbl">Análisis</span></div>
+  <div class="nav-item" id="navScales" onclick="showScreen('scales',this)" style="position:relative;display:none"><i class="ti ti-chart-bar-off nav-icon"></i><span class="nav-lbl">Escalas</span><span id="scalesDot" style="display:none;position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--coral)"></span></div>
   <div class="nav-item" onclick="showScreen('messages',this)" style="position:relative"><i class="ti ti-message-circle nav-icon"></i><span class="nav-lbl">Mensajes</span><span id="msgDot" style="display:none;position:absolute;top:6px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--coral)"></span></div>
-  <div class="nav-item" onclick="showScreen('instructions',this)"><i class="ti ti-info-circle nav-icon"></i><span class="nav-lbl">Guía</span></div>
   <div class="nav-item" onclick="showScreen('profile',this)"><i class="ti ti-user-circle nav-icon"></i><span class="nav-lbl">Perfil</span></div>
 </div>
 
@@ -953,6 +1014,7 @@ function enterApp(){
   renderGreeting(); renderProfile(); loadSleep(); subscribeRecords();
   updateStreak(); loadWb(); renderNotifToggles(); scheduleNotifs();
   loadDoctorMessages();
+  loadScalesForPatient();
 }
 
 // ── ONBOARD ──
@@ -1020,6 +1082,7 @@ window.showScreen=(name,el)=>{
   if(name==='analysis') renderAnalysis();
   if(name==='profile'){ renderProfile(); renderNotifToggles(); }
   if(name==='messages') loadDoctorMessages();
+  if(name==='scales') loadScalesForPatient();
 };
 
 // ── GREETING ──
@@ -1198,7 +1261,7 @@ async function startMicAndChrono(){
     startChronoTimer();
     const t0=Date.now();
     sampleInt=setInterval(()=>{ acousticSamples.push({t:Date.now()-t0,db:Math.max(0,getDB()-baseline)}); },100);
-  },2000);
+  },3000);
 }
 
 function getDB(){ if(!analyserNode) return 0; const d=new Uint8Array(analyserNode.frequencyBinCount); analyserNode.getByteFrequencyData(d); return 20*Math.log10(Math.max(1,d.reduce((a,b)=>a+b,0)/d.length)); }
@@ -1682,6 +1745,356 @@ function getWeekLabel(dateStr){
   const sun=new Date(mon); sun.setDate(mon.getDate()+6);
   return mon.toLocaleDateString('es',{month:'short',day:'numeric'})+' – '+sun.toLocaleDateString('es',{month:'short',day:'numeric'});
 }
+
+// ── SCALES ENGINE (PATIENT) ──
+// Same catalog as doctor (duplicated for offline support)
+const PAC_SCALES_CATALOG = [
+  {id:'ipss',name:'IPSS',full:'Síntomas del Tracto Urinario Inferior',questions:[
+    {q:'¿Con qué frecuencia ha tenido sensación de no vaciar completamente la vejiga?',labels:['Nunca','Rara vez (1 de cada 5 veces)','A veces (1 de cada 3 veces)','La mitad de las veces','Casi siempre (2 de cada 3 veces)','Casi siempre (más de 2 de cada 3)'],max:5},
+    {q:'¿Con qué frecuencia ha tenido que orinar de nuevo menos de 2 horas después?',labels:['Nunca','Rara vez','A veces','La mitad de las veces','Casi siempre','Siempre'],max:5},
+    {q:'¿Con qué frecuencia ha tenido que interrumpir y reanudar el chorro al orinar?',labels:['Nunca','Rara vez','A veces','La mitad de las veces','Casi siempre','Siempre'],max:5},
+    {q:'¿Con qué frecuencia le ha resultado difícil aguantarse las ganas de orinar?',labels:['Nunca','Rara vez','A veces','La mitad de las veces','Casi siempre','Siempre'],max:5},
+    {q:'¿Con qué frecuencia ha tenido un chorro de orina débil?',labels:['Nunca','Rara vez','A veces','La mitad de las veces','Casi siempre','Siempre'],max:5},
+    {q:'¿Con qué frecuencia ha tenido que hacer fuerza para empezar a orinar?',labels:['Nunca','Rara vez','A veces','La mitad de las veces','Casi siempre','Siempre'],max:5},
+    {q:'¿Cuántas veces suele levantarse a orinar desde que se acuesta hasta que se levanta?',labels:['Ninguna','1 vez','2 veces','3 veces','4 veces','5 o más veces'],max:5},
+    {q:'Si tuviera que pasar el resto de su vida con los síntomas urinarios tal como los tiene ahora, ¿cómo se sentiría?',labels:['Encantado','Satisfecho','Bastante satisfecho','Indiferente','Bastante insatisfecho','Disgustado','Fatal'],max:6,isQoL:true}
+  ]},
+  {id:'oabq',name:'OAB-q SF',full:'Vejiga Hiperactiva — Molestia por Síntomas',questions:[
+    {q:'¿Cuánto le ha molestado orinar con mucha frecuencia durante el día?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Muchísimo'],max:6},
+    {q:'¿Cuánto le ha molestado sentir una necesidad repentina e intensa de orinar?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Muchísimo'],max:6},
+    {q:'¿Cuánto le ha molestado que esa necesidad llegue de repente, sin aviso?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Muchísimo'],max:6},
+    {q:'¿Cuánto le ha molestado perder pequeñas cantidades de orina de forma accidental?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Muchísimo'],max:6},
+    {q:'¿Cuánto le ha molestado levantarse a orinar durante la noche?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Muchísimo'],max:6},
+    {q:'¿Cuánto le ha molestado sentir que moja la ropa antes de llegar al baño?',labels:['Nada','Muy poco','Poco','Algo','Bastante','Mucho','Muchísimo'],max:6}
+  ]},
+  {id:'iciqn',name:'ICIQ-N',full:'Nocturia',questions:[
+    {q:'¿Cuántas veces se levanta a orinar en una noche típica?',labels:['Ninguna','1 vez','2 veces','3 veces','4 o más veces'],max:4},
+    {q:'¿Cuánto le molesta levantarse a orinar durante la noche?',labels:['Nada','Un poco','Moderadamente','Bastante','Muchísimo'],max:4},
+    {q:'¿Estas visitas nocturnas al baño afectan su vida diaria?',labels:['Nada','Un poco','Moderadamente','Bastante','Muchísimo'],max:4}
+  ]},
+  {id:'udi6',name:'UDI-6',full:'Inventario de Molestias Urogenitales',questions:[
+    {q:'¿Tiene con frecuencia ganas de orinar?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
+    {q:'¿Pierde orina con una sensación de urgencia?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
+    {q:'¿Pierde orina al toser, estornudar o reírse?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
+    {q:'¿Tiene pérdidas pequeñas de orina (gotitas)?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
+    {q:'¿Siente que no vacía completamente la vejiga al orinar?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3},
+    {q:'¿Siente dolor o malestar en la parte baja del abdomen o zona genital?',labels:['No me molesta','Me molesta algo','Molesta moderadamente','Me molesta bastante'],max:3}
+  ]},
+  {id:'iciqsf',name:'ICIQ-UI SF',full:'Incontinencia Urinaria',questions:[
+    {q:'¿Con qué frecuencia pierde orina?',labels:['Nunca','Una vez a la semana o menos','2 o 3 veces a la semana','Una vez al día','Varias veces al día','Continuamente'],max:5},
+    {q:'¿Qué cantidad de orina pierde habitualmente?',labels:['No pierdo nada','Muy poca cantidad (gotitas)','Una cantidad pequeña','Una cantidad moderada','Una cantidad grande','Mucha cantidad'],max:5},
+    {q:'¿Cuánto afectan estas pérdidas a su vida diaria? (0=nada, 10=muchísimo)',isSlider:true,max:10}
+  ]},
+  {id:'pgii',name:'PGI-I',full:'Impresión Global de Mejoría',questions:[
+    {q:'¿Cómo describiría su condición urinaria ahora, comparada con ANTES de empezar el tratamiento?',labels:['Muchísimo mejor','Mucho mejor','Un poco mejor','Sin cambio — igual que antes','Un poco peor','Mucho peor','Muchísimo peor'],max:6}
+  ]}
+];
+
+function pacScaleInterpret(id, total){
+  const map={
+    ipss: [[7,'Leve'],[19,'Moderado'],[35,'Severo']],
+    oabq: [[8,'Leve'],[18,'Moderado'],[36,'Severo']],
+    iciqn: [[2,'Normal'],[5,'Leve'],[9,'Moderado'],[12,'Severo']],
+    udi6: [[4,'Leve'],[10,'Moderado'],[18,'Severo']],
+    iciqsf: [[5,'Leve'],[12,'Moderado'],[21,'Severo']],
+    pgii: [[2,'Mejoría significativa'],[3,'Mejoría leve'],[4,'Sin cambio'],[7,'Empeoramiento']]
+  };
+  const thresholds=map[id]||[];
+  for(const[max,label] of thresholds){ if(total<=max) return label; }
+  return 'Severo';
+}
+
+// State for filling scales
+let currentRequest=null;
+let currentScaleIndex=0;
+let currentAnswers={}; // scaleId -> scores[]
+let currentScaleAnswers=[];
+
+async function loadScalesForPatient(){
+  if(!patient?.id) return;
+  try{
+    // Show/hide scales nav tab based on mode
+    const mode=patient.mode||'diary';
+    const navTab=document.getElementById('navScales');
+    if(navTab) navTab.style.display=(mode==='scales'||mode==='both')?'flex':'none';
+
+    // Load pending requests
+    const reqSnap=await getDocs(collection(db,'patients',patient.id,'scaleRequests'));
+    const requests=reqSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const pending=requests.filter(r=>r.status==='pending');
+    
+    // Show badge if pending
+    const dot=document.getElementById('scalesDot');
+    if(dot) dot.style.display=pending.length>0?'block':'none';
+    
+    // Show pending banner on main screen
+    const banner=document.getElementById('pendingScalesBanner');
+    if(banner && pending.length>0){
+      banner.style.display='block';
+      banner.innerHTML=`<div class="pending-scales-banner" onclick="showScreen('scales',document.getElementById('navScales'))">
+        <h3><i class="ti ti-clipboard-check" style="margin-right:6px"></i>Tienes ${pending.length} escala(s) pendiente(s)</h3>
+        <p>Tu médico solicita que completes estas escalas · Toca para completar</p>
+      </div>`;
+    }
+    
+    // Also show on main screen as action banner
+    renderScalesHistory(requests);
+  }catch(e){ console.error('scales load error',e); }
+}
+
+async function renderScalesHistory(requests){
+  const el=document.getElementById('scalesHistoryContent');
+  if(!el) return;
+  
+  const pending=requests.filter(r=>r.status==='pending');
+  const completed=requests.filter(r=>r.status==='completed');
+  
+  let html='';
+  
+  if(pending.length){
+    html+=`<div style="margin-bottom:1.25rem">
+      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Pendientes de completar</div>
+      ${pending.map(req=>`
+        <div class="scale-card" style="border-color:var(--coral);cursor:pointer" onclick="startFillScales('${req.id}')">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:13px;font-weight:600">${req.note||'Escalas de seguimiento'}</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:2px">${(req.scales||[]).length} escala(s) · ${req.type==='baseline'?'Línea base':'Seguimiento'}</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();startFillScales('${req.id}')"><i class="ti ti-pencil"></i>Completar</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }
+  
+  if(completed.length){
+    // Load results for comparison
+    const resSnap=await getDocs(collection(db,'patients',patient.id,'scaleResults'));
+    const allResults=resSnap.docs.map(d=>({id:d.id,...d.data()}));
+    
+    html+=`<div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Historial completado</div>`;
+    
+    // Group by scale across all requests
+    const byScale={};
+    allResults.forEach(r=>{
+      if(!byScale[r.scaleId]) byScale[r.scaleId]=[];
+      const req=completed.find(req=>req.id===r.requestId);
+      if(req) byScale[r.scaleId].push({...r,requestDate:req.requestedAt,requestType:req.type});
+    });
+    
+    Object.entries(byScale).forEach(([scaleId,results])=>{
+      const def=PAC_SCALES_CATALOG.find(s=>s.id===scaleId);
+      if(!def) return;
+      const sorted=results.sort((a,b)=>{const ta=a.requestDate?.seconds||0;const tb=b.requestDate?.seconds||0;return ta-tb;});
+      const latest=sorted[sorted.length-1];
+      const total=latest.scores?.reduce((a,b)=>a+b,0)||0;
+      const interp=pacScaleInterpret(scaleId,total);
+      const interpColor=interp.includes('Leve')||interp.includes('Normal')||interp.includes('Mejoría signif')?'var(--green)':interp.includes('Moderado')||interp.includes('Mejoría leve')?'var(--amber)':'var(--red)';
+      const prev=sorted[sorted.length-2];
+      const prevTotal=prev?.scores?.reduce((a,b)=>a+b,0);
+      const trend=prevTotal!=null?(total<prevTotal?'↓ Mejora':total>prevTotal?'↑ Empeora':'→ Igual'):null;
+      
+      html+=`<div class="scale-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${sorted.length>1?'10px':'0'}">
+          <div>
+            <div style="font-size:13px;font-weight:600">${def.name} <span style="font-size:11px;color:var(--text2);font-weight:400">— ${def.full}</span></div>
+            <div style="font-size:12px;color:${interpColor};font-weight:600;margin-top:3px">${interp} (${total}/${def.questions.reduce((a,q)=>a+(q.max||0),0)})</div>
+            ${trend?`<div style="font-size:11px;color:var(--text2);margin-top:2px">${trend} vs evaluación anterior</div>`:''}
+          </div>
+          <div style="font-size:1.3rem;font-weight:700;color:${interpColor};font-family:'Inter',monospace">${total}</div>
+        </div>
+        ${sorted.length>1?`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">
+          <tr style="background:var(--bg)">
+            ${sorted.map((r,i)=>`<th style="padding:4px 8px;text-align:center;color:var(--text3)">${i===0?'Línea base':'Seguim. '+(i)}</th>`).join('')}
+          </tr>
+          <tr>
+            ${sorted.map(r=>{const t=r.scores?.reduce((a,b)=>a+b,0)||0;const interp2=pacScaleInterpret(scaleId,t);const c=interp2.includes('Leve')||interp2.includes('Normal')?'var(--green)':interp2.includes('Moderado')?'var(--amber)':'var(--red)';return `<td style="padding:4px 8px;text-align:center;font-weight:700;color:${c};font-family:'Inter',monospace">${t}</td>`;}).join('')}
+          </tr>
+        </table></div>`:''}
+      </div>`;
+    });
+  }
+  
+  if(!pending.length&&!completed.length){
+    html='<div class="empty-state"><i class="ti ti-chart-bar-off"></i><p>Tu médico aún no ha asignado escalas de seguimiento.</p></div>';
+  }
+  
+  el.innerHTML=html;
+}
+
+// ── FILL SCALES ──
+async function startFillScales(requestId){
+  if(!patient?.id) return;
+  const reqSnap=await getDocs(collection(db,'patients',patient.id,'scaleRequests'));
+  const req=reqSnap.docs.find(d=>d.id===requestId);
+  if(!req) return;
+  currentRequest={id:requestId,...req.data()};
+  currentScaleIndex=0;
+  currentAnswers={};
+  
+  const scales=currentRequest.scales||[];
+  document.getElementById('scaleProgressDots').innerHTML=scales.map((_,i)=>`<div class="scale-prog-dot ${i===0?'active':''}" id="scaleDot${i}"></div>`).join('');
+  
+  showScreen('scales',document.getElementById('navScales'));
+  document.getElementById('scalesHomeView').style.display='none';
+  document.getElementById('scalesFillView').style.display='block';
+  
+  fillCurrentScale();
+}
+
+function fillCurrentScale(){
+  const scales=currentRequest?.scales||[];
+  if(currentScaleIndex>=scales.length){
+    submitScaleResults();
+    return;
+  }
+  const scaleId=scales[currentScaleIndex];
+  const def=PAC_SCALES_CATALOG.find(s=>s.id===scaleId);
+  if(!def){ currentScaleIndex++; fillCurrentScale(); return; }
+  
+  currentScaleAnswers=new Array(def.questions.length).fill(null);
+  
+  document.getElementById('scaleFillTitle').textContent=def.name+' — '+def.full;
+  
+  // Update progress dots
+  scales.forEach((_,i)=>{
+    const dot=document.getElementById('scaleDot'+i);
+    if(dot) dot.className='scale-prog-dot '+(i<currentScaleIndex?'done':i===currentScaleIndex?'active':'');
+  });
+  
+  const el=document.getElementById('scaleFillContent');
+  el.innerHTML=`<div class="scale-card">
+    <div style="font-size:12px;color:var(--text2);margin-bottom:1rem">${def.questions.length} pregunta(s) · Toca la respuesta que mejor te describe</div>
+    ${def.questions.map((q,qi)=>`
+      <div class="scale-q">
+        <div class="scale-q-text"><span class="scale-q-num">${qi+1}</span>${q.q}</div>
+        ${q.isSlider?`
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:11px;color:var(--text2)">0 = Nada</span>
+            <input type="range" class="scale-slider" id="scaleSlider${qi}" min="0" max="10" value="5" oninput="document.getElementById('sliderVal${qi}').textContent=this.value;currentScaleAnswers[${qi}]=parseInt(this.value)">
+            <span style="font-size:11px;color:var(--text2)">10 = Muchísimo</span>
+          </div>
+          <div style="text-align:center;font-size:1.1rem;font-weight:700;color:var(--blue-act)" id="sliderVal${qi}">5</div>
+        `:`
+          <div class="scale-opts">
+            ${(q.labels||[]).map((label,li)=>`
+              <div class="scale-opt" id="scaleOpt${qi}_${li}" onclick="selectScaleOpt(${qi},${li})">
+                <div class="scale-opt-label">${label}</div>
+                <div class="scale-opt-val">${li}</div>
+              </div>`).join('')}
+          </div>
+        `}
+      </div>`).join('')}
+    <div style="margin-top:1.5rem;display:flex;gap:10px">
+      ${currentScaleIndex>0?`<button class="btn" onclick="currentScaleIndex--;fillCurrentScale()"><i class="ti ti-arrow-left"></i>Anterior</button>`:''}
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="nextScale()">
+        ${currentScaleIndex<(currentRequest?.scales||[]).length-1?'Siguiente escala <i class="ti ti-arrow-right"></i>':'<i class="ti ti-check"></i> Finalizar y enviar'}
+      </button>
+    </div>
+  </div>`;
+  
+  // Initialize slider answers
+  def.questions.forEach((q,qi)=>{ if(q.isSlider) currentScaleAnswers[qi]=5; });
+}
+
+window.selectScaleOpt=(qi,li)=>{
+  document.querySelectorAll(`[id^="scaleOpt${qi}_"]`).forEach(el=>el.classList.remove('selected'));
+  document.getElementById(`scaleOpt${qi}_${li}`)?.classList.add('selected');
+  currentScaleAnswers[qi]=li;
+};
+
+window.nextScale=()=>{
+  const scales=currentRequest?.scales||[];
+  const def=PAC_SCALES_CATALOG.find(s=>s.id===scales[currentScaleIndex]);
+  if(!def) return;
+  
+  // Validate all questions answered
+  const unanswered=currentScaleAnswers.findIndex(a=>a===null);
+  if(unanswered>=0){
+    document.querySelectorAll('.scale-q')[unanswered]?.scrollIntoView({behavior:'smooth',block:'center'});
+    document.querySelectorAll('.scale-q')[unanswered]?.style && (document.querySelectorAll('.scale-q')[unanswered].style.borderLeft='3px solid var(--coral)');
+    return;
+  }
+  
+  currentAnswers[scales[currentScaleIndex]]=[...currentScaleAnswers];
+  currentScaleIndex++;
+  
+  if(currentScaleIndex>=scales.length){
+    submitScaleResults();
+  } else {
+    fillCurrentScale();
+  }
+};
+
+async function submitScaleResults(){
+  if(!patient?.id||!currentRequest) return;
+  try{
+    document.getElementById('scaleFillContent').innerHTML=`<div style="text-align:center;padding:2rem"><i class="ti ti-loader-2" style="font-size:2rem;color:var(--blue-act);display:block;margin-bottom:1rem"></i><p>Guardando resultados...</p></div>`;
+    
+    // Save each scale result
+    for(const [scaleId,scores] of Object.entries(currentAnswers)){
+      await addDoc(collection(db,'patients',patient.id,'scaleResults'),{
+        scaleId, scores, requestId:currentRequest.id,
+        completedAt:serverTimestamp(),
+        total:scores.reduce((a,b)=>a+b,0)
+      });
+    }
+    
+    // Mark request as completed
+    await updateDoc(doc(db,'patients',patient.id,'scaleRequests',currentRequest.id),{status:'completed',completedAt:serverTimestamp()});
+    
+    // Show completion screen
+    const scaleNames=Object.keys(currentAnswers).map(id=>PAC_SCALES_CATALOG.find(s=>s.id===id)?.name||id).join(', ');
+    document.getElementById('scaleFillContent').innerHTML=`
+      <div class="scale-result-banner">
+        <i class="ti ti-circle-check" style="font-size:2.5rem;color:var(--green);display:block;margin-bottom:1rem"></i>
+        <div style="font-size:1rem;font-weight:600;color:var(--text)">¡Escalas completadas!</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px">${scaleNames}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Tu médico puede ver los resultados en tiempo real.</div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="backToScalesHome()"><i class="ti ti-arrow-left"></i>Volver al inicio</button>`;
+    
+    // Reload scales data
+    loadScalesForPatient();
+  }catch(e){
+    document.getElementById('scaleFillContent').innerHTML=`<div style="color:var(--red);padding:1rem">Error al guardar: ${e.message}</div>`;
+  }
+}
+
+// ── PATIENT MEDS VIEW ──
+async function loadPatientMedsView(){
+  const el=document.getElementById('patMedsView'); if(!el||!patient?.id) return;
+  try{
+    const snap=await getDocs(collection(db,'patients',patient.id,'medications'));
+    const meds=snap.docs.map(d=>({id:d.id,...d.data()})).filter(m=>m.activo!==false);
+    if(!meds.length){ el.innerHTML='<p style="font-size:12px;color:var(--text2)">Sin medicamentos registrados por tu médico.</p>'; return; }
+    el.innerHTML=meds.map(m=>`<div class="med-pac-item">
+      <h4>${m.nombre} ${m.dosis||''}</h4>
+      <p>${m.frecuencia||''} · ${m.tipo==='uro'?'Urológico':'Comorbilidad'}${m.fechaInicio?' · desde '+m.fechaInicio:''}</p>
+    </div>`).join('');
+  }catch(e){ el.innerHTML=''; }
+}
+
+async function loadPatientAntsView(){
+  const el=document.getElementById('patAntView'); if(!el||!patient?.id) return;
+  try{
+    const snap=await getDoc(doc(db,'patients',patient.id));
+    if(!snap.exists()){ el.innerHTML=''; return; }
+    const data=snap.data();
+    const ants=data.antecedentes||[];
+    const otros=data.antOtros||'';
+    if(!ants.length&&!otros){ el.innerHTML='<p style="font-size:12px;color:var(--text2)">Sin antecedentes registrados.</p>'; return; }
+    el.innerHTML=(ants.map(a=>`<span class="ant-view-chip">${a}</span>`).join(''))+
+      (otros?`<p style="font-size:12px;color:var(--text2);margin-top:8px">${otros}</p>`:'');
+  }catch(e){ el.innerHTML=''; }
+}
+
+window.backToScalesHome=()=>{
+  document.getElementById('scalesHomeView').style.display='block';
+  document.getElementById('scalesFillView').style.display='none';
+  currentRequest=null;
+  loadScalesForPatient();
+};
 
 // ── PROFILE ──
 function renderProfile(){
