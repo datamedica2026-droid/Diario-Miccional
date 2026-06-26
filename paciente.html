@@ -2147,7 +2147,7 @@ async function renderScalesHistory(requests){
 }
 
 // ── FILL SCALES ──
-window.startFillScales = async function startFillScales(requestId){
+async function startFillScales(requestId){
   if(!patient?.id) return;
   const reqSnap=await getDocs(collection(db,'patients',patient.id,'scaleRequests'));
   const req=reqSnap.docs.find(d=>d.id===requestId);
@@ -2175,8 +2175,7 @@ window.startFillScales = async function startFillScales(requestId){
   fillCurrentScale();
 }
 
-
-window.fillCurrentScale = function fillCurrentScale(){
+function fillCurrentScale(){
   const scales=currentRequest?.scales||[];
   if(currentScaleIndex>=scales.length){
     submitScaleResults();
@@ -2304,12 +2303,15 @@ async function submitScaleResults(){
   try{
     document.getElementById('scaleFillContent').innerHTML=`<div style="text-align:center;padding:2rem"><i class="ti ti-loader-2" style="font-size:2rem;color:var(--blue-act);display:block;margin-bottom:1rem"></i><p>Guardando resultados...</p></div>`;
     
-    // Save each scale result
+    // Save each scale result (skip _raw entries, flatten any nested arrays)
     for(const [scaleId,scores] of Object.entries(currentAnswers)){
+      if(scaleId.endsWith('_raw')) continue; // skip raw checkbox arrays
+      // Flatten: ensure no nested arrays (checkboxMulti stored as 0, rest as numbers)
+      const flatScores=scores.map(s=>Array.isArray(s)?0:(typeof s==='number'?s:0));
       await addDoc(collection(db,'patients',patient.id,'scaleResults'),{
-        scaleId, scores, requestId:currentRequest.id,
+        scaleId, scores:flatScores, requestId:currentRequest.id,
         completedAt:serverTimestamp(),
-        total:scores.reduce((a,b)=>a+b,0)
+        total:flatScores.reduce((a,b)=>a+b,0)
       });
     }
     
