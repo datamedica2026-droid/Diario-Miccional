@@ -729,11 +729,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div style="flex:1;height:4px;border-radius:2px;background:var(--blue-act)" id="npStep1bar"></div>
       <div style="flex:1;height:4px;border-radius:2px;background:var(--border)" id="npStep2bar"></div>
       <div style="flex:1;height:4px;border-radius:2px;background:var(--border)" id="npStep3bar"></div>
-      <div style="flex:1;height:4px;border-radius:2px;background:var(--border)" id="npStep4bar"></div>
     </div>
     <!-- STEP 1 -->
     <div id="npStepBasic">
-      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:1rem"><i class="ti ti-user" style="color:var(--blue-act)"></i> Paso 1 de 4 — Datos del paciente</div>
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:1rem"><i class="ti ti-user" style="color:var(--blue-act)"></i> Paso 1 de 3 — Datos del paciente</div>
       <div class="form-row">
         <div class="form-group"><label>Nombre completo *</label><input type="text" id="npN" placeholder="María López"></div>
         <div class="form-group"><label>Fecha de nacimiento</label><input type="date" id="npFN"></div>
@@ -757,7 +756,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
     <!-- STEP 2 -->
     <div id="npStepMode" style="display:none">
-      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:1rem"><i class="ti ti-adjustments" style="color:var(--blue-act)"></i> Paso 2 de 4 — Modo de seguimiento</div>
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:1rem"><i class="ti ti-adjustments" style="color:var(--blue-act)"></i> Paso 2 de 3 — Modo de seguimiento</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem">
         <div id="modeCardDiary" onclick="selectMode('diary',this)" style="border:2px solid var(--blue-act);border-radius:10px;padding:12px;cursor:pointer;text-align:center;background:var(--blue-light)">
           <i class="ti ti-clipboard-list" style="font-size:22px;display:block;margin-bottom:6px;color:var(--blue-act)"></i>
@@ -782,7 +781,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     </div>
     <!-- STEP 3 -->
     <div id="npStepAnt" style="display:none">
-      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:1rem"><i class="ti ti-notes-medical" style="color:var(--blue-act)"></i> Paso 3 de 4 — Antecedentes urológicos</div>
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:1rem"><i class="ti ti-notes-medical" style="color:var(--blue-act)"></i> Paso 3 de 3 — Antecedentes urológicos</div>
       <div style="margin-bottom:.75rem">
         <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Comorbilidades</div>
         <div style="display:flex;flex-wrap:wrap;gap:5px" id="antComorbilidades">
@@ -809,27 +808,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div class="form-group"><label>Otros antecedentes (alergias, familiares...)</label><textarea id="npAntOtros" rows="2" placeholder="Antecedentes familiares, alergias, otras condiciones..."></textarea></div>
     </div>
-    <!-- STEP 4 -->
-    <div id="npStepMeds" style="display:none">
-      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:1rem"><i class="ti ti-pill" style="color:var(--blue-act)"></i> Paso 4 de 4 — Medicamentos actuales</div>
-      <div id="npMedsList" style="margin-bottom:12px"><p style="font-size:12px;color:var(--text2)">Sin medicamentos agregados. Puedes continuar sin agregar.</p></div>
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px">
-        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px">Agregar medicamento</div>
-        <div class="form-row">
-          <div class="form-group" style="margin:0"><label>Nombre *</label><input type="text" id="medNombre" placeholder="Solifenacina 5mg"></div>
-          <div class="form-group" style="margin:0"><label>Dosis</label><input type="text" id="medDosis" placeholder="5mg"></div>
-        </div>
-        <div class="form-row" style="margin-top:8px">
-          <div class="form-group" style="margin:0"><label>Frecuencia</label><select id="medFrec"><option>Cada 24h (una vez/día)</option><option>Cada 12h (dos veces/día)</option><option>Cada 8h (tres veces/día)</option><option>Solo en la noche</option><option>Solo en la mañana</option><option>Según necesidad</option></select></div>
-          <div class="form-group" style="margin:0"><label>Tipo</label><select id="medTipo"><option value="uro">Urológico</option><option value="comorbilidad">Comorbilidad</option><option value="otro">Otro</option></select></div>
-        </div>
-        <div class="form-row" style="margin-top:8px">
-          <div class="form-group" style="margin:0"><label>Fecha inicio</label><input type="date" id="medFechaInicio"></div>
-          <div class="form-group" style="margin:0"><label>Prescriptor (opcional)</label><input type="text" id="medPrescriptor" placeholder="Dr. García"></div>
-        </div>
-        <button class="btn btn-green btn-sm" onclick="addMedToList()" style="margin-top:10px;width:100%;justify-content:center"><i class="ti ti-plus"></i>Agregar a la lista</button>
-      </div>
-    </div>
+
 
     <div id="npErr" class="msg-err" style="display:none"><i class="ti ti-alert-circle"></i><span></span></div>
     <div class="modal-footer">
@@ -1615,11 +1594,11 @@ window.openNewPat=()=>{
   // Reset wizard state
   npCurrentStep=1; npMode='diary'; npMeds=[];
   // Show step 1, hide rest
-  ['npStepBasic','npStepMode','npStepAnt','npStepMeds'].forEach((id,i)=>{
+  ['npStepBasic','npStepMode','npStepAnt'].forEach((id,i)=>{
     const el=document.getElementById(id); if(el) el.style.display=i===0?'block':'none';
   });
   // Reset progress bars
-  ['npStep1bar','npStep2bar','npStep3bar','npStep4bar'].forEach((id,i)=>{
+  ['npStep1bar','npStep2bar','npStep3bar'].forEach((id,i)=>{
     const el=document.getElementById(id); if(el) el.style.background=i===0?'var(--blue-act)':'var(--border)';
   });
   // Reset buttons
@@ -2051,14 +2030,20 @@ window.exportCSV=async(id)=>{
 };
 window.genFullReport=async(id)=>{
   const p=patsCache[id];if(!p)return;
-  const [rSnap,slSnap,wbSnap]=await Promise.all([
+  const [rSnap,slSnap,wbSnap,medSnapR,scaleReqSnapR,scaleResSnapR]=await Promise.all([
     getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc'))),
     getDocs(collection(db,'patients',id,'sleep')),
-    getDocs(collection(db,'patients',id,'wellbeing'))
+    getDocs(collection(db,'patients',id,'wellbeing')),
+    getDocs(collection(db,'patients',id,'medications')),
+    getDocs(collection(db,'patients',id,'scaleRequests')),
+    getDocs(collection(db,'patients',id,'scaleResults'))
   ]);
   const recs=rSnap.docs.map(d=>({id:d.id,...d.data()}));
   const sleepMap={}; slSnap.docs.forEach(d=>{sleepMap[d.id]=d.data();});
   const wbMap={}; wbSnap.docs.forEach(d=>{wbMap[d.id]=d.data();});
+  const patMeds2=medSnapR.docs.map(d=>({id:d.id,...d.data()}));
+  const patScaleReqs=scaleReqSnapR.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.status==='completed').sort((a,b)=>(a.requestedAt?.seconds||0)-(b.requestedAt?.seconds||0));
+  const patScaleRes=scaleResSnapR.docs.map(d=>({id:d.id,...d.data()}));
   const mics=recs.filter(r=>r.type==='miction');
   const drks=recs.filter(r=>r.type==='drink');
   const leaks=recs.filter(r=>r.type==='leak');
@@ -2068,6 +2053,7 @@ window.genFullReport=async(id)=>{
   const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0);
   const avgVol=mics.length?Math.round(totalVol/mics.length):0;
   const avgDB=acRecs.length?(acRecs.reduce((a,r)=>a+(r.acoustics?.avgDB||0),0)/acRecs.length).toFixed(1):'—';
+  const avgFlow=mics.filter(r=>r.flow).length?(mics.filter(r=>r.flow).reduce((a,r)=>a+r.flow,0)/mics.filter(r=>r.flow).length).toFixed(1):'—';
   const urgC=[0,0,0,0,0]; mics.forEach(r=>{if(r.urgency!=null)urgC[r.urgency]++;});
 
   const styles=`body{font-family:Arial,sans-serif;max-width:min(900px,100vw);margin:0 auto;overflow-x:hidden;padding:2rem;color:#1e2a3a;font-size:12px;}
@@ -2802,8 +2788,8 @@ window.selectMode=(mode,el)=>{
 };
 
 window.npNextStep=()=>{
-  const steps=['npStepBasic','npStepMode','npStepAnt','npStepMeds'];
-  const bars=['npStep1bar','npStep2bar','npStep3bar','npStep4bar'];
+  const steps=['npStepBasic','npStepMode','npStepAnt'];
+  const bars=['npStep1bar','npStep2bar','npStep3bar'];
   // Validate current step
   if(npCurrentStep===1){
     if(!document.getElementById('npN').value.trim()){
@@ -2819,15 +2805,15 @@ window.npNextStep=()=>{
   document.getElementById(steps[npCurrentStep-1]).style.display='block';
   document.getElementById(bars[npCurrentStep-1]).style.background='var(--blue-act)';
   document.getElementById('npBtnPrev').style.display='';
-  if(npCurrentStep===4){
+  if(npCurrentStep===3){
     document.getElementById('npBtnNext').style.display='none';
     document.getElementById('npBtnSave').style.display='';
   }
 };
 
 window.npPrevStep=()=>{
-  const steps=['npStepBasic','npStepMode','npStepAnt','npStepMeds'];
-  const bars=['npStep1bar','npStep2bar','npStep3bar','npStep4bar'];
+  const steps=['npStepBasic','npStepMode','npStepAnt'];
+  const bars=['npStep1bar','npStep2bar','npStep3bar'];
   document.getElementById(steps[npCurrentStep-1]).style.display='none';
   document.getElementById(bars[npCurrentStep-1]).style.background='var(--border)';
   npCurrentStep--;
@@ -2954,11 +2940,11 @@ const _origOpenNewPat = window.openNewPat;
 window.openNewPat=()=>{
   npCurrentStep=1; npMode='diary'; npMeds=[];
   // Reset steps
-  ['npStepBasic','npStepMode','npStepAnt','npStepMeds'].forEach((id,i)=>{
+  ['npStepBasic','npStepMode','npStepAnt'].forEach((id,i)=>{
     const el=document.getElementById(id);
     if(el) el.style.display=i===0?'block':'none';
   });
-  ['npStep1bar','npStep2bar','npStep3bar','npStep4bar'].forEach((id,i)=>{
+  ['npStep1bar','npStep2bar','npStep3bar'].forEach((id,i)=>{
     const el=document.getElementById(id);
     if(el) el.style.background=i===0?'var(--blue-act)':'var(--border)';
   });
@@ -3074,14 +3060,21 @@ async function loadPatScales(patId, p){
 
 // ── LOAD MEDS TAB ──
 async function loadPatMeds(patId){
+  // Update both the Meds tab and the Profile tab inline display
   const el=document.getElementById(`pd-meds-content-${patId}`);
-  if(!el) return;
+  const elProfile=document.getElementById(`pd-meds-profile-${patId}`);
   try{
     const snap=await getDocs(collection(db,'patients',patId,'medications'));
     const meds=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.fechaInicio||'').localeCompare(b.fechaInicio||''));
-    if(!meds.length){ el.innerHTML='<div class="empty"><i class="ti ti-pill"></i><p style="font-size:12px">Sin medicamentos registrados.</p></div>'; return; }
     const active=meds.filter(m=>m.activo!==false);
     const inactive=meds.filter(m=>m.activo===false);
+    
+    if(!meds.length){
+      const empty='<div class="empty"><i class="ti ti-pill"></i><p style="font-size:12px">Sin medicamentos registrados. Agrega con el botón +.</p></div>';
+      if(el) el.innerHTML=empty;
+      if(elProfile) elProfile.innerHTML=empty;
+      return;
+    }
     let html='';
     if(active.length){
       html+=`<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Medicamentos activos</div>`;
@@ -3103,8 +3096,13 @@ async function loadPatMeds(patId){
         </div>
       </div>`).join('');
     }
-    el.innerHTML=html;
-  }catch(e){ el.innerHTML=`<div style="font-size:12px;color:var(--red)">Error: ${e.message}</div>`; }
+    if(el) el.innerHTML=html;
+    if(elProfile) elProfile.innerHTML=html;
+  }catch(e){
+    const errHtml=`<div style="font-size:12px;color:var(--red)">Error: ${e.message}</div>`;
+    if(el) el.innerHTML=errHtml;
+    if(elProfile) elProfile.innerHTML=errHtml;
+  }
 }
 
 window.discontinueMed=async(patId,medId)=>{
@@ -3302,6 +3300,16 @@ async function loadClinicalTimeline(patId, p){
       const date=req.requestedAt?.toDate?.()?.toISOString().slice(0,10)||req.completedAt?.toDate?.()?.toISOString().slice(0,10)||'—';
       const scaleNames=(req.scales||[]).map(id=>SCALES_CATALOG.find(s=>s.id===id)?.name||id).join(', ');
       events.push({type:'scale', date, title:`Escalas completadas`, detail:scaleNames, reqId:req.id, _ts:req.requestedAt?.seconds||0});
+    });
+
+    // Add medications as timeline events (deduplicated from clinicalEvents)
+    meds.forEach(m=>{
+      if(!events.find(e=>e._medId===m.id&&e.type==='med_start')){
+        events.push({type:'med_start',date:m.fechaInicio||p.fechaInicio||'—',title:'Inicio: '+m.nombre+(m.dosis?' '+m.dosis:''),detail:[m.frecuencia,m.prescriptor?'Prescrito por: '+m.prescriptor:'',m.motivo].filter(Boolean).join(' · ')||'',_medId:m.id,_ts:0});
+      }
+      if(m.activo===false&&m.fechaFin&&!events.find(e=>e._medId===m.id&&e.type==='med_stop')){
+        events.push({type:'med_stop',date:m.fechaFin,title:'Discontinuado: '+m.nombre+(m.dosis?' '+m.dosis:''),detail:m.motivoStop||'Discontinuación registrada',_medId:m.id,_ts:0});
+      }
     });
     
     // Add antecedentes as historical events with tracking
