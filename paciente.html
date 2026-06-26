@@ -2159,10 +2159,16 @@ async function startFillScales(requestId){
   const scales=currentRequest.scales||[];
   document.getElementById('scaleProgressDots').innerHTML=scales.map((_,i)=>`<div class="scale-prog-dot ${i===0?'active':''}" id="scaleDot${i}"></div>`).join('');
   
-  // Ensure scales nav is visible
+  // Ensure scales nav is visible and screen is active WITHOUT triggering loadScalesForPatient
   const nsEl=document.getElementById('navScales');
   if(nsEl) nsEl.style.display='flex';
-  showScreen('scales',nsEl);
+  // Manually activate screen-scales without calling showScreen (avoids race condition)
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const scalesScreen=document.getElementById('screen-scales');
+  if(scalesScreen) scalesScreen.classList.add('active');
+  if(nsEl) nsEl.classList.add('active');
+  // Show fill view, hide home view
   document.getElementById('scalesHomeView').style.display='none';
   document.getElementById('scalesFillView').style.display='block';
   
