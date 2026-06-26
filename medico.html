@@ -1659,14 +1659,57 @@ window.openNewPat=()=>{
 window.closeM=(name)=>document.getElementById('modal'+name).classList.remove('open');
 
 window.saveNewPat=async()=>{
-  const nombre=document.getElementById('npN').value.trim(); const clinica=document.getElementById('npC').value; const year=document.getElementById('npY').value;
+  const nombre=document.getElementById('npN').value.trim();
+  const clinica=document.getElementById('npC').value;
+  const year=document.getElementById('npY').value;
   const err=document.getElementById('npErr'); err.style.display='none';
   if(!nombre){ err.querySelector('span').textContent='El nombre es obligatorio'; err.style.display='flex'; return; }
   if(!clinica){ err.querySelector('span').textContent='Selecciona una clínica'; err.style.display='flex'; return; }
   const code=genCode();
-  const data={nombre,fechaNac:document.getElementById('npFN').value,genero:document.getElementById('npG').value,telefono:document.getElementById('npT').value.trim(),email:document.getElementById('npE').value.trim(),diagnostico:document.getElementById('npD').value.trim(),medicoTratante:document.getElementById('npM').value.trim(),notasIniciales:document.getElementById('npNo').value.trim(),clinica,yearInicio:parseInt(year)||new Date().getFullYear(),fechaInicio:new Date().toISOString().slice(0,10),doctorId:curDoc.uid,accessCode:code,status:'active',notes:[],createdAt:serverTimestamp()};
-  try{const ref=await addDoc(collection(db,'patients'),data);closeM('NewPat');setTimeout(()=>printCard(ref.id,{...data,id:ref.id}),400);}
-  catch(e){err.querySelector('span').textContent=e.message;err.style.display='flex';}
+  // Collect antecedentes
+  const ants=[];
+  ['antComorbilidades','antExposiciones','antUrologicos','antQuirurgicos'].forEach(gid=>{
+    const g=document.getElementById(gid); if(!g) return;
+    g.querySelectorAll('.ant-chip.selected').forEach(c=>ants.push(c.textContent.trim()));
+  });
+  // Collect scales
+  const selectedScales=[...document.querySelectorAll('input[name="npScale"]:checked')].map(i=>i.value);
+  const mode=npMode||'diary';
+  const data={
+    nombre,
+    fechaNac:document.getElementById('npFN').value,
+    genero:document.getElementById('npG').value,
+    telefono:document.getElementById('npT').value.trim(),
+    email:document.getElementById('npE').value.trim(),
+    diagnostico:document.getElementById('npD').value.trim(),
+    medicoTratante:document.getElementById('npM').value.trim(),
+    notasIniciales:document.getElementById('npNo').value.trim(),
+    antOtros:document.getElementById('npAntOtros')?.value.trim()||'',
+    clinica, yearInicio:parseInt(year)||new Date().getFullYear(),
+    fechaInicio:new Date().toISOString().slice(0,10),
+    doctorId:curDoc.uid, accessCode:code, status:'active',
+    mode, assignedScales:selectedScales, antecedentes:ants,
+    notes:[], createdAt:serverTimestamp()
+  };
+  try{
+    const ref=await addDoc(collection(db,'patients'),data);
+    // Save medications as subcollection
+    for(const m of (npMeds||[])){
+      await addDoc(collection(db,'patients',ref.id,'medications'),{
+        ...m, createdAt:serverTimestamp()
+      });
+    }
+    // Create baseline scale request if scales assigned and mode includes scales
+    if(selectedScales.length && mode!=='diary'){
+      await addDoc(collection(db,'patients',ref.id,'scaleRequests'),{
+        scales:selectedScales, type:'baseline', status:'pending',
+        requestedBy:curDoc.uid, requestedAt:serverTimestamp(),
+        note:'Línea base — completar al inicio del seguimiento'
+      });
+    }
+    closeM('NewPat');
+    setTimeout(()=>printCard(ref.id,{...data,id:ref.id}),400);
+  }catch(e){ err.querySelector('span').textContent=e.message; err.style.display='flex'; }
 };
 function genCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=chars[Math.floor(Math.random()*chars.length)];return c+'-'+Array.from({length:4},()=>chars[Math.floor(Math.random()*chars.length)]).join('');}
 window.copyCode=(code)=>{navigator.clipboard?.writeText(code);};
