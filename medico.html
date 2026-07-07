@@ -3888,7 +3888,7 @@ window.ptab=(el,id)=>{
 
 
 // ── CLINICAL TIMELINE + COMPARISONS ──
-async function loadClinicalTimeline(patId, p){
+window.loadClinicalTimeline = async function loadClinicalTimeline(patId, p){
   const el=document.getElementById(`pd-timeline-content-${patId}`);
   if(!el) return;
   el.innerHTML='<div style="font-size:12px;color:var(--text2)">Cargando...</div>';
