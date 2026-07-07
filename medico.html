@@ -2275,7 +2275,6 @@ window.openNewPat=()=>{
 window.closeM=(name)=>document.getElementById('modal'+name).classList.remove('open');
 
 // saveNewPat — defined below with complete logic
-function genCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=chars[Math.floor(Math.random()*chars.length)];return c+'-'+Array.from({length:4},()=>chars[Math.floor(Math.random()*chars.length)]).join('');}
 window.copyCode=(code)=>{navigator.clipboard?.writeText(code);};
 window.printCard=(id,patData)=>{
   const p=patData||patsCache[id];if(!p)return;
