@@ -1547,7 +1547,7 @@ window.selectPat=async(id)=>{
   selPatId=id; filterPats();
   // Mobile: slide to content view
   if(window.innerWidth<=600){
-    document.querySelector('#ttab-patients .main-layout')?.classList.add('pat-selected');
+    document.getElementById('ttab-patients')?.classList.add('pat-selected');
   }
   const p=patsCache[id]; if(!p) return;
   const [rSnap,slSnap,wbSnap,medSnap,scaleReqSnap,scaleResSnap]=await Promise.all([
@@ -4367,46 +4367,71 @@ window.loadClinicalTimeline = async function loadClinicalTimeline(patId, p){
     // ── COMPARATIVO APP vs UROFLUJOMETRÍA ──
     if(p.urofluj){
       const uro=p.urofluj;
-      const appMics=Object.values(patDiaryAllRecs||{}).flat?.()?.filter?.(r=>r.type==='miction') ||
-        (await getDocs(query(collection(db,'patients',patId,'records'),orderBy('timestamp','desc')))).docs.map(d=>d.data()).filter(r=>r.type==='miction');
+      // Load mics fresh from what we already have in this function
+      const appMicsAll=recs.filter(r=>r.type==='miction');
+      const appMicsWithAudio=appMicsAll.filter(r=>r.acoustics&&!r.acoustics.signalInsufficient);
       
-      const appMicsWithAudio=appMics.filter(r=>r.acoustics&&!r.acoustics.signalInsufficient);
-      const avgAppFlow=appMics.filter(r=>r.flow).length ? 
-        (appMics.filter(r=>r.flow).reduce((a,r)=>a+(r.flow||0),0)/appMics.filter(r=>r.flow).length).toFixed(1) : null;
-      const avgAppVol=appMics.length ? Math.round(appMics.reduce((a,r)=>a+(r.vol||0),0)/appMics.length) : null;
-      const avgAppDur=appMics.filter(r=>r.dur).length ?
-        (appMics.filter(r=>r.dur).reduce((a,r)=>a+(r.dur||0),0)/appMics.filter(r=>r.dur).length).toFixed(1) : null;
+      // App metrics — only comparable values
+      const avgAppVol=appMicsAll.length ? Math.round(appMicsAll.reduce((a,r)=>a+(r.vol||0),0)/appMicsAll.length) : null;
+      const avgAppDur=appMicsAll.filter(r=>r.dur).length ?
+        +(appMicsAll.filter(r=>r.dur).reduce((a,r)=>a+(r.dur||0),0)/appMicsAll.filter(r=>r.dur).length).toFixed(1) : null;
+      // Estimated Qavg from app = vol/dur per miction, averaged
+      const micsWithBoth=appMicsAll.filter(r=>r.vol&&r.dur);
+      const avgAppQavg=micsWithBoth.length ?
+        +(micsWithBoth.reduce((a,r)=>a+(r.vol/r.dur),0)/micsWithBoth.length).toFixed(1) : null;
 
-      // Correlation: compare app avgFlow vs urofluj qavg
-      let corrMsg='', corrColor='var(--text2)';
-      if(avgAppFlow && uro.qavg){
-        const diff=Math.abs(avgAppFlow-uro.qavg);
-        const pct=Math.round(diff/uro.qavg*100);
-        if(pct<=15){ corrMsg=`✓ Buena correlación (±${pct}%) — la app refleja bien el flujo real del paciente.`; corrColor='var(--green)'; }
-        else if(pct<=30){ corrMsg=`⚠ Correlación moderada (±${pct}%) — diferencia aceptable, revisar técnica de grabación.`; corrColor='var(--amber)'; }
-        else { corrMsg=`⚠ Baja correlación (±${pct}%) — posible problema de grabación o cambio clínico significativo.`; corrColor='var(--coral)'; }
+      // Correlation messages — compare comparable metrics
+      const comparisons=[];
+      
+      // Vol comparison
+      if(avgAppVol && uro.vol){
+        const diffV=Math.abs(avgAppVol-uro.vol);
+        const pctV=Math.round(diffV/uro.vol*100);
+        const clrV=pctV<=20?'var(--green)':pctV<=40?'var(--amber)':'var(--coral)';
+        const iconV=pctV<=20?'✓':'⚠';
+        comparisons.push({label:'Volumen promedio',app:avgAppVol+' ml',uro:uro.vol+' ml',pct:pctV,color:clrV,icon:iconV,
+          note:pctV<=20?'Consistente con la uro':pctV<=40?'Diferencia moderada — puede variar por hidratación':'Diferencia notable — revisar si el paciente llena el medidor correctamente'});
+      }
+      
+      // Duration comparison
+      if(avgAppDur && uro.tiempo){
+        const diffD=Math.abs(avgAppDur-uro.tiempo);
+        const pctD=Math.round(diffD/uro.tiempo*100);
+        const clrD=pctD<=25?'var(--green)':pctD<=50?'var(--amber)':'var(--coral)';
+        comparisons.push({label:'Duración micción',app:avgAppDur+'s',uro:uro.tiempo+'s',pct:pctD,color:clrD,
+          icon:pctD<=25?'✓':'⚠',
+          note:pctD<=25?'Tiempo consistente con la uro':'La duración en la app difiere — puede indicar cambio en el patrón miccional'});
+      }
+      
+      // Qavg comparison (only if we have enough mics with both vol+dur)
+      if(avgAppQavg && uro.qavg && micsWithBoth.length>=3){
+        const diffQ=Math.abs(avgAppQavg-uro.qavg);
+        const pctQ=Math.round(diffQ/uro.qavg*100);
+        const clrQ=pctQ<=25?'var(--green)':pctQ<=45?'var(--amber)':'var(--coral)';
+        comparisons.push({label:'Flujo estimado (vol÷dur)',app:avgAppQavg+' ml/s',uro:uro.qavg+' ml/s (Qavg)',pct:pctQ,color:clrQ,
+          icon:pctQ<=25?'✓':'⚠',
+          note:'Estimación a partir de '+micsWithBoth.length+' micciones con vol+dur. '+(pctQ<=25?'Correlación aceptable con Qavg.':'Diferencia respecto a Qavg — considerar repetir uroflujometría.')});
       }
 
       html+=`<div class="card" style="margin-bottom:1rem">
-        <div class="card-label"><i class="ti ti-activity-heartbeat" style="color:var(--blue-act)"></i>Comparativo App vs Uroflujometría (${uro.fecha||'—'})</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:12px">
-          <div>
-            <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;text-transform:uppercase">App — promedio registros</div>
-            ${avgAppFlow?`<div style="margin-bottom:4px"><span style="font-size:1.1rem;font-weight:700;color:var(--blue-act)">${avgAppFlow}</span><span style="font-size:11px;color:var(--text2)"> ml/s flujo</span></div>`:''}
-            ${avgAppVol?`<div style="margin-bottom:4px"><span style="font-size:1.1rem;font-weight:700;color:var(--blue-act)">${avgAppVol}</span><span style="font-size:11px;color:var(--text2)"> ml vol. promedio</span></div>`:''}
-            ${avgAppDur?`<div><span style="font-size:1.1rem;font-weight:700;color:var(--blue-act)">${avgAppDur}s</span><span style="font-size:11px;color:var(--text2)"> duración promedio</span></div>`:''}
-            <div style="font-size:10px;color:var(--text3);margin-top:6px">${appMics.length} micciones · ${appMicsWithAudio.length} con audio válido</div>
-          </div>
-          <div>
-            <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;text-transform:uppercase">Uroflujometría real</div>
-            ${uro.qmax?`<div style="margin-bottom:4px"><span style="font-size:1.1rem;font-weight:700;color:var(--green)">${uro.qmax}</span><span style="font-size:11px;color:var(--text2)"> ml/s Qmax</span></div>`:''}
-            ${uro.qavg?`<div style="margin-bottom:4px"><span style="font-size:1.1rem;font-weight:700;color:var(--green)">${uro.qavg}</span><span style="font-size:11px;color:var(--text2)"> ml/s Qavg</span></div>`:''}
-            ${uro.vol?`<div style="margin-bottom:4px"><span style="font-size:1.1rem;font-weight:700;color:var(--green)">${uro.vol}</span><span style="font-size:11px;color:var(--text2)"> ml vol. vaciado</span></div>`:''}
-            ${uro.tiempo?`<div><span style="font-size:1.1rem;font-weight:700;color:var(--green)">${uro.tiempo}s</span><span style="font-size:11px;color:var(--text2)"> tiempo micción</span></div>`:''}
-          </div>
+        <div class="card-label"><i class="ti ti-activity-heartbeat" style="color:var(--blue-act)"></i>Comparativo App vs Uroflujometría · ${uro.fecha||'—'}</div>
+        <div style="background:var(--blue-light);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--text2);margin-bottom:12px">
+          <i class="ti ti-info-circle"></i> Comparativa entre los promedios del diario y los valores de la uroflujometría real. 
+          El flujo de la app es una <em>estimación</em> (volumen ÷ duración), no equivalente al Qmax ni Qavg real.
         </div>
-        ${corrMsg?`<div style="font-size:12px;color:${corrColor};background:var(--card2);border-radius:8px;padding:8px 12px">${corrMsg}</div>`:''}
-        ${uro.patron?`<div style="font-size:11px;color:var(--text2);margin-top:8px"><i class="ti ti-chart-line"></i> Patrón uro: <strong>${uro.patron}</strong></div>`:''}
+        ${comparisons.length ? comparisons.map(c=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+            <div style="width:28px;height:28px;border-radius:50%;background:${c.color}22;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:${c.color}">${c.icon}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12px;font-weight:600;color:var(--text)">${c.label}</div>
+              <div style="font-size:11px;color:var(--text2)">App: <strong>${c.app}</strong> · Uro: <strong>${c.uro}</strong> · diferencia ±${c.pct}%</div>
+              <div style="font-size:11px;color:${c.color};margin-top:2px">${c.note}</div>
+            </div>
+          </div>`).join('') : '<div style="font-size:12px;color:var(--text2);padding:8px 0">Registra más micciones con volumen y duración para ver la comparativa.</div>'}
+        <div style="font-size:10px;color:var(--text3);margin-top:10px">
+          ${appMicsAll.length} micciones totales · ${appMicsWithAudio.length} con audio válido · ${micsWithBoth.length} con vol+dur
+          ${uro.patron?` · Patrón uro: <strong>${uro.patron}</strong>`:''}
+        </div>
       </div>`;
     }
 
@@ -4875,7 +4900,7 @@ window.addEventListener('appinstalled', () => {
 
 // ── MOBILE BACK TO LIST ──
 window.mobileBackToList = () => {
-  document.querySelector('#ttab-patients .main-layout')?.classList.remove('pat-selected');
+  document.getElementById('ttab-patients')?.classList.remove('pat-selected');
   selPatId = null;
   filterPats();
 };
