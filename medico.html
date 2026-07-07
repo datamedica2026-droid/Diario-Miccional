@@ -521,6 +521,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   .hero-actions{gap:4px;}
   .hero-actions .btn-sm{font-size:10px;padding:3px 7px;}
 }
+input,select,textarea{font-size:16px !important;}
 </style>
 </head>
 <body>
@@ -1170,6 +1171,50 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </div>
 
+
+<!-- MODAL UROFLUJOMETRÍA -->
+<div class="modal-overlay" id="modalUrofluj">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-activity-heartbeat"></i>Registrar Uroflujometría de referencia</div>
+    <input type="hidden" id="uroPatId">
+    <div style="background:var(--blue-light);border:1px solid var(--blue-act);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:var(--text2)">
+      <i class="ti ti-info-circle" style="color:var(--blue-act)"></i>
+      Estos datos calibran el análisis acústico de la app para este paciente específico, y permiten comparar las grabaciones del diario contra su uroflujometría real.
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Fecha del estudio *</label><input type="date" id="uroFecha"></div>
+      <div class="form-group"><label>Volumen vaciado (ml) *</label><input type="number" id="uroVol" placeholder="350" min="0"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Qmax — flujo máximo (ml/s)</label><input type="number" id="uroQmax" placeholder="18.5" step="0.1" min="0"></div>
+      <div class="form-group"><label>Qavg — flujo promedio (ml/s)</label><input type="number" id="uroQavg" placeholder="9.2" step="0.1" min="0"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Tiempo de micción (seg)</label><input type="number" id="uroTiempo" placeholder="38" min="0"></div>
+      <div class="form-group"><label>Patrón del flujo</label>
+        <select id="uroPatron">
+          <option value="">— Selecciona —</option>
+          <option value="campana">Campana (normal)</option>
+          <option value="plateau">Meseta (obstrucción)</option>
+          <option value="intermitente">Intermitente (disinergia)</option>
+          <option value="tower">Torre (inestabilidad)</option>
+          <option value="irregular">Irregular</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label>Observaciones clínicas</label>
+      <textarea id="uroObs" placeholder="Ej: estudio realizado con vejiga llena, sin artefactos..." style="height:60px"></textarea>
+    </div>
+    <div class="form-group"><label>Institución / Equipo</label>
+      <input type="text" id="uroInstitucion" placeholder="Ej: Clínica Mayo — Urodinamia v2">
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeM('Urofluj')"><i class="ti ti-x"></i>Cancelar</button>
+      <button class="btn btn-primary" onclick="saveUrofluj()"><i class="ti ti-device-floppy"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL ACTIVATE SCALES -->
 <div class="modal-overlay" id="modalActivateScales">
   <div class="modal" style="max-width:580px">
@@ -1749,6 +1794,39 @@ function renderPatView(p, recs, sleepMap, wbMap){
         <div class="card-label" style="margin-bottom:8px;display:flex;align-items:center;justify-content:space-between"><span><i class="ti ti-pill"></i>Medicamentos</span><button class="btn btn-sm btn-green" onclick="openAddMedModal('${p.id}')"><i class="ti ti-plus"></i>Agregar</button></div>
         <div id="pd-meds-profile-${p.id}"><div style="font-size:12px;color:var(--text2)">Cargando...</div></div>
       </div>
+      
+      <!-- UROFLUJOMETRÍA DE REFERENCIA -->
+      <div style="margin-top:8px">
+        <div class="card-label" style="margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+          <span><i class="ti ti-activity-heartbeat"></i>Uroflujometría de referencia</span>
+          <button class="btn btn-sm btn-primary" onclick="openUroflujModal('${p.id}')"><i class="ti ti-plus"></i>${p.urofluj?'Actualizar':'Registrar'}</button>
+        </div>
+        ${p.urofluj ? `
+          <div class="card" style="background:var(--card2)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div style="font-size:12px;font-weight:600;color:var(--text)">Estudio del ${p.urofluj.fecha||'—'}</div>
+              <span style="font-size:11px;color:var(--text3)">${p.urofluj.institucion||''}</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+              ${p.urofluj.qmax?`<div style="text-align:center;background:var(--blue-light);border-radius:8px;padding:8px"><div style="font-size:1.1rem;font-weight:700;color:var(--blue-act)">${p.urofluj.qmax}</div><div style="font-size:10px;color:var(--text2)">Qmax ml/s</div></div>`:''}
+              ${p.urofluj.qavg?`<div style="text-align:center;background:var(--green-dim);border-radius:8px;padding:8px"><div style="font-size:1.1rem;font-weight:700;color:var(--green)">${p.urofluj.qavg}</div><div style="font-size:10px;color:var(--text2)">Qavg ml/s</div></div>`:''}
+              ${p.urofluj.vol?`<div style="text-align:center;background:var(--card);border-radius:8px;padding:8px"><div style="font-size:1.1rem;font-weight:700;color:var(--text)">${p.urofluj.vol}</div><div style="font-size:10px;color:var(--text2)">Vol ml</div></div>`:''}
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--text2)">
+              ${p.urofluj.tiempo?`<span><i class="ti ti-clock"></i> ${p.urofluj.tiempo}s</span>`:''}
+              ${p.urofluj.patron?`<span><i class="ti ti-chart-line"></i> Patrón: ${p.urofluj.patron}</span>`:''}
+            </div>
+            ${p.urofluj.obs?`<div style="margin-top:8px;font-size:11px;color:var(--text2);font-style:italic">${p.urofluj.obs}</div>`:''}
+          </div>
+        ` : `
+          <div style="background:var(--amber-dim);border:1px dashed var(--amber);border-radius:10px;padding:14px;text-align:center">
+            <i class="ti ti-alert-circle" style="font-size:1.5rem;color:var(--amber);display:block;margin-bottom:6px"></i>
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px">Sin uroflujometría de referencia</div>
+            <div style="font-size:11px;color:var(--text2);margin-bottom:10px">Considera solicitar una uroflujometría para calibrar el análisis acústico de la app a este paciente.</div>
+            <button class="btn btn-sm" onclick="openUroflujModal('${p.id}')"><i class="ti ti-plus"></i>Registrar ahora</button>
+          </div>
+        `}
+      </div>
     </div>
   `;
   setTimeout(()=>buildCharts(mics,drks,wbMap,sleepMap),150);
@@ -2252,6 +2330,8 @@ window.genFullReport=async(id)=>{
     <div class="st"><div class="sl">Fugas registradas</div><div class="sv" style="color:${leaks.length>0?'#e65100':'#2e7d32'}">${leaks.length}</div><div class="sr">Normal: 0</div></div>
     <div class="st"><div class="sl">Con análisis acústico</div><div class="sv">${acRecs.length}</div><div class="sr">de ${mics.length} micciones</div></div>
     <div class="st"><div class="sl">dB promedio global</div><div class="sv">${avgDB} dB</div><div class="sr">Sobre baseline calibrado</div></div>
+    ${acRecs.filter(r=>r.acoustics?.signalInsufficient).length>0?`<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:6px;padding:6px 10px;font-size:11px;color:#856404;margin-top:6px"><i>⚠ ${acRecs.filter(r=>r.acoustics?.signalInsufficient).length} grabación(es) con señal insuficiente (duración <4s o sin chorro audible). Estos registros se incluyen en el conteo pero no se clasifican acústicamente.</i></div>`:''}
+    ${(p.genero==='f')?`<div style="background:#f3e5f5;border:1px solid #9c27b0;border-radius:6px;padding:6px 10px;font-size:11px;color:#6a1b9a;margin-top:6px"><i>ℹ Paciente femenino: el análisis acústico tiene menor fiabilidad por la anatomía del chorro. Se prioriza el análisis volumétrico y temporal.</i></div>`:''}
     <div class="st"><div class="sl">Días con registros</div><div class="sv">${[...new Set(recs.map(r=>r.date))].length}</div></div>
   </div>`:''}
 
@@ -2745,7 +2825,8 @@ window.genFullReport=async(id)=>{
     <div class="footer">
     Diario Miccional v2.0 · by <strong>InnoIA</strong> · verificado <strong>CURG</strong> (Colombian Urology Research Group)<br>
     Generado: ${new Date().toLocaleString('es')} · Médico: ${curDocData?.nombre||'—'} · Clínica: ${p.clinica||'—'}<br>
-    Base científica: ICS 2019, EAU Guidelines 2023, Tsui et al. 2006 · Ley 1581/2012 Colombia y equivalentes LATAM<br>
+    Base científica: ICS 2019, EAU Guidelines 2023, Tsui et al. 2006 · Ley 1581/2012 Colombia<br>
+    <strong>⚠ Nota clínica:</strong> El análisis acústico es una estimación de apoyo clínico basada en el modelo de Tsui et al. (2006). <em>No equivale a una uroflujometría convencional</em> y debe interpretarse en contexto clínico. La fiabilidad varía según el entorno de grabación y el género del paciente. y equivalentes LATAM<br>
     Este informe está protegido bajo normativa de protección de datos personales de salud.
   </div>
   
@@ -3724,6 +3805,81 @@ window.showMedHistory=async(patId,medId,medNombre)=>{
   setTimeout(()=>document.addEventListener('click',function h(e){if(!popup.contains(e.target)){popup.remove();document.removeEventListener('click',h);}},),100);
 };
 
+
+// ══════════════════════════════════════════════════════════════
+// UROFLUJOMETRÍA DE REFERENCIA
+// ══════════════════════════════════════════════════════════════
+
+window.openUroflujModal = (patId) => {
+  document.getElementById('uroPatId').value = patId;
+  const p = patsCache[patId];
+  // Pre-fill if already has data
+  if(p?.urofluj){
+    document.getElementById('uroFecha').value = p.urofluj.fecha||'';
+    document.getElementById('uroVol').value = p.urofluj.vol||'';
+    document.getElementById('uroQmax').value = p.urofluj.qmax||'';
+    document.getElementById('uroQavg').value = p.urofluj.qavg||'';
+    document.getElementById('uroTiempo').value = p.urofluj.tiempo||'';
+    document.getElementById('uroPatron').value = p.urofluj.patron||'';
+    document.getElementById('uroObs').value = p.urofluj.obs||'';
+    document.getElementById('uroInstitucion').value = p.urofluj.institucion||'';
+  } else {
+    ['uroFecha','uroVol','uroQmax','uroQavg','uroTiempo','uroObs','uroInstitucion'].forEach(id=>{
+      const el=document.getElementById(id); if(el) el.value='';
+    });
+    document.getElementById('uroPatron').value='';
+    document.getElementById('uroFecha').value = new Date().toISOString().slice(0,10);
+  }
+  document.getElementById('modalUrofluj').classList.add('open');
+};
+
+window.saveUrofluj = async () => {
+  const patId = document.getElementById('uroPatId').value;
+  const fecha = document.getElementById('uroFecha').value;
+  const vol = parseFloat(document.getElementById('uroVol').value)||null;
+  if(!fecha || !vol){ showToast('Fecha y volumen son obligatorios','error'); return; }
+
+  const urofluj = {
+    fecha,
+    vol,
+    qmax: parseFloat(document.getElementById('uroQmax').value)||null,
+    qavg: parseFloat(document.getElementById('uroQavg').value)||null,
+    tiempo: parseFloat(document.getElementById('uroTiempo').value)||null,
+    patron: document.getElementById('uroPatron').value||null,
+    obs: document.getElementById('uroObs').value.trim()||null,
+    institucion: document.getElementById('uroInstitucion').value.trim()||null,
+    registradaPor: curDocData?.nombre||'médico',
+    registradaEn: new Date().toISOString()
+  };
+
+  // Save to patient document
+  await updateDoc(doc(db,'patients',patId), { urofluj });
+  patsCache[patId].urofluj = urofluj;
+
+  // Log as clinical event in timeline
+  const detail = [
+    urofluj.qmax ? `Qmax: ${urofluj.qmax} ml/s` : null,
+    urofluj.qavg ? `Qavg: ${urofluj.qavg} ml/s` : null,
+    urofluj.vol ? `Vol: ${urofluj.vol} ml` : null,
+    urofluj.tiempo ? `Tiempo: ${urofluj.tiempo}s` : null,
+    urofluj.patron ? `Patrón: ${urofluj.patron}` : null,
+    urofluj.institucion ? `Institución: ${urofluj.institucion}` : null,
+  ].filter(Boolean).join(' · ');
+
+  await addDoc(collection(db,'patients',patId,'clinicalEvents'), {
+    type: 'urofluj',
+    date: fecha,
+    title: 'Uroflujometría de referencia registrada',
+    detail,
+    createdAt: serverTimestamp()
+  });
+
+  closeM('Urofluj');
+  showToast('Uroflujometría guardada y registrada en evolución.');
+  // Refresh profile view
+  selectPat(patId);
+};
+
 // ── EDIT MEDICATION ──
 window.openEditMedModal=async(patId,medId)=>{
   const snap=await getDoc(doc(db,'patients',patId,'medications',medId));
@@ -4151,8 +4307,8 @@ window.loadClinicalTimeline = async function loadClinicalTimeline(patId, p){
       html+=`<div class="card-label" style="margin-bottom:12px"><i class="ti ti-timeline"></i>Línea de tiempo clínica</div>`;
       html+=`<div class="timeline">`;
       events.forEach(evt=>{
-        const dotClass=evt.type==='med_start'?'tl-dot-med':evt.type==='med_stop'?'tl-dot-disc':evt.type==='med_edit'?'tl-dot-med':evt.type==='surgery'?'tl-dot-surgery':evt.type==='scale'?'tl-dot-scale':'tl-dot-alert';
-        const typeLabel=evt.type==='med_start'?'Inicio medicamento':evt.type==='med_stop'?'Discontinuado':evt.type==='med_edit'?'Cambio de medicamento':evt.type==='surgery'?'Antecedente':evt.type==='scale'?'Escalas completadas':'Evento';
+        const dotClass=evt.type==='med_start'?'tl-dot-med':evt.type==='med_stop'?'tl-dot-disc':evt.type==='med_edit'?'tl-dot-med':evt.type==='surgery'?'tl-dot-surgery':evt.type==='scale'?'tl-dot-scale':evt.type==='urofluj'?'tl-dot-scale':'tl-dot-alert';
+        const typeLabel=evt.type==='med_start'?'Inicio medicamento':evt.type==='med_stop'?'Discontinuado':evt.type==='med_edit'?'Cambio de medicamento':evt.type==='surgery'?'Antecedente':evt.type==='scale'?'Escalas completadas':evt.type==='urofluj'?'Uroflujometría de referencia':'Evento';
         
         // For scale events, show score delta if available
         let scaleInfo='';
@@ -4208,6 +4364,52 @@ window.loadClinicalTimeline = async function loadClinicalTimeline(patId, p){
       </div>
     </div>`;
     
+    // ── COMPARATIVO APP vs UROFLUJOMETRÍA ──
+    if(p.urofluj){
+      const uro=p.urofluj;
+      const appMics=Object.values(patDiaryAllRecs||{}).flat?.()?.filter?.(r=>r.type==='miction') ||
+        (await getDocs(query(collection(db,'patients',patId,'records'),orderBy('timestamp','desc')))).docs.map(d=>d.data()).filter(r=>r.type==='miction');
+      
+      const appMicsWithAudio=appMics.filter(r=>r.acoustics&&!r.acoustics.signalInsufficient);
+      const avgAppFlow=appMics.filter(r=>r.flow).length ? 
+        (appMics.filter(r=>r.flow).reduce((a,r)=>a+(r.flow||0),0)/appMics.filter(r=>r.flow).length).toFixed(1) : null;
+      const avgAppVol=appMics.length ? Math.round(appMics.reduce((a,r)=>a+(r.vol||0),0)/appMics.length) : null;
+      const avgAppDur=appMics.filter(r=>r.dur).length ?
+        (appMics.filter(r=>r.dur).reduce((a,r)=>a+(r.dur||0),0)/appMics.filter(r=>r.dur).length).toFixed(1) : null;
+
+      // Correlation: compare app avgFlow vs urofluj qavg
+      let corrMsg='', corrColor='var(--text2)';
+      if(avgAppFlow && uro.qavg){
+        const diff=Math.abs(avgAppFlow-uro.qavg);
+        const pct=Math.round(diff/uro.qavg*100);
+        if(pct<=15){ corrMsg=`✓ Buena correlación (±${pct}%) — la app refleja bien el flujo real del paciente.`; corrColor='var(--green)'; }
+        else if(pct<=30){ corrMsg=`⚠ Correlación moderada (±${pct}%) — diferencia aceptable, revisar técnica de grabación.`; corrColor='var(--amber)'; }
+        else { corrMsg=`⚠ Baja correlación (±${pct}%) — posible problema de grabación o cambio clínico significativo.`; corrColor='var(--coral)'; }
+      }
+
+      html+=`<div class="card" style="margin-bottom:1rem">
+        <div class="card-label"><i class="ti ti-activity-heartbeat" style="color:var(--blue-act)"></i>Comparativo App vs Uroflujometría (${uro.fecha||'—'})</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:12px">
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;text-transform:uppercase">App — promedio registros</div>
+            ${avgAppFlow?`<div style="margin-bottom:4px"><span style="font-size:1.1rem;font-weight:700;color:var(--blue-act)">${avgAppFlow}</span><span style="font-size:11px;color:var(--text2)"> ml/s flujo</span></div>`:''}
+            ${avgAppVol?`<div style="margin-bottom:4px"><span style="font-size:1.1rem;font-weight:700;color:var(--blue-act)">${avgAppVol}</span><span style="font-size:11px;color:var(--text2)"> ml vol. promedio</span></div>`:''}
+            ${avgAppDur?`<div><span style="font-size:1.1rem;font-weight:700;color:var(--blue-act)">${avgAppDur}s</span><span style="font-size:11px;color:var(--text2)"> duración promedio</span></div>`:''}
+            <div style="font-size:10px;color:var(--text3);margin-top:6px">${appMics.length} micciones · ${appMicsWithAudio.length} con audio válido</div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;text-transform:uppercase">Uroflujometría real</div>
+            ${uro.qmax?`<div style="margin-bottom:4px"><span style="font-size:1.1rem;font-weight:700;color:var(--green)">${uro.qmax}</span><span style="font-size:11px;color:var(--text2)"> ml/s Qmax</span></div>`:''}
+            ${uro.qavg?`<div style="margin-bottom:4px"><span style="font-size:1.1rem;font-weight:700;color:var(--green)">${uro.qavg}</span><span style="font-size:11px;color:var(--text2)"> ml/s Qavg</span></div>`:''}
+            ${uro.vol?`<div style="margin-bottom:4px"><span style="font-size:1.1rem;font-weight:700;color:var(--green)">${uro.vol}</span><span style="font-size:11px;color:var(--text2)"> ml vol. vaciado</span></div>`:''}
+            ${uro.tiempo?`<div><span style="font-size:1.1rem;font-weight:700;color:var(--green)">${uro.tiempo}s</span><span style="font-size:11px;color:var(--text2)"> tiempo micción</span></div>`:''}
+          </div>
+        </div>
+        ${corrMsg?`<div style="font-size:12px;color:${corrColor};background:var(--card2);border-radius:8px;padding:8px 12px">${corrMsg}</div>`:''}
+        ${uro.patron?`<div style="font-size:11px;color:var(--text2);margin-top:8px"><i class="ti ti-chart-line"></i> Patrón uro: <strong>${uro.patron}</strong></div>`:''}
+      </div>`;
+    }
+
     // Explain why med-scale comparison is empty if meds exist but no comparison
     if(meds.length>0 && medComparisons.length===0 && scaleReqs.length>0){
       html+=`<div style="background:var(--amber-dim);border:1px solid var(--amber);border-radius:8px;padding:10px 12px;margin-bottom:1rem;font-size:12px;color:var(--amber)">
@@ -4364,7 +4566,7 @@ Líquido total ingerido: ${drks.reduce((a,r)=>a+(r.vol||0),0)} ml
 Fugas de orina: ${leaks.length} episodio(s)
 Urgencia severa (U3-U4): ${urgHigh} episodio(s) (${mics.length?Math.round(urgHigh/mics.length*100):0}%)
 ${acRecs.length?'Análisis acústico del flujo (Tsui et al. 2006):\n  dB promedio: '+avgDB+' | Débil: '+fD.weak+' | Bajo: '+fD.low+' | Normal: '+fD.normal+' | Fuerte: '+fD.strong:''}${scalesSummary}──────────────────────────────────────────────
-${activeMeds.length?'MEDICAMENTOS ACTUALES:\n'+activeMeds.map(m=>`  • ${m.nombre} ${m.dosis||''} — ${m.frecuencia||''} (${m.tipo==='uro'?'Urológico':'Comorbilidad'})${m.fechaInicio?' desde '+m.fechaInicio:''}`).join('\n')+'\n──────────────────────────────────────────────\n':''}${diagnostico?'DIAGNÓSTICO:\n'+diagnostico+'\n──────────────────────────────────────────────\n':''}${obs?'HALLAZGOS / EXAMEN FÍSICO:\n'+obs+'\n──────────────────────────────────────────────\n':''}${plan?'PLAN DE MANEJO:\n'+plan+'\n──────────────────────────────────────────────\n':''}${siguiente?'PRÓXIMA CITA / INSTRUCCIONES:\n'+siguiente+'\n──────────────────────────────────────────────\n':''}Nota generada con Diario Miccional v2.0 · by InnoIA · verificado CURG
+${p.urofluj?`UROFLUJOMETRÍA DE REFERENCIA (${p.urofluj.fecha||'—'}):\n${[p.urofluj.qmax?'  Qmax: '+p.urofluj.qmax+' ml/s':null,p.urofluj.qavg?'  Qavg: '+p.urofluj.qavg+' ml/s':null,p.urofluj.vol?'  Vol: '+p.urofluj.vol+' ml':null,p.urofluj.patron?'  Patrón: '+p.urofluj.patron:null].filter(Boolean).join('\n')}\n──────────────────────────────────────────────\n`:''}${activeMeds.length?'MEDICAMENTOS ACTUALES:\n'+activeMeds.map(m=>`  • ${m.nombre} ${m.dosis||''} — ${m.frecuencia||''} (${m.tipo==='uro'?'Urológico':'Comorbilidad'})${m.fechaInicio?' desde '+m.fechaInicio:''}`).join('\n')+'\n──────────────────────────────────────────────\n':''}${diagnostico?'DIAGNÓSTICO:\n'+diagnostico+'\n──────────────────────────────────────────────\n':''}${obs?'HALLAZGOS / EXAMEN FÍSICO:\n'+obs+'\n──────────────────────────────────────────────\n':''}${plan?'PLAN DE MANEJO:\n'+plan+'\n──────────────────────────────────────────────\n':''}${siguiente?'PRÓXIMA CITA / INSTRUCCIONES:\n'+siguiente+'\n──────────────────────────────────────────────\n':''}Nota generada con Diario Miccional v2.0 · by InnoIA · verificado CURG
 Referencia científica: ICS 2019, EAU Guidelines 2023, Tsui et al. 2006`;
     
     document.getElementById('hcOutput').textContent=nota;
