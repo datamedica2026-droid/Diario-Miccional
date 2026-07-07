@@ -4115,13 +4115,15 @@ window.loadClinicalTimeline = async function loadClinicalTimeline(patId, p){
   el.innerHTML='<div style="font-size:12px;color:var(--text2)">Cargando...</div>';
   
   try{
-    // Load all data in parallel
-    const [evtSnap,medSnap,scaleReqSnap,scaleResSnap]=await Promise.all([
+    // Load all data in parallel (including records for uro comparativo)
+    const [evtSnap,medSnap,scaleReqSnap,scaleResSnap,recSnap]=await Promise.all([
       getDocs(collection(db,'patients',patId,'clinicalEvents')),
       getDocs(collection(db,'patients',patId,'medications')),
       getDocs(collection(db,'patients',patId,'scaleRequests')),
-      getDocs(collection(db,'patients',patId,'scaleResults'))
+      getDocs(collection(db,'patients',patId,'scaleResults')),
+      getDocs(query(collection(db,'patients',patId,'records'),orderBy('timestamp','desc')))
     ]);
+    const recs=recSnap.docs.map(d=>({id:d.id,...d.data()}));
     
     const meds=medSnap.docs.map(d=>({id:d.id,...d.data()}));
     const scaleReqs=scaleReqSnap.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.status==='completed');
