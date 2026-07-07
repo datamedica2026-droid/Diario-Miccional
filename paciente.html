@@ -9,6 +9,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Diario Miccional">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#042C53">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Diario Miccional">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -569,12 +574,40 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="terms-link">Al registrarte aceptas nuestros <a onclick="document.getElementById('modalTermsPac').classList.add('open')">Términos y condiciones</a> y <a onclick="document.getElementById('consentOverlay').style.display='flex'">Política de privacidad</a></div>
     </div>
   </div>
+  <!-- Install as app -->
+  <div id="loginInstallBanner" style="display:none;margin:1rem 1rem 0;background:var(--blue-light);border:1px solid var(--blue-act);border-radius:10px;padding:10px 14px;align-items:center;gap:10px">
+    <i class="ti ti-device-mobile" style="font-size:1.4rem;color:var(--blue-act);flex-shrink:0"></i>
+    <div style="flex:1">
+      <div style="font-size:12px;font-weight:600;color:var(--text)">Instalar como app</div>
+      <div style="font-size:11px;color:var(--text2)">Accede desde tu pantalla de inicio, sin abrir el navegador</div>
+    </div>
+    <button onclick="installPWA()" style="background:var(--blue-act);color:#fff;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">Instalar</button>
+  </div>
   <div class="brand-footer">
     <span class="brand-footer-text">Desarrollado por <span class="innoia">InnoIA</span> · Verificado por <span class="curg">CURG</span> · Colombian Urology Research Group</span>
   </div>
 </div>
 
 <!-- DIARIO -->
+
+<!-- BIENVENIDA (primera vez) -->
+<div class="screen" id="screen-welcome">
+  <div style="padding:2rem 1.25rem;display:flex;flex-direction:column;align-items:center;text-align:center;min-height:80vh;justify-content:center">
+    <div style="width:72px;height:72px;background:var(--blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;border:2px solid var(--blue-act)">
+      <i class="ti ti-stethoscope" style="font-size:2rem;color:var(--blue-act)"></i>
+    </div>
+    <div style="font-size:1.4rem;font-weight:700;color:var(--text);margin-bottom:.5rem">¡Bienvenido/a, <span id="welcomeName"></span>!</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:2rem;max-width:320px;line-height:1.6">Tu médico ya te vinculó al sistema de seguimiento clínico. Aquí llevarás un registro de tus síntomas urinarios que él podrá ver en tiempo real.</div>
+    
+    <div id="welcomeSteps" style="width:100%;max-width:360px;text-align:left;margin-bottom:2rem"></div>
+    
+    <button class="btn btn-primary btn-full" style="max-width:360px" onclick="dismissWelcome()">
+      <i class="ti ti-arrow-right"></i>Empezar
+    </button>
+    <div style="font-size:11px;color:var(--text3);margin-top:1rem">Diario Miccional · by InnoIA · verificado CURG</div>
+  </div>
+</div>
+
 <div class="screen" id="screen-main">
   <div class="install-banner" id="installBanner">
     <i class="ti ti-device-mobile-down"></i>
@@ -678,10 +711,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <!-- MENSAJES -->
 <div class="screen" id="screen-messages">
-  <div style="font-size:1rem;font-weight:600;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px">
-    <i class="ti ti-message-circle" style="color:var(--blue-act);font-size:20px"></i>Mensajes de tu médico
+  <div style="font-size:1rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:8px">
+    <i class="ti ti-bell" style="color:var(--blue-act);font-size:20px"></i>Centro de avisos
   </div>
-  <div id="msgContent"><div class="empty-state"><i class="ti ti-message-off"></i><p>Sin mensajes de tu médico aún.</p></div></div>
+
+  <!-- Notas del médico -->
+  <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Mensajes de tu médico</div>
+  <div id="msgContent"><div class="empty-state"><i class="ti ti-message-off"></i><p>Sin mensajes aún.</p></div></div>
+
+  <!-- Escalas asignadas pendientes -->
+  <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 8px">Escalas pendientes</div>
+  <div id="notifPendingScales"><div style="font-size:12px;color:var(--text2)">Cargando...</div></div>
+
+  <!-- Escalas completadas recientemente -->
+  <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 8px">Evaluaciones enviadas</div>
+  <div id="notifCompletedScales"><div style="font-size:12px;color:var(--text2)">Cargando...</div></div>
 </div>
 
 <!-- ANÁLISIS -->
@@ -851,7 +895,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="nav-item" onclick="showScreen('analysis',this)"><i class="ti ti-chart-bar nav-icon"></i><span class="nav-lbl">Análisis</span></div>
   <div class="nav-item" onclick="showScreen('progreso',this)"><i class="ti ti-heart-rate-monitor nav-icon"></i><span class="nav-lbl">Progreso</span></div>
   <div class="nav-item" id="navScales" onclick="showScreen('scales',this)" style="position:relative;display:none"><i class="ti ti-chart-bar-off nav-icon"></i><span class="nav-lbl">Escalas</span><span id="scalesDot" style="display:none;position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--coral)"></span></div>
-  <div class="nav-item" onclick="showScreen('messages',this)" style="position:relative"><i class="ti ti-message-circle nav-icon"></i><span class="nav-lbl">Mensajes</span><span id="msgDot" style="display:none;position:absolute;top:6px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--coral)"></span></div>
+  <div class="nav-item" onclick="showScreen('messages',this)" style="position:relative"><i class="ti ti-bell nav-icon"></i><span class="nav-lbl">Avisos</span><span id="msgDot" style="display:none;position:absolute;top:6px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--coral)"></span></div>
   <div class="nav-item" onclick="showScreen('profile',this)"><i class="ti ti-user-circle nav-icon"></i><span class="nav-lbl">Perfil</span></div>
 </div>
 
@@ -1102,11 +1146,62 @@ function enterApp(){
   loadScalesForPatient();
   // Pre-load profile data so it's ready when user opens profile tab
   setTimeout(()=>{ loadPatientMedsView(); loadPatientAntsView(); }, 500);
+  // Show welcome screen on first login (overrides the showScreen above)
+  showWelcomeIfNeeded();
 }
 
 // ── ONBOARD ──
 window.obTab=(el,id)=>{ el.closest('.tab-row').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); el.classList.add('active'); ['ob-code','ob-reg'].forEach(i=>{ document.getElementById(i).style.display=i===id?'block':'none'; }); };
 window.fmtCode=(el)=>{ let v=el.value.toUpperCase().replace(/[^A-Z0-9]/g,''); if(v.length>4) v=v.slice(0,4)+'-'+v.slice(4,8); el.value=v; };
+
+
+// ── BIENVENIDA PRIMERA VEZ ──
+function showWelcomeIfNeeded(){
+  const key='dm_welcomed_'+patient.id;
+  if(localStorage.getItem(key)) return false; // ya vio la bienvenida
+  // Populate welcome screen
+  document.getElementById('welcomeName').textContent=(patient.nombre||'').split(' ')[0]||'';
+  const mode=patient.mode||'diary';
+  const steps=[];
+  if(mode==='diary'||mode==='both'){
+    steps.push({icon:'ti-droplet',color:'var(--blue-act)',title:'Registra cada micción',desc:'Cada vez que vayas al baño, abre el Diario y agrega el registro con volumen, urgencia y síntomas.'});
+    steps.push({icon:'ti-glass',color:'var(--green)',title:'Registra lo que bebes',desc:'También anota tus bebidas del día para que tu médico calcule tu balance de líquidos.'});
+  }
+  if(mode==='scales'||mode==='both'){
+    steps.push({icon:'ti-chart-bar-off',color:'var(--coral)',title:'Completa las escalas',desc:'Tu médico te enviará cuestionarios periódicos. Los encontrarás en la pestaña Escalas.'});
+  }
+  steps.push({icon:'ti-heart-rate-monitor',color:'var(--purple)',title:'Revisa tu progreso',desc:'En la pestaña Progreso podrás ver cómo evolucionan tus síntomas a lo largo del tiempo.'});
+  
+  document.getElementById('welcomeSteps').innerHTML=steps.map(s=>`
+    <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <i class="ti ${s.icon}" style="font-size:1.1rem;color:${s.color}"></i>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${s.title}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px;line-height:1.5">${s.desc}</div>
+      </div>
+    </div>`).join('');
+  
+  // Show welcome screen instead of normal flow
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-welcome').classList.add('active');
+  return true;
+}
+
+window.dismissWelcome=()=>{
+  localStorage.setItem('dm_welcomed_'+patient.id,'1');
+  document.getElementById('screen-welcome').classList.remove('active');
+  // Now go to the normal first screen based on mode
+  const mode=patient.mode||'diary';
+  if(mode==='scales'){
+    const navScales=document.getElementById('navScales');
+    showScreen('scales',navScales||document.querySelector('.nav-item'));
+  } else {
+    const diaryNav=document.querySelector('.nav-item[onclick*="main"]');
+    showScreen('main',diaryNav||document.querySelector('.nav-item'));
+  }
+};
 
 window.connectCode=async()=>{
   const code=document.getElementById('codeInput').value.trim().toUpperCase();
@@ -1221,7 +1316,13 @@ function updateStreak(){
 
 // ── PWA ──
 let deferredPrompt=null;
-window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredPrompt=e; if(!localStorage.getItem('curg_install_dismissed')) document.getElementById('installBanner').style.display='flex'; });
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); deferredPrompt=e;
+  if(!localStorage.getItem('curg_install_dismissed')){
+    const b1=document.getElementById('installBanner'); if(b1) b1.style.display='flex';
+    const b2=document.getElementById('loginInstallBanner'); if(b2) b2.style.display='flex';
+  }
+});
 window.installPWA=async()=>{ if(!deferredPrompt) return; deferredPrompt.prompt(); deferredPrompt=null; document.getElementById('installBanner').style.display='none'; };
 window.dismissInstall=()=>{ localStorage.setItem('curg_install_dismissed','1'); document.getElementById('installBanner').style.display='none'; };
 // Service worker disabled (standalone HTML)
@@ -1686,7 +1787,7 @@ window.genPDF=async()=>{
 
   ${scalesHtmlForPDF}
 
-  \${(()=>{
+  ${(()=>{
     if(!pdfMeds.filter(m=>m.fechaInicio).length||!pdfScaleReqs.length||!(patient.assignedScales?.length)) return '';
     const comparisons=pdfMeds.filter(m=>m.fechaInicio).map(m=>{
       const before=pdfScaleReqs.filter(r=>{const d=r.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'';return d<m.fechaInicio;});
@@ -1704,13 +1805,13 @@ window.genPDF=async()=>{
       return deltas.length?{med:m,deltas}:null;
     }).filter(Boolean);
     if(!comparisons.length) return '';
-    return \`<h2>Impacto de medicamentos en escalas clínicas</h2>
+    return `<h2>Impacto de medicamentos en escalas clínicas</h2>
     <p style="font-size:11px;color:#64748b;margin-bottom:8px">Comparación de scores antes y después de iniciar cada medicamento.</p>
-    \${comparisons.map(c=>\`<div style="margin-bottom:10px;border:1px solid #e2e8f0;border-radius:8px;padding:10px">
-      <div style="font-weight:600;font-size:12px;margin-bottom:6px">\${c.med.nombre} \${c.med.dosis||''} — desde \${c.med.fechaInicio}</div>
+    ${comparisons.map(c=>`<div style="margin-bottom:10px;border:1px solid #e2e8f0;border-radius:8px;padding:10px">
+      <div style="font-weight:600;font-size:12px;margin-bottom:6px">${c.med.nombre} ${c.med.dosis||''} — desde ${c.med.fechaInicio}</div>
       <table><tr style="background:#f0f4f8"><th>Escala</th><th>Antes</th><th>Después</th><th>Cambio</th><th>Impacto</th></tr>
-      \${c.deltas.map(d=>\`<tr><td style="font-weight:500">\${d.name}</td><td style="text-align:center;font-family:monospace">\${d.before}</td><td style="text-align:center;font-family:monospace">\${d.after}</td><td style="text-align:center;font-family:monospace;color:\${d.delta>0?'#2e7d32':d.delta<0?'#c62828':'#64748b'};font-weight:700">\${d.delta>0?'-'+d.delta:d.delta<0?'+'+Math.abs(d.delta):'0'}</td><td style="text-align:center"><span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:\${d.delta>0?'#e8f5e9;color:#2e7d32':d.delta<0?'#ffebee;color:#c62828':'#f0f4f8;color:#64748b'}">\${d.delta>0?'Mejoría':d.delta<0?'Empeoramiento':'Sin cambio'}</span></td></tr>\`).join('')}
-      </table></div>\`).join('')}\`;
+      ${c.deltas.map(d=>`<tr><td style="font-weight:500">${d.name}</td><td style="text-align:center;font-family:monospace">${d.before}</td><td style="text-align:center;font-family:monospace">${d.after}</td><td style="text-align:center;font-family:monospace;color:${d.delta>0?'#2e7d32':d.delta<0?'#c62828':'#64748b'};font-weight:700">${d.delta>0?'-'+d.delta:d.delta<0?'+'+Math.abs(d.delta):'0'}</td><td style="text-align:center"><span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:${d.delta>0?'#e8f5e9;color:#2e7d32':d.delta<0?'#ffebee;color:#c62828':'#f0f4f8;color:#64748b'}">${d.delta>0?'Mejoría':d.delta<0?'Empeoramiento':'Sin cambio'}</span></td></tr>`).join('')}
+      </table></div>`).join('')}`;
   })()}
 
   <div class="footer">
@@ -1719,7 +1820,17 @@ window.genPDF=async()=>{
     Base científica: ICS 2019, EAU Guidelines 2023, Tsui et al. 2006 · Ley 1581/2012 Colombia<br>
     Este informe es de apoyo clínico. Debe ser interpretado por un profesional de salud.
   </div>
-  </body></html>`;
+  
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/sw.js')
+      .then(r => console.log('SW registered:', r.scope))
+      .catch(e => console.log('SW error:', e));
+  });
+}
+</script>
+</body></html>`;
 
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
@@ -1780,10 +1891,79 @@ async function loadDoctorMessages(){
     if(unread.length>0){
       const updated=notes.map(n=>({...n,readByPatient:true}));
       await updateDoc(doc(db,'patients',patient.id),{notes:updated});
-      if(dot) dot.style.display='none';
-      if(banner) banner.style.display='none';
     }
   }catch(e){ /* suppressed */ }
+
+  // Load scales for notification center
+  try{
+    const [reqSnap,resSnap]=await Promise.all([
+      getDocs(collection(db,'patients',patient.id,'scaleRequests')),
+      getDocs(collection(db,'patients',patient.id,'scaleResults'))
+    ]);
+    const reqs=reqSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const ress=resSnap.docs.map(d=>({id:d.id,...d.data()}));
+
+    const pending=reqs.filter(r=>r.status==='pending');
+    const completed=reqs.filter(r=>r.status==='completed').sort((a,b)=>(b.completedAt?.seconds||0)-(a.completedAt?.seconds||0));
+
+    // Update nav dot: any pending scales = dot on
+    const dot2=document.getElementById('msgDot');
+    const totalUnread=(patient?.notes||[]).filter(n=>!n.readByPatient).length + pending.length;
+    if(dot2) dot2.style.display=totalUnread>0?'block':'none';
+    if(dot2&&pending.length>0){ dot2.textContent=totalUnread>9?'9+':totalUnread||''; dot2.style.cssText+='font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:8px;'; }
+
+    // Pending scales section
+    const pEl=document.getElementById('notifPendingScales');
+    if(pEl){
+      if(!pending.length){
+        pEl.innerHTML='<div style="font-size:12px;color:var(--text2);padding:8px 0">Sin escalas pendientes. ¡Todo al día!</div>';
+      } else {
+        pEl.innerHTML=pending.map(r=>{
+          const names=(r.scales||[]).map(sid=>PAC_SCALES_CATALOG.find(s=>s.id===sid)?.name||sid).join(', ');
+          const dias=r.requestedAt?.toDate?Math.floor((Date.now()-r.requestedAt.toDate().getTime())/86400000):null;
+          return `<div style="background:var(--coral-light);border:1px solid var(--coral);border-radius:10px;padding:10px 12px;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <i class="ti ti-chart-bar-off" style="color:var(--coral)"></i>
+              <span style="font-size:13px;font-weight:600;color:var(--text)">${names}</span>
+            </div>
+            ${r.note?'<div style="font-size:11px;color:var(--text2);margin-bottom:6px">'+r.note+'</div>':''}
+            ${dias!=null?'<div style="font-size:11px;color:var(--coral)">⏳ Solicitada hace '+dias+' día'+(dias!==1?'s':'')+'</div>':''}
+            <button class="btn btn-primary btn-full" style="margin-top:8px;padding:8px" onclick="startFillScales('${r.id}')"><i class="ti ti-pencil"></i>Completar ahora</button>
+          </div>`;
+        }).join('');
+      }
+    }
+
+    // Completed scales section
+    const cEl=document.getElementById('notifCompletedScales');
+    if(cEl){
+      if(!completed.length){
+        cEl.innerHTML='<div style="font-size:12px;color:var(--text2);padding:8px 0">Sin evaluaciones enviadas aún.</div>';
+      } else {
+        cEl.innerHTML=completed.slice(0,5).map(r=>{
+          const names=(r.scales||[]).map(sid=>PAC_SCALES_CATALOG.find(s=>s.id===sid)?.name||sid).join(', ');
+          const fecha=r.completedAt?.toDate?.()?.toLocaleDateString('es',{day:'2-digit',month:'short',year:'numeric'})||'—';
+          // Get scores for this request
+          const myResults=ress.filter(rs=>rs.requestId===r.id);
+          const scoreText=myResults.map(rs=>{
+            const def=PAC_SCALES_CATALOG.find(s=>s.id===rs.scaleId);
+            if(!def) return '';
+            const t=(rs.scores||[]).reduce((a,b)=>a+(typeof b==='number'?b:0),0);
+            return def.name+': '+t;
+          }).filter(Boolean).join(' · ');
+          return `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <i class="ti ti-circle-check" style="color:var(--green)"></i>
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:600">${names}</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px">${fecha}${scoreText?' · '+scoreText:''}</div>
+              </div>
+            </div>
+          </div>`;
+        }).join('');
+      }
+    }
+  }catch(e){}
 }
 
 // ── EDIT PATIENT PROFILE ──
@@ -2318,16 +2498,34 @@ async function submitScaleResults(){
     // Mark request as completed
     await updateDoc(doc(db,'patients',patient.id,'scaleRequests',currentRequest.id),{status:'completed',completedAt:serverTimestamp()});
     
-    // Show completion screen
-    const scaleNames=Object.keys(currentAnswers).map(id=>PAC_SCALES_CATALOG.find(s=>s.id===id)?.name||id).join(', ');
+    // Show completion screen with score summary
+    const now=new Date();
+    const fechaHora=now.toLocaleDateString('es',{day:'2-digit',month:'long',year:'numeric'})+' · '+now.toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'});
+    const scoreLines=Object.entries(currentAnswers).filter(([id])=>!id.endsWith('_raw')).map(([scaleId,scores])=>{
+      const def=PAC_SCALES_CATALOG.find(s=>s.id===scaleId);
+      if(!def) return '';
+      const total=scores.reduce((a,b)=>a+(typeof b==='number'?b:0),0);
+      const interp=def.scoring?def.scoring(scores):{interpretation:''};
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div><div style="font-size:13px;font-weight:600">${def.name}</div><div style="font-size:11px;color:var(--text2)">${def.full||''}</div></div>
+        <div style="text-align:right"><div style="font-size:1.1rem;font-weight:700;color:var(--blue-act)">${total}</div><div style="font-size:10px;color:var(--text2)">${interp.interpretation||''}</div></div>
+      </div>`;
+    }).join('');
+    
     document.getElementById('scaleFillContent').innerHTML=`
-      <div class="scale-result-banner">
-        <i class="ti ti-circle-check" style="font-size:2.5rem;color:var(--green);display:block;margin-bottom:1rem"></i>
-        <div style="font-size:1rem;font-weight:600;color:var(--text)">¡Escalas completadas!</div>
-        <div style="font-size:13px;color:var(--text2);margin-top:6px">${scaleNames}</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:4px">Tu médico puede ver los resultados en tiempo real.</div>
+      <div style="text-align:center;padding:1.5rem 0 1rem">
+        <div style="width:64px;height:64px;background:var(--green-dim);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem">
+          <i class="ti ti-circle-check" style="font-size:2rem;color:var(--green)"></i>
+        </div>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--text)">¡Listo! Evaluación enviada</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">${fechaHora}</div>
       </div>
-      <button class="btn btn-primary btn-full" onclick="backToScalesHome()"><i class="ti ti-arrow-left"></i>Volver al inicio</button>`;
+      <div style="background:var(--green-dim);border:1px solid var(--green);border-radius:10px;padding:10px 14px;margin-bottom:1rem;font-size:12px;color:var(--green);display:flex;align-items:center;gap:8px">
+        <i class="ti ti-send" style="font-size:1rem;flex-shrink:0"></i>
+        Tu médico ya puede ver estos resultados en tiempo real.
+      </div>
+      ${scoreLines?'<div style="margin-bottom:1rem">'+scoreLines+'</div>':''}
+      <button class="btn btn-primary btn-full" onclick="backToScalesHome()"><i class="ti ti-home"></i>Volver al inicio</button>`;
     
     // Reload scales data
     loadScalesForPatient();
