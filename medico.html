@@ -534,7 +534,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div style="text-align:center;margin-top:6px"><span style="font-size:12px;color:var(--text2)">¿Primera vez? </span><button class="btn btn-sm" onclick="showReg()">Crear cuenta médico</button></div>
     </div>
-    <div id="medInstallBanner" style="display:none;margin-top:1rem;background:var(--blue-light);border:1px solid var(--blue-act);border-radius:10px;padding:10px 14px;align-items:center;gap:10px">
+    <div id="medInstallBanner" style="display:flex;margin-top:1rem;background:var(--blue-light);border:1px solid var(--blue-act);border-radius:10px;padding:10px 14px;align-items:center;gap:10px">
       <i class="ti ti-device-mobile" style="font-size:1.5rem;color:var(--blue-act);flex-shrink:0"></i>
       <div style="flex:1">
         <div style="font-size:12px;font-weight:600;color:var(--text)">Instalar como app</div>
@@ -4587,8 +4587,9 @@ window.addEventListener('beforeinstallprompt', e => {
 
 window.installMedPWA = async () => {
   if (!medDeferredPrompt) {
-    // Fallback: show instructions
-    alert('Para instalar:\n1. En Chrome: menú ⋮ → "Añadir a pantalla de inicio"\n2. En Safari (iOS): botón compartir → "En el inicio"');
+    // Show inline instructions instead of alert
+    const banner = document.getElementById('medInstallBanner');
+    if(banner) banner.innerHTML = `<i class="ti ti-info-circle" style="font-size:1.5rem;color:var(--blue-act);flex-shrink:0"></i><div style="font-size:12px;color:var(--text)"><strong>¿Cómo instalar?</strong><br>📱 <strong>Android (Chrome):</strong> menú ⋮ → "Añadir a pantalla de inicio"<br>🍎 <strong>iPhone (Safari):</strong> botón compartir ↑ → "En la pantalla de inicio"</div>`;
     return;
   }
   medDeferredPrompt.prompt();
