@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diario Miccional — Panel Médico · InnoIA</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#042C53">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Diario Miccional">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -36,6 +41,25 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{overflow-x:hidden;max-width:100vw;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
+
+
+/* ── NOTIFICATION CENTER ── */
+.notif-btn{position:relative;background:rgba(255,255,255,.1);border:none;color:#fff;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:background .15s;}
+.notif-btn:hover{background:rgba(255,255,255,.2);}
+.notif-btn-badge{position:absolute;top:-4px;right:-4px;background:var(--coral);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--blue-deep);}
+.notif-panel{position:fixed;top:52px;right:0;width:min(380px,100vw);height:calc(100vh - 52px);background:var(--surface);border-left:1px solid var(--border);z-index:500;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,.3);}
+.notif-panel.open{transform:translateX(0);}
+.notif-panel-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.notif-panel-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.notif-list{flex:1;overflow-y:auto;padding:.75rem;}
+.notif-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;}
+.notif-item:hover{border-color:var(--blue-act);}
+.notif-item.unread{border-left:3px solid var(--blue-act);}
+.notif-item.alert{border-left:3px solid var(--coral);}
+.notif-item-header{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.notif-item-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.notif-item-meta{font-size:10px;color:var(--text3);margin-top:3px;}
+.notif-empty{text-align:center;padding:3rem 1rem;color:var(--text2);}
 
 /* ── AUTH ── */
 .auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(ellipse at top,#0d2137 0%,var(--bg) 60%);}
@@ -510,6 +534,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       </div>
       <div style="text-align:center;margin-top:6px"><span style="font-size:12px;color:var(--text2)">¿Primera vez? </span><button class="btn btn-sm" onclick="showReg()">Crear cuenta médico</button></div>
     </div>
+    <div id="medInstallBanner" style="display:none;margin-top:1rem;background:var(--blue-light);border:1px solid var(--blue-act);border-radius:10px;padding:10px 14px;align-items:center;gap:10px">
+      <i class="ti ti-device-mobile" style="font-size:1.5rem;color:var(--blue-act);flex-shrink:0"></i>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:600;color:var(--text)">Instalar como app</div>
+        <div style="font-size:11px;color:var(--text2)">Accede desde tu pantalla de inicio, sin navegador</div>
+      </div>
+      <button onclick="installMedPWA()" style="background:var(--blue-act);color:#fff;border:none;padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap">Instalar</button>
+    </div>
     <div id="forgotForm" style="display:none">
       <div class="auth-title">Recuperar contraseña</div>
       <div class="auth-sub">Te enviaremos un enlace para restablecer tu contraseña.</div>
@@ -544,6 +576,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="topbar-spacer"></div>
     <button class="btn-lang" id="langBtn" onclick="toggleLang()">EN</button>
       <button id="themeBtn" onclick="toggleTheme()" style="background:rgba(255,255,255,.1);border:none;color:#fff;padding:4px 8px;border-radius:6px;font-size:14px;cursor:pointer;font-family:inherit" title="Cambiar tema">🌙</button>
+    <button class="notif-btn" id="notifBtn" onclick="toggleNotifPanel()" title="Notificaciones">
+      <i class="ti ti-bell"></i>
+      <span class="notif-btn-badge" id="notifBadge" style="display:none">0</span>
+    </button>
     <div class="doctor-chip">
       <div class="doctor-av" id="docAv">DR</div>
       <span class="doctor-name" id="docName">...</span>
@@ -551,6 +587,22 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <button class="btn btn-sm btn-danger" style="margin-left:4px" onclick="doLogout()"><i class="ti ti-logout"></i>Salir</button>
     </div>
   </div>
+
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-header">
+    <div class="notif-panel-title"><i class="ti ti-bell" style="color:var(--blue-act)"></i>Notificaciones</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn btn-sm" onclick="markAllNotifsRead()" style="font-size:11px">Marcar leídas</button>
+      <button onclick="toggleNotifPanel()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1">×</button>
+    </div>
+  </div>
+  <div class="notif-list" id="notifList">
+    <div class="notif-empty"><i class="ti ti-bell-off" style="font-size:2rem;display:block;margin-bottom:.5rem"></i>Sin notificaciones</div>
+  </div>
+</div>
+<div id="notifOverlay" style="display:none;position:fixed;inset:0;z-index:499;background:rgba(0,0,0,.3)" onclick="toggleNotifPanel()"></div>
 
   <div class="top-tabs">
     <div class="ttab active" onclick="showTTab('patients',this)"><i class="ti ti-users"></i>Pacientes</div>
@@ -1328,12 +1380,21 @@ function loadPats(){
     snap.forEach(d=>{ patsCache[d.id]={id:d.id,...d.data()}; });
     filterPats();
     checkInactivityOnLoad();
-    // Enrich with pending scales badge (async, re-renders after)
+    // Enrich with pending scales details (async, re-renders after)
     const patIds=Object.keys(patsCache);
     Promise.all(patIds.map(async pid=>{
       try{
         const sq=await getDocs(query(collection(db,'patients',pid,'scaleRequests'),where('status','==','pending')));
-        if(sq.size>0){ patsCache[pid]._pendingScales=sq.size; }
+        if(sq.size>0){
+          patsCache[pid]._pendingScales=sq.size;
+          // Store details: which scales, when requested
+          patsCache[pid]._pendingScaleDetails=sq.docs.map(d=>{
+            const data=d.data();
+            const names=(data.scales||[]).map(sid=>SCALES_CATALOG.find(s=>s.id===sid)?.name||sid).join(', ');
+            const dias=data.requestedAt?.toDate?Math.floor((Date.now()-data.requestedAt.toDate().getTime())/86400000):null;
+            return {names, dias, note:data.note||''};
+          });
+        }
       }catch(e){}
     })).then(()=>filterPats());
   });
@@ -1369,9 +1430,12 @@ function renderPatList(pats){
       <div class="pat-av" style="background:${c}22;color:${c};border:1px solid ${c}44">${ini}</div>
       <div style="flex:1;min-width:0">
         <div class="pat-name">${p.nombre||'—'}</div>
-        <div class="pat-meta">${p.clinica||''} · ${p.yearInicio||''}${p._pendingScales?' · <span style="color:var(--coral);font-weight:600">⏳ escala pendiente</span>':''}</div>
+        <div class="pat-meta">${p.clinica||''} · ${p.yearInicio||''}</div>
       </div>
-      <div class="status-dot ${st}"></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+        ${p._pendingScales?`<span onclick="event.stopPropagation();showPendingDetail('${p.id}')" title="Ver detalle" style="background:var(--coral);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;line-height:1.4;cursor:pointer">⏳ ${p._pendingScales} escala${p._pendingScales>1?'s':''}</span>`:''}
+        <div class="status-dot ${st}"></div>
+      </div>
     </div>`;
   }).join('');
 }
@@ -2105,26 +2169,546 @@ window.genFullReport=async(id)=>{
   <title>Informe Técnico CURG — ${p.nombre}</title>
   <style>${styles}</style></head><body>
   <div class="hdr">
-    <h1>Diario Miccional — Informe Técnico Completo</h1>
+    <h1>Diario Miccional — ${p.mode==="scales"?"Informe de Escalas Clínicas":p.mode==="both"?"Informe Completo":"Informe de Diario Miccional"}</h1>
     <p>Paciente: <strong>${p.nombre}</strong> · Clínica: ${p.clinica||'—'} · Año: ${p.yearInicio||'—'} · Diagnóstico: ${p.diagnostico||'—'}</p>
     <p>Médico: ${p.medicoTratante||curDocData?.nombre||'—'} · Generado: ${new Date().toLocaleString('es')}</p>
     <p>by <span class="inn">InnoIA</span> · verificado <span class="curg">CURG</span> · Colombian Urology Research Group</p>
   </div>
   <div class="warn">⚠️ Informe de apoyo clínico. No constituye diagnóstico médico. Interpretación exclusiva del profesional de salud tratante.</div>
 
-  <h2>Resumen ejecutivo</h2>
+  \${p.mode!=='scales'?`<h2>Resumen ejecutivo</h2>
   <div class="gr">
-    <div class="st"><div class="sl">Total micciones</div><div class="sv">${mics.length}</div><div class="sr">Normal: 4–7/día</div></div>
-    <div class="st"><div class="sl">Vol. promedio</div><div class="sv">${avgVol} ml</div><div class="sr">Normal: 250–400 ml</div></div>
-    <div class="st"><div class="sl">Vol. total orina</div><div class="sv">${totalVol} ml</div><div class="sr">Normal: 800–2000 ml/24h</div></div>
-    <div class="st"><div class="sl">Líquido ingerido</div><div class="sv">${drks.reduce((a,r)=>a+(r.vol||0),0)} ml</div><div class="sr">Recomendado: 1500–2000 ml</div></div>
+    <div class="st"><div class="sl">Total micciones</div><div class="sv">\${mics.length}</div><div class="sr">Normal: 4–7/día</div></div>
+    <div class="st"><div class="sl">Vol. promedio</div><div class="sv">\${avgVol} ml</div><div class="sr">Normal: 250–400 ml</div></div>
+    <div class="st"><div class="sl">Vol. total orina</div><div class="sv">\${totalVol} ml</div><div class="sr">Normal: 800–2000 ml/24h</div></div>
+    <div class="st"><div class="sl">Líquido ingerido</div><div class="sv">\${drks.reduce((a,r)=>a+(r.vol||0),0)} ml</div><div class="sr">Recomendado: 1500–2000 ml</div></div>
+  </div>`:''}
+  \${p.mode!=='scales'?`<div class="gr">
+    <div class="st"><div class="sl">Fugas registradas</div><div class="sv" style="color:\${leaks.length>0?'#e65100':'#2e7d32'}">\${leaks.length}</div><div class="sr">Normal: 0</div></div>
+    <div class="st"><div class="sl">Con análisis acústico</div><div class="sv">\${acRecs.length}</div><div class="sr">de \${mics.length} micciones</div></div>
+    <div class="st"><div class="sl">dB promedio global</div><div class="sv">\${avgDB} dB</div><div class="sr">Sobre baseline calibrado</div></div>
+    <div class="st"><div class="sl">Días con registros</div><div class="sv">\${[...new Set(recs.map(r=>r.date))].length}</div></div>
+  </div>`:''}
+
+  ${p.mode!=='scales'?``:''}  
+
+    ${(p.antecedentes&&p.antecedentes.length)?`
+      <div class="card" style="margin-top:8px">
+        <div class="card-label"><i class="ti ti-notes-medical"></i>Antecedentes</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:${p.antOtros?'8px':'0'}">
+          ${(p.antecedentes||[]).map(a=>`<span style="padding:3px 10px;border-radius:20px;background:var(--blue-light);color:var(--blue-act);font-size:11px;font-weight:500">${a}</span>`).join('')}
+        </div>
+        ${p.antOtros?`<p style="font-size:12px;color:var(--text2);margin-top:4px">${p.antOtros}</p>`:''}
+      </div>`:''}
+      <div id="pd-meds-inline-${p.id}" style="margin-top:8px">
+        <div class="card-label" style="margin-bottom:8px;display:flex;align-items:center;justify-content:space-between"><span><i class="ti ti-pill"></i>Medicamentos</span><button class="btn btn-sm btn-green" onclick="openAddMedModal('${p.id}')"><i class="ti ti-plus"></i>Agregar</button></div>
+        <div id="pd-meds-profile-${p.id}"><div style="font-size:12px;color:var(--text2)">Cargando...</div></div>
+      </div>
+    </div>
+  `;
+  setTimeout(()=>buildCharts(mics,drks,wbMap,sleepMap),150);
+}
+
+// ── DIARY DATE FILTER ──
+window.filterDiaryDate=(date,el)=>{
+  document.querySelectorAll('.date-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  const container=document.getElementById('diaryRecords');
+  if(!container) return;
+  if(date==='all'){
+    container.innerHTML=renderDiary(patDiaryAllRecs,patDiaryAllSleep,patDiaryAllWb);
+  } else {
+    const filtered=patDiaryAllRecs.filter(r=>r.date===date);
+    const sl={[date]:patDiaryAllSleep[date]||{}};
+    const wb={[date]:patDiaryAllWb[date]||{}};
+    container.innerHTML=renderDiary(filtered,sl,wb);
+  }
+};
+
+
+// ── NEW PATIENT ──
+window.openNewPat=()=>{
+  // Reset wizard state
+  npCurrentStep=1; npMode='diary'; npMeds=[];
+  // Show step 1, hide rest
+  ['npStepBasic','npStepMode','npStepAnt'].forEach((id,i)=>{
+    const el=document.getElementById(id); if(el) el.style.display=i===0?'block':'none';
+  });
+  // Reset progress bars
+  ['npStep1bar','npStep2bar','npStep3bar'].forEach((id,i)=>{
+    const el=document.getElementById(id); if(el) el.style.background=i===0?'var(--blue-act)':'var(--border)';
+  });
+  // Reset buttons
+  const prev=document.getElementById('npBtnPrev'); if(prev) prev.style.display='none';
+  const next=document.getElementById('npBtnNext'); if(next) next.style.display='';
+  const save=document.getElementById('npBtnSave'); if(save) save.style.display='none';
+  // Clear fields
+  ['npN','npFN','npT','npE','npD','npNo','npAntOtros'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  const npG=document.getElementById('npG'); if(npG) npG.value='';
+  const npM=document.getElementById('npM'); if(npM) npM.value=curDocData?.nombre||'';
+  const npY=document.getElementById('npY'); if(npY) npY.value=new Date().getFullYear();
+  const npC=document.getElementById('npC'); if(npC) npC.value='';
+  // Reset mode cards
+  ['modeCardDiary','modeCardScales','modeCardBoth'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.style.border='2px solid var(--border)'; el.style.background=''; el.querySelectorAll('i,div').forEach(c=>{if(c.tagName==='I')c.style.color='var(--text3)';else if(c.style)c.style.color='var(--text2)';}); }
+  });
+  // Default diary mode selected
+  const diary=document.getElementById('modeCardDiary');
+  if(diary){ diary.style.border='2px solid var(--blue-act)'; diary.style.background='var(--blue-light)'; }
+  const npScalesSection=document.getElementById('npScalesSection');
+  if(npScalesSection) npScalesSection.style.display='none';
+  // Reset chips
+  document.querySelectorAll('.ant-chip').forEach(c=>c.classList.remove('selected'));
+  // Reset meds list
+  const npMedsList=document.getElementById('npMedsList');
+  if(npMedsList) npMedsList.innerHTML='<p style="font-size:12px;color:var(--text2)">Sin medicamentos agregados. Puedes continuar sin agregar.</p>';
+  // Reset err
+  const npErr=document.getElementById('npErr'); if(npErr) npErr.style.display='none';
+  // Populate clinicas
+  const npC2=document.getElementById('npC');
+  if(npC2){ npC2.innerHTML='<option value="">Selecciona clínica...</option>'; (curDocData?.clinicas||[]).forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;npC2.appendChild(o);}); }
+  // Refresh scale list
+  refreshScaleList();
+  document.getElementById('modalNewPat').classList.add('open');
+};
+window.closeM=(name)=>document.getElementById('modal'+name).classList.remove('open');
+
+// saveNewPat — defined below with complete logic
+function genCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=chars[Math.floor(Math.random()*chars.length)];return c+'-'+Array.from({length:4},()=>chars[Math.floor(Math.random()*chars.length)]).join('');}
+window.copyCode=(code)=>{navigator.clipboard?.writeText(code);};
+window.printCard=(id,patData)=>{
+  const p=patData||patsCache[id];if(!p)return;
+  const docName=curDocData?.nombre||'CURG';const appUrl=window.location.origin+'/paciente.html';
+  document.getElementById('printArea').innerHTML=`<div class="print-card"><div class="print-header"><div class="print-logo-dot"></div><div class="print-logo-line"></div><div class="print-header-text"><h2>Diario Miccional</h2><p>${docName}${p.clinica?' · '+p.clinica:''}</p></div><div class="print-badge"><span class="pb-innoia">by InnoIA</span><span class="pb-curg">CURG</span></div></div><div class="print-patient">${p.nombre||'—'}</div><div class="print-diag">${p.diagnostico||''}</div><div class="print-code-label">Tu código de acceso:</div><div class="print-code">${p.accessCode||'—'}</div><div id="qr-${id}" style="margin:10px 0"></div><div class="print-instr"><strong>¿Cómo usar tu Diario Miccional?</strong><br>1. Abre el navegador<br>2. Ve a: <strong>${appUrl}</strong><br>3. Ingresa tu código: <strong>${p.accessCode}</strong><br>4. Registra cada micción, bebida o fuga<br>5. Tu médico verá tus datos en tiempo real</div><div class="print-footer"><span>Diario Miccional by InnoIA</span><span>verificado CURG · 2026</span></div></div>`;
+  document.getElementById('printArea').style.display='block';
+  setTimeout(()=>{const qrEl=document.getElementById('qr-'+id);if(qrEl&&window.QRCode)new QRCode(qrEl,{text:appUrl+'?code='+(p.accessCode||''),width:110,height:110,colorDark:'#042C53',colorLight:'#ffffff'});setTimeout(()=>{window.print();document.getElementById('printArea').style.display='none';},500);},100);
+};
+window.openNoteModal=(id)=>{noteTargetId=id;document.getElementById('noteText').value='';document.getElementById('modalNote').classList.add('open');};
+window.saveNote=async()=>{const text=document.getElementById('noteText').value.trim();if(!text||!noteTargetId)return;const p=patsCache[noteTargetId];const notes=[...(p.notes||[]),{text,date:new Date().toISOString().slice(0,10),doctor:curDocData?.nombre||''}];await updateDoc(doc(db,'patients',noteTargetId),{notes});closeM('Note');selectPat(noteTargetId);};
+// ── EDIT DOCTOR PROFILE ──
+let epPhotoBase64 = null;
+
+window.previewProfilePhoto=(input)=>{
+  const file=input.files[0]; if(!file) return;
+  if(file.size>2*1024*1024){ alert('Imagen demasiado grande. Máximo 2MB.'); return; }
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    epPhotoBase64=e.target.result;
+    const prev=document.getElementById('epAvatarPreview');
+    if(prev) prev.innerHTML=`<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+  };
+  reader.readAsDataURL(file);
+};
+
+window.openEditProfile=()=>{
+  document.getElementById('epNombre').value=curDocData?.nombre||'';
+  document.getElementById('epEspec').value=curDocData?.especialidad||'';
+  document.getElementById('epClinicas').value=(curDocData?.clinicas||[]).join(', ');
+  document.getElementById('epErr').style.display='none';
+  document.getElementById('modalEditProfile').classList.add('open');
+};
+window.saveEditProfile=async()=>{
+  const nombre=document.getElementById('epNombre').value.trim();
+  const err=document.getElementById('epErr');
+  if(!nombre){err.querySelector('span').textContent='El nombre es obligatorio';err.style.display='flex';return;}
+  const clinicas=document.getElementById('epClinicas').value.split(',').map(c=>c.trim()).filter(Boolean);
+  try{
+    const updates={nombre,especialidad:document.getElementById('epEspec').value.trim(),clinicas};
+    if(epPhotoBase64) updates.photoURL=epPhotoBase64;
+    await updateDoc(doc(db,'doctors',curDoc.uid),updates);
+    curDocData={...curDocData,...updates};
+    document.getElementById('docName').textContent=nombre;
+    const avEl=document.getElementById('docAv');
+    if(curDocData.photoURL){
+      avEl.innerHTML=`<img src="${curDocData.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      avEl.style.padding='0';
+    } else {
+      avEl.textContent=nombre.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    }
+    populateFilters();
+    closeM('EditProfile');
+  }catch(e){err.querySelector('span').textContent=e.message;err.style.display='flex';}
+};
+
+// ── EDIT PATIENT ──
+let editPatId=null;
+window.openEditPat=(id)=>{
+  editPatId=id;
+  const p=patsCache[id]; if(!p) return;
+  document.getElementById('enpNombre').value=p.nombre||'';
+  document.getElementById('enpFN').value=p.fechaNac||'';
+  document.getElementById('enpG').value=p.genero||'';
+  document.getElementById('enpY').value=p.yearInicio||new Date().getFullYear();
+  document.getElementById('enpT').value=p.telefono||'';
+  document.getElementById('enpE').value=p.email||'';
+  document.getElementById('enpD').value=p.diagnostico||'';
+  document.getElementById('enpM').value=p.medicoTratante||'';
+  document.getElementById('enpNo').value=p.notasIniciales||'';
+  // Populate clinica
+  const enpC=document.getElementById('enpC');
+  if(enpC){ enpC.innerHTML='<option value="">Selecciona...</option>'; (curDocData?.clinicas||[]).forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;if(c===p.clinica)o.selected=true;enpC.appendChild(o);}); }
+  // Mode
+  const enpMode=document.getElementById('enpMode');
+  if(enpMode) enpMode.value=p.mode||'diary';
+  // Toggle scales section
+  const sg=document.getElementById('enpScalesGroup');
+  if(sg) sg.style.display=(p.mode==='scales'||p.mode==='both')?'block':'none';
+  // Populate scales checkboxes (filtered by patient gender)
+  const sl=document.getElementById('enpScalesList');
+  if(sl){
+    const pGender=p.genero||'';
+    sl.innerHTML=SCALES_CATALOG.map(s=>{
+      const compat=s.gender==='all'||!pGender||s.gender===pGender;
+      const incompatLabel=s.gender==='m'?'Solo masculino':s.gender==='f'?'Solo femenino':'';
+      return `<label style="display:flex;align-items:flex-start;gap:8px;padding:6px 8px;border:1px solid ${compat?'var(--border)':'var(--red-dim)'};border-radius:8px;cursor:${compat?'pointer':'not-allowed'};background:${compat?'var(--bg)':'var(--red-dim)'};opacity:${compat?'1':'0.55'}">
+        <input type="checkbox" name="enpScale" value="${s.id}" ${(p.assignedScales||[]).includes(s.id)&&compat?'checked':''} ${compat?'':'disabled'} style="width:14px;height:14px;accent-color:var(--blue-act);flex-shrink:0;margin-top:2px">
+        <div>
+          <div style="font-size:11px;font-weight:600">${s.name} — ${s.full} ${!compat?'<span style="font-size:10px;color:var(--red);font-weight:400">⛔ '+incompatLabel+'</span>':''}</div>
+          <div style="font-size:10px;color:var(--text2)">${s.desc}</div>
+        </div>
+      </label>`;
+    }).join('');
+  }
+  // Antecedentes chips — reset then select
+  ['enpAntComorbilidades','enpAntExposiciones','enpAntUrologicos','enpAntQuirurgicos'].forEach(gid=>{
+    const g=document.getElementById(gid); if(!g) return;
+    g.querySelectorAll('.ant-chip').forEach(c=>{
+      c.classList.toggle('selected',(p.antecedentes||[]).includes(c.textContent.trim()));
+    });
+  });
+  const enpAntOtros=document.getElementById('enpAntOtros');
+  if(enpAntOtros) enpAntOtros.value=p.antOtros||'';
+  document.getElementById('enpErr').style.display='none';
+  document.getElementById('modalEditPat').classList.add('open');
+};
+// Toggle scales section when mode changes in edit modal
+document.getElementById('enpMode')?.addEventListener('change',function(){
+  const sg=document.getElementById('enpScalesGroup');
+  if(sg) sg.style.display=(this.value==='scales'||this.value==='both')?'block':'none';
+});
+window.saveEditPat=async()=>{
+  if(!editPatId) return;
+  const err=document.getElementById('enpErr');
+  const nombre=document.getElementById('enpNombre').value.trim();
+  if(!nombre){err.querySelector('span').textContent='El nombre es obligatorio';err.style.display='flex';return;}
+  try{
+    // Collect antecedentes from all chip groups
+    const ants=[];
+    ['enpAntComorbilidades','enpAntExposiciones','enpAntUrologicos','enpAntQuirurgicos'].forEach(gid=>{
+      const g=document.getElementById(gid); if(!g) return;
+      g.querySelectorAll('.ant-chip.selected').forEach(c=>ants.push(c.textContent.trim()));
+    });
+    const mode=document.getElementById('enpMode')?.value||'diary';
+    const assignedScales=[...document.querySelectorAll('input[name="enpScale"]:checked')].map(i=>i.value);
+    const updates={
+      nombre,
+      fechaNac:document.getElementById('enpFN').value,
+      genero:document.getElementById('enpG').value,
+      yearInicio:parseInt(document.getElementById('enpY').value)||new Date().getFullYear(),
+      clinica:document.getElementById('enpC').value,
+      telefono:document.getElementById('enpT').value.trim(),
+      email:document.getElementById('enpE').value.trim(),
+      diagnostico:document.getElementById('enpD').value.trim(),
+      medicoTratante:document.getElementById('enpM').value.trim(),
+      notasIniciales:document.getElementById('enpNo').value.trim(),
+      mode, assignedScales,
+      antecedentes:ants,
+      antOtros:document.getElementById('enpAntOtros')?.value.trim()||''
+    };
+    // Track antecedentes changes
+    const oldPat=patsCache[editPatId];
+    const oldAnts=oldPat?.antecedentes||[];
+    const newAnts=ants;
+    const added=newAnts.filter(a=>!oldAnts.includes(a));
+    const removed=oldAnts.filter(a=>!newAnts.includes(a));
+    if(added.length||removed.length){
+      const history=[...(oldPat?.antecedentesHistory||[]),{
+        date:new Date().toISOString().slice(0,10),
+        added,removed,
+        changedBy:curDocData?.nombre||'',
+        previousAnts:oldAnts
+      }];
+      updates.antecedentesHistory=history;
+    }
+        // Track antecedentes history
+    const oldP2=patsCache[editPatId];
+    const oldA2=oldP2?.antecedentes||[];
+    const addedA=ants.filter(a=>!oldA2.includes(a));
+    const removedA=oldA2.filter(a=>!ants.includes(a));
+    if(addedA.length||removedA.length){
+      updates.antecedentesHistory=[...(oldP2?.antecedentesHistory||[]),{date:new Date().toISOString().slice(0,10),added:addedA,removed:removedA,changedBy:curDocData?.nombre||''}];
+    }
+    await updateDoc(doc(db,'patients',editPatId),updates);
+    // Write antecedentes change to clinicalEvents so it appears in Evolución
+    if(added.length||removed.length){
+      const today=new Date().toISOString().slice(0,10);
+      const parts=[];
+      if(added.length) parts.push('Agregados: '+added.join(', '));
+      if(removed.length) parts.push('Eliminados: '+removed.join(', '));
+      await addDoc(collection(db,'patients',editPatId,'clinicalEvents'),{
+        type:'surgery',
+        date:today,
+        title:'Actualización de antecedentes',
+        detail:parts.join(' | ')+' (por '+( curDocData?.nombre||'médico')+')',
+        createdAt:serverTimestamp()
+      });
+    }
+    closeM('EditPat');
+    showToast('Paciente actualizado correctamente.');
+    selectPat(editPatId);
+  }catch(e){err.querySelector('span').textContent=e.message;err.style.display='flex';}
+};
+
+async function loadColleagues(){
+  const list=document.getElementById('colleaguesList');
+  if(!list) return;
+  list.innerHTML='<div style="font-size:12px;color:var(--text2);padding:1rem">Cargando...</div>';
+  const clinicas=curDocData?.clinicas||[];
+  if(!clinicas.length){
+    list.innerHTML='<div style="grid-column:1/-1;font-size:13px;color:var(--text2)"><i class="ti ti-info-circle" style="color:var(--blue-act)"></i> No tienes clínicas asignadas. Usa el botón ⚙️ para editar tu perfil y agregar clínicas.</div>';
+    return;
+  }
+  const GRADS=[['#0d47a1','#1976d2'],['#1b5e20','#388e3c'],['#4a148c','#7b1fa2'],['#b71c1c','#d32f2f'],['#e65100','#f57c00'],['#006064','#00838f'],['#1a237e','#3949ab'],['#37474f','#546e7a']];
+  try{
+    const snap=await getDocs(collection(db,'doctors'));
+    const seen=new Set();
+    const results=[];
+    snap.forEach(d=>{
+      if(d.id===curDoc.uid||seen.has(d.id)) return;
+      const data=d.data();
+      const docClinics=data.clinicas||[];
+      const match=clinicas.find(cl=>docClinics.some(dc=>dc.toLowerCase().trim()===cl.toLowerCase().trim()));
+      if(match){ seen.add(d.id); results.push({id:d.id,...data,clinicaMatch:match}); }
+    });
+    if(!results.length){
+      list.innerHTML='<div style="grid-column:1/-1;font-size:13px;color:var(--text2)">No hay otros médicos registrados en tus clínicas aún.</div>';
+      return;
+    }
+    list.innerHTML=results.map((c,i)=>{
+      const g=GRADS[i%GRADS.length];
+      const ini=(c.nombre||'DR').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const av=c.photoURL
+        ?`<img src="${c.photoURL}" style="width:100%;height:100%;object-fit:cover;">`
+        :`<span style="color:#fff">${ini}</span>`;
+      const avBg=c.photoURL?'var(--card2)':`linear-gradient(135deg,${g[0]},${g[1]})`;
+      const safeName=(c.nombre||'').replace(/'/g,'&apos;');
+      return `<div class="colleague-card">
+        <div class="colleague-card-top">
+          <div class="colleague-card-banner" style="background:linear-gradient(135deg,${g[0]},${g[1]})"></div>
+          <div class="colleague-card-avatar" style="background:${avBg}">${av}</div>
+        </div>
+        <div class="colleague-card-body">
+          <div class="colleague-card-name">${c.nombre||'—'}</div>
+          <div class="colleague-card-spec"><i class="ti ti-stethoscope"></i>${c.especialidad||'Médico'}</div>
+          <div class="colleague-card-clinic"><i class="ti ti-building-hospital"></i>${c.clinicaMatch}</div>
+          <div class="colleague-card-actions">
+            <button class="btn btn-primary btn-sm" onclick="startColleagueConsult('${c.id}','${safeName}')">
+              <i class="ti ti-arrows-exchange"></i>Interconsulta
+            </button>
+            ${c.email?`<button class="btn btn-sm" onclick="window.location.href='mailto:${c.email}?subject=Interconsulta%20CURG'"><i class="ti ti-mail"></i>Email</button>`:''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    list.innerHTML=`<div style="grid-column:1/-1;font-size:12px;color:var(--red)"><i class="ti ti-alert-circle"></i> Error: ${e.message}</div>`;
+  }
+}
+
+window.startColleagueConsult=(doctorId,doctorName)=>{
+  showTTab('patients',document.querySelector('.ttab'));
+  setTimeout(()=>{
+    document.getElementById('consultPrompt')?.remove();
+    const msg=document.createElement('div'); msg.id='consultPrompt';
+    msg.style.cssText='background:var(--blue-light);border:1px solid var(--blue-act);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--blue-act);margin-bottom:12px;display:flex;align-items:center;gap:8px;';
+    msg.innerHTML=`<i class="ti ti-arrows-exchange" style="font-size:14px;flex-shrink:0"></i><span>Selecciona el paciente para interconsultar con <strong>${doctorName}</strong></span><button onclick="this.parentElement.remove()" style="margin-left:auto;background:transparent;border:none;cursor:pointer;color:var(--blue-act)"><i class="ti ti-x"></i></button>`;
+    const pc=document.getElementById('patContent'); if(pc) pc.insertBefore(msg,pc.firstChild);
+  },200);
+};
+
+window.confirmDeletePat=async(id,nombre)=>{
+  if(!confirm(`¿Eliminar a ${nombre}?
+
+Esta acción no se puede deshacer. Se eliminarán todos sus registros.`)) return;
+  try{
+    for(const col of ['records','sleep','wellbeing']){
+      const snap=await getDocs(collection(db,'patients',id,col));
+      for(const d of snap.docs) await deleteDoc(doc(db,'patients',id,col,d.id));
+    }
+    await deleteDoc(doc(db,'patients',id));
+    selPatId=null;
+    document.getElementById('patContent').innerHTML=`<div class="empty" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center"><i class="ti ti-check-circle" style="font-size:3rem;color:var(--green);margin-bottom:1rem"></i><div style="font-size:1rem;font-weight:600">Paciente eliminado</div></div>`;
+  }catch(e){ alert('Error al eliminar: '+e.message); }
+};
+
+let msgTargetId=null;
+window.openMsgModal=(id)=>{ msgTargetId=id; document.getElementById('msgText').value=''; document.getElementById('modalMsg').classList.add('open'); };
+window.sendMsg=async()=>{
+  const text=document.getElementById('msgText').value.trim();
+  if(!text||!msgTargetId) return;
+  const p=patsCache[msgTargetId];
+  const notes=[...(p.notes||[]),{text,date:new Date().toISOString().slice(0,10),doctor:curDocData?.nombre||'',readByPatient:false}];
+  await updateDoc(doc(db,'patients',msgTargetId),{notes});
+  closeM('Msg');
+  alert('Mensaje enviado. El paciente lo verá en su app.');
+};
+
+async function loadReceivedConsults(){
+  const list=document.getElementById('receivedConsultsList'); if(!list) return;
+  try{
+    // Only load consultations where current doctor has added notes
+    // (meaning they accessed it with the code)
+    const snap=await getDocs(collection(db,'consultations'));
+    const received=[];
+    snap.forEach(d=>{
+      const c=d.data();
+      // Skip consultations created by current doctor
+      if(c.fromDoctorId===curDoc.uid) return;
+      // Only show if current doctor has left a note (proof they accessed it)
+      const myNotes=(c.notes||[]).filter(n=>n.doctorId===curDoc.uid);
+      if(myNotes.length===0) return;
+      received.push({id:d.id,...c,myNotes});
+    });
+    if(!received.length){ list.innerHTML='<p style="font-size:12px;color:var(--text2)">No has recibido interconsultas aún.</p>'; return; }
+    const badge=document.getElementById('receivedBadge');
+    const hasNew=received.some(c=>c.status==='active');
+    if(badge) badge.style.display=hasNew?'inline':'none';
+    list.innerHTML=received.slice(0,10).map(c=>{
+      const exp=c.expiresAt?.toDate?.();
+      const expired=exp&&exp<new Date();
+      return `<div class="consult-item">
+        <div class="consult-item-left">
+          <i class="ti ti-user-circle" style="font-size:20px;color:var(--text3)"></i>
+          <div class="consult-item-info">
+            <h4>${c.patientName||'—'} <span style="font-size:11px;color:var(--text2)">de ${c.fromDoctorName||'colega'}</span></h4>
+            <p><span class="consult-code" style="font-size:11px;padding:2px 8px">${c.code}</span> · ${c.notes?.length||0} nota(s)</p>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="consult-status ${expired||c.status==='revoked'?'cs-expired':'cs-active'}">${expired?'Expirada':c.status==='revoked'?'Revocada':'Activa'}</span>
+          ${!expired&&c.status==='active'?`<button class="btn btn-sm btn-primary" onclick="viewReceivedConsult('${c.code}')"><i class="ti ti-eye"></i>Ver</button>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){ list.innerHTML=`<p style="font-size:12px;color:var(--text2)">Error: ${e.message}</p>`; }
+}
+
+window.viewReceivedConsult=(code)=>{
+  document.getElementById('consultCodeInput').value=code;
+  showTTab('consult',document.querySelector('.ttab:nth-child(5)'));
+  setTimeout(()=>accessConsultation(),100);
+};
+
+window.exportXLSX=async(id)=>{
+  if(!window.XLSX){ alert('Cargando XLSX...'); return; }
+  const snap=await getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc')));
+  const recs=snap.docs.map(d=>d.data()); const p=patsCache[id];
+  // Sheet 1: Micciones
+  const mics=recs.filter(r=>r.type==='miction').map(r=>({
+    'Paciente':p.nombre,'Clínica':p.clinica,'Año':p.yearInicio,
+    'Fecha':r.date,'Hora':r.hora,'Volumen (ml)':r.vol||'','Duración (s)':r.dur||'',
+    'Flujo (ml/s)':r.flow||'','Urgencia':r.urgency!=null?`U${r.urgency}`:'','Posición':r.pos||'',
+    'Género':r.genero||'','Clasif. acústica':r.acoustics?.classification||'',
+    'dB promedio':r.acoustics?.avgDB||'','dB pico':r.acoustics?.peakDB||'',
+    'Baseline dB':r.acoustics?.ambientDB||'','Patrón':r.acoustics?.pattern||'','Notas':r.notas||''
+  }));
+  // Sheet 2: Bebidas
+  const drks=recs.filter(r=>r.type==='drink').map(r=>({'Fecha':r.date,'Hora':r.hora,'Tipo':r.tipo||'','Volumen (ml)':r.vol||'','Notas':r.notas||''}));
+  // Sheet 3: Fugas
+  const leaks=recs.filter(r=>r.type==='leak').map(r=>({'Fecha':r.date,'Hora':r.hora,'Tipo':r.tipo||'','Requirió muda':r.muda?'Sí':'No','Notas':r.notas||''}));
+  const wb=XLSX.utils.book_new();
+  if(mics.length) XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(mics),'Micciones');
+  if(drks.length) XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(drks),'Bebidas');
+  if(leaks.length) XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(leaks),'Fugas');
+  if(!mics.length&&!drks.length&&!leaks.length){ alert('Sin registros para exportar'); return; }
+  const filename=`CURG_${(p.nombre||'paciente').replace(/ /g,'_')}_${p.clinica||'clinica'}_${new Date().toISOString().slice(0,10)}.xlsx`;
+  XLSX.writeFile(wb,filename);
+};
+
+window.exportCSV=async(id)=>{
+  const snap=await getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc')));
+  const recs=snap.docs.map(d=>d.data());const p=patsCache[id];
+  const rows=[['Paciente','Clinica','Ano','Fecha','Hora','Tipo','Vol_ml','Dur_s','Flujo_ml_s','Urgencia','Posicion','Tipo_bebida','Muda','Clasif_acustica','dB_prom','dB_pico','dB_baseline','Patron','Notas']];
+  recs.forEach(r=>rows.push([p.nombre,p.clinica,p.yearInicio,r.date,r.hora,r.type,r.vol||'',r.dur||'',r.flow||'',r.urgency!=null?r.urgency:'',r.pos||'',r.tipo||'',r.muda?'SI':'',r.acoustics?.classification||'',r.acoustics?.avgDB||'',r.acoustics?.peakDB||'',r.acoustics?.ambientDB||'',r.acoustics?.pattern||'',r.notas||'']));
+  const lines=rows.map(row=>row.map(v=>String(v)).join(','));
+  const csv=lines.join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='CURG_'+String(p.nombre||'paciente').replace(/ /g,'_')+'_'+String(p.clinica||'clinica')+'.csv';
+  a.click();
+};
+window.genFullReport=async(id)=>{
+  const p=patsCache[id];if(!p)return;
+  const [rSnap,slSnap,wbSnap,medSnapR,scaleReqSnapR,scaleResSnapR]=await Promise.all([
+    getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc'))),
+    getDocs(collection(db,'patients',id,'sleep')),
+    getDocs(collection(db,'patients',id,'wellbeing')),
+    getDocs(collection(db,'patients',id,'medications')),
+    getDocs(collection(db,'patients',id,'scaleRequests')),
+    getDocs(collection(db,'patients',id,'scaleResults'))
+  ]);
+  const recs=rSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const sleepMap={}; slSnap.docs.forEach(d=>{sleepMap[d.id]=d.data();});
+  const wbMap={}; wbSnap.docs.forEach(d=>{wbMap[d.id]=d.data();});
+  const patMeds2=medSnapR.docs.map(d=>({id:d.id,...d.data()}));
+  const patScaleReqs=scaleReqSnapR.docs.map(d=>({id:d.id,...d.data()})).filter(r=>r.status==='completed').sort((a,b)=>(a.requestedAt?.seconds||0)-(b.requestedAt?.seconds||0));
+  const patScaleRes=scaleResSnapR.docs.map(d=>({id:d.id,...d.data()}));
+  const mics=recs.filter(r=>r.type==='miction');
+  const drks=recs.filter(r=>r.type==='drink');
+  const leaks=recs.filter(r=>r.type==='leak');
+  const acRecs=mics.filter(r=>r.acoustics);
+  const fD={weak:0,low:0,normal:0,strong:0};
+  acRecs.forEach(r=>{if(r.acoustics?.classification)fD[r.acoustics.classification]++;});
+  const totalVol=mics.reduce((a,r)=>a+(r.vol||0),0);
+  const avgVol=mics.length?Math.round(totalVol/mics.length):0;
+  const avgDB=acRecs.length?(acRecs.reduce((a,r)=>a+(r.acoustics?.avgDB||0),0)/acRecs.length).toFixed(1):'—';
+  const avgFlow=mics.filter(r=>r.flow).length?(mics.filter(r=>r.flow).reduce((a,r)=>a+r.flow,0)/mics.filter(r=>r.flow).length).toFixed(1):'—';
+  const urgC=[0,0,0,0,0]; mics.forEach(r=>{if(r.urgency!=null)urgC[r.urgency]++;});
+
+  const styles=`body{font-family:Arial,sans-serif;max-width:min(900px,100vw);margin:0 auto;overflow-x:hidden;padding:2rem;color:#1e2a3a;font-size:12px;}
+  .hdr{background:#042C53;color:#fff;padding:1.5rem;border-radius:8px;margin-bottom:1.5rem;}
+  .hdr h1{font-size:1.2rem;margin:0 0 4px;color:#fff;}.hdr p{opacity:.85;font-size:11px;margin:2px 0;}
+  .inn{color:#D85A30;font-weight:700;}.curg{color:#4fc3f7;font-weight:700;}
+  .warn{background:#fff3e0;border:1px solid #e65100;border-radius:6px;padding:10px;color:#e65100;margin-bottom:1rem;font-size:11px;}
+  h2{font-size:13px;color:#042C53;margin:1.5rem 0 .5rem;border-bottom:2px solid #e2e8f0;padding-bottom:4px;}
+  .gr{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;}
+  .gr2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1rem;}
+  .st{background:#f4f6f9;border:1px solid #e2e8f0;border-radius:6px;padding:10px;}
+  .sl{font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+  .sv{font-size:1.2rem;font-weight:700;margin-top:4px;}.sr{font-size:10px;color:#94a3b8;margin-top:2px;}
+  table{width:100%;border-collapse:collapse;margin-bottom:1rem;font-size:12px;}
+  th{background:#f0f4f8;padding:6px 8px;text-align:left;font-weight:600;border:1px solid #e2e8f0;color:#374151;}
+  td{padding:6px 8px;border:1px solid #eee;}tr:nth-child(even){background:#f8fafc;}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+  .bw{background:#ffebee;color:#c62828;}.bl{background:#fff3e0;color:#e65100;}
+  .bn{background:#e8f5e9;color:#2e7d32;}.bs{background:#e3f2fd;color:#1565c0;}
+  .footer{margin-top:2rem;padding:1rem;background:#f0f4f8;border-radius:6px;font-size:10px;color:#94a3b8;text-align:center;border-top:2px solid #e2e8f0;}`;
+
+  const html=`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+  <title>Informe Técnico CURG — ${p.nombre}</title>
+  <style>${styles}</style></head><body>
+  <div class="hdr">
+    <h1>Diario Miccional — ${p.mode==="scales"?"Informe de Escalas Clínicas":p.mode==="both"?"Informe Completo":"Informe de Diario Miccional"}</h1>
+    <p>Paciente: <strong>${p.nombre}</strong> · Clínica: ${p.clinica||'—'} · Año: ${p.yearInicio||'—'} · Diagnóstico: ${p.diagnostico||'—'}</p>
+    <p>Médico: ${p.medicoTratante||curDocData?.nombre||'—'} · Generado: ${new Date().toLocaleString('es')}</p>
+    <p>by <span class="inn">InnoIA</span> · verificado <span class="curg">CURG</span> · Colombian Urology Research Group</p>
   </div>
+  <div class="warn">⚠️ Informe de apoyo clínico. No constituye diagnóstico médico. Interpretación exclusiva del profesional de salud tratante.</div>
+
+  \${p.mode!=='scales'?`<h2>Resumen ejecutivo</h2>
   <div class="gr">
-    <div class="st"><div class="sl">Fugas registradas</div><div class="sv" style="color:${leaks.length>0?'#e65100':'#2e7d32'}">${leaks.length}</div><div class="sr">Normal: 0</div></div>
-    <div class="st"><div class="sl">Con análisis acústico</div><div class="sv">${acRecs.length}</div><div class="sr">de ${mics.length} micciones</div></div>
-    <div class="st"><div class="sl">dB promedio global</div><div class="sv">${avgDB} dB</div><div class="sr">Sobre baseline calibrado</div></div>
-    <div class="st"><div class="sl">Días con registros</div><div class="sv">${[...new Set(recs.map(r=>r.date))].length}</div></div>
-  </div>
+    <div class="st"><div class="sl">Total micciones</div><div class="sv">\${mics.length}</div><div class="sr">Normal: 4–7/día</div></div>
+    <div class="st"><div class="sl">Vol. promedio</div><div class="sv">\${avgVol} ml</div><div class="sr">Normal: 250–400 ml</div></div>
+    <div class="st"><div class="sl">Vol. total orina</div><div class="sv">\${totalVol} ml</div><div class="sr">Normal: 800–2000 ml/24h</div></div>
+    <div class="st"><div class="sl">Líquido ingerido</div><div class="sv">\${drks.reduce((a,r)=>a+(r.vol||0),0)} ml</div><div class="sr">Recomendado: 1500–2000 ml</div></div>
+  </div>`:''}
+  \${p.mode!=='scales'?`<div class="gr">
+    <div class="st"><div class="sl">Fugas registradas</div><div class="sv" style="color:\${leaks.length>0?'#e65100':'#2e7d32'}">\${leaks.length}</div><div class="sr">Normal: 0</div></div>
+    <div class="st"><div class="sl">Con análisis acústico</div><div class="sv">\${acRecs.length}</div><div class="sr">de \${mics.length} micciones</div></div>
+    <div class="st"><div class="sl">dB promedio global</div><div class="sv">\${avgDB} dB</div><div class="sr">Sobre baseline calibrado</div></div>
+    <div class="st"><div class="sl">Días con registros</div><div class="sv">\${[...new Set(recs.map(r=>r.date))].length}</div></div>
+  </div>`:''}
 
   <h2>Distribución de urgencia</h2>
   <table><tr><th>Nivel</th><th>Descripción clínica</th><th>Nº micciones</th><th>%</th></tr>
@@ -2201,7 +2785,7 @@ window.genFullReport=async(id)=>{
 
   ${patMeds2.length?`<h2 style="font-size:13px;color:#042C53;margin:1.5rem 0 .5rem;border-bottom:2px solid #e2e8f0;padding-bottom:4px">Medicamentos</h2><table style="width:100%;border-collapse:collapse;margin-bottom:1rem;font-size:12px"><tr style="background:#f0f4f8"><th style="padding:6px 8px;text-align:left;border:1px solid #e2e8f0">Medicamento</th><th style="padding:6px;border:1px solid #e2e8f0">Dosis</th><th style="padding:6px;border:1px solid #e2e8f0">Frecuencia</th><th style="padding:6px;border:1px solid #e2e8f0">Tipo</th><th style="padding:6px;border:1px solid #e2e8f0">Desde</th><th style="padding:6px;border:1px solid #e2e8f0">Estado</th></tr>${patMeds2.map(m=>`<tr><td style="padding:6px 8px;border:1px solid #eee;font-weight:500">${m.nombre} ${m.dosis||''}</td><td style="padding:6px;border:1px solid #eee">${m.frecuencia||'—'}</td><td style="padding:6px;border:1px solid #eee">${m.tipo==='uro'?'Urológico':'Comorbilidad'}</td><td style="padding:6px;border:1px solid #eee">${m.fechaInicio||'—'}</td><td style="padding:6px;border:1px solid #eee">${m.activo===false?'<span style="color:#c62828">Discontinuado</span>':'<span style="color:#2e7d32">Activo</span>'}</td></tr>`).join('')}</table>`:''}
 
-  ${patScaleReqs.length?`<h2 style="font-size:13px;color:#042C53;margin:1.5rem 0 .5rem;border-bottom:2px solid #e2e8f0;padding-bottom:4px">Escalas clínicas — Seguimiento comparativo</h2><p style="font-size:11px;color:#64748b;margin-bottom:8px">ICS 2019, EAU Guidelines 2023.</p>${(p.assignedScales||[]).map(scaleId=>{const def=SCALES_CATALOG.find(s=>s.id===scaleId);if(!def)return '';const res=patScaleReqs.map(req=>{const r=patScaleRes.find(r=>r.requestId===req.id&&r.scaleId===scaleId);if(!r)return null;const t=r.scores?.reduce((a,b)=>a+b,0)||0;return {t,date:req.type==='baseline'?'Línea base':req.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'—',interp:def.scoring(r.scores)};}).filter(Boolean);if(!res.length)return '';const maxS=def.questions.reduce((a,q)=>a+(q.max||0),0);return `<div style="margin-bottom:10px;border:1px solid #e2e8f0;border-radius:8px;padding:10px"><div style="font-weight:600;font-size:12px;margin-bottom:6px">${def.name} — ${def.full}</div><table style="width:100%;border-collapse:collapse;font-size:11px"><tr style="background:#f0f4f8"><td style="padding:4px 8px;font-weight:600">Evaluación</td>${res.map(r=>`<td style="padding:4px 8px;text-align:center;font-weight:600">${r.date}</td>`).join('')}</tr><tr><td style="padding:4px 8px;color:#64748b">Score (/${maxS})</td>${res.map(r=>`<td style="padding:4px 8px;text-align:center;font-weight:700;font-family:monospace">${r.t}</td>`).join('')}</tr><tr><td style="padding:4px 8px;color:#64748b">Interpretación</td>${res.map(r=>`<td style="padding:4px 8px;text-align:center"><span style="padding:2px 6px;border-radius:8px;font-size:10px;font-weight:700;background:${r.interp.interpretation.includes('Leve')||r.interp.interpretation.includes('Normal')?'#e8f5e9;color:#2e7d32':r.interp.interpretation.includes('Moderado')?'#fff3e0;color:#e65100':'#ffebee;color:#c62828'}">${r.interp.interpretation}</span></td>`).join('')}</tr></table></div>`;}).join('')}`:''}
+  ${p.mode!=='diary'?`  ${patScaleReqs.length?`<h2 style="font-size:13px;color:#042C53;margin:1.5rem 0 .5rem;border-bottom:2px solid #e2e8f0;padding-bottom:4px">Escalas clínicas — Seguimiento comparativo</h2><p style="font-size:11px;color:#64748b;margin-bottom:8px">ICS 2019, EAU Guidelines 2023.</p>${(p.assignedScales||[]).map(scaleId=>{const def=SCALES_CATALOG.find(s=>s.id===scaleId);if(!def)return '';const res=patScaleReqs.map(req=>{const r=patScaleRes.find(r=>r.requestId===req.id&&r.scaleId===scaleId);if(!r)return null;const t=r.scores?.reduce((a,b)=>a+b,0)||0;return {t,date:req.type==='baseline'?'Línea base':req.requestedAt?.toDate?.()?.toISOString().slice(0,10)||'—',interp:def.scoring(r.scores)};}).filter(Boolean);if(!res.length)return '';const maxS=def.questions.reduce((a,q)=>a+(q.max||0),0);return `<div style="margin-bottom:10px;border:1px solid #e2e8f0;border-radius:8px;padding:10px"><div style="font-weight:600;font-size:12px;margin-bottom:6px">${def.name} — ${def.full}</div><table style="width:100%;border-collapse:collapse;font-size:11px"><tr style="background:#f0f4f8"><td style="padding:4px 8px;font-weight:600">Evaluación</td>${res.map(r=>`<td style="padding:4px 8px;text-align:center;font-weight:600">${r.date}</td>`).join('')}</tr><tr><td style="padding:4px 8px;color:#64748b">Score (/${maxS})</td>${res.map(r=>`<td style="padding:4px 8px;text-align:center;font-weight:700;font-family:monospace">${r.t}</td>`).join('')}</tr><tr><td style="padding:4px 8px;color:#64748b">Interpretación</td>${res.map(r=>`<td style="padding:4px 8px;text-align:center"><span style="padding:2px 6px;border-radius:8px;font-size:10px;font-weight:700;background:${r.interp.interpretation.includes('Leve')||r.interp.interpretation.includes('Normal')?'#e8f5e9;color:#2e7d32':r.interp.interpretation.includes('Moderado')?'#fff3e0;color:#e65100':'#ffebee;color:#c62828'}">${r.interp.interpretation}</span></td>`).join('')}</tr></table></div>`;}).join('')}`:''}
 
   ${(()=>{
     // Med-scale comparison for report
@@ -2231,15 +2815,25 @@ window.genFullReport=async(id)=>{
         ${c.deltas.map(d=>`<tr><td style="padding:4px 8px;font-weight:500">${d.name}</td><td style="padding:4px 8px;text-align:center;font-family:monospace">${d.before}</td><td style="padding:4px 8px;text-align:center;font-family:monospace">${d.after}</td><td style="padding:4px 8px;text-align:center;font-family:monospace;color:${d.delta>0?'#2e7d32':d.delta<0?'#c62828':'#64748b'};font-weight:700">${d.delta>0?'-'+d.delta:d.delta<0?'+'+Math.abs(d.delta):'0'}</td><td style="padding:4px 8px;text-align:center"><span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:${d.delta>0?'#e8f5e9;color:#2e7d32':d.delta<0?'#ffebee;color:#c62828':'#f0f4f8;color:#64748b'}">${d.delta>0?'Mejoría':d.delta<0?'Empeoramiento':'Sin cambio'}</span></td></tr>`).join('')}
       </table>
     </div>`).join('')}`;
-  })()}
+  })()}`:''}  
 
-  <div class="footer">
+    <div class="footer">
     Diario Miccional v2.0 · by <strong>InnoIA</strong> · verificado <strong>CURG</strong> (Colombian Urology Research Group)<br>
     Generado: ${new Date().toLocaleString('es')} · Médico: ${curDocData?.nombre||'—'} · Clínica: ${p.clinica||'—'}<br>
     Base científica: ICS 2019, EAU Guidelines 2023, Tsui et al. 2006 · Ley 1581/2012 Colombia y equivalentes LATAM<br>
     Este informe está protegido bajo normativa de protección de datos personales de salud.
   </div>
-  </body></html>`;
+  
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/sw.js')
+      .then(r => console.log('SW registered:', r.scope))
+      .catch(e => console.log('SW error:', e));
+  });
+}
+</script>
+</body></html>`;
 
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
@@ -3096,6 +3690,7 @@ async function loadPatMeds(patId){
           ${m.motivo?`<p style="color:var(--text3);font-size:10px;margin-top:2px">${m.motivo}</p>`:''}
         </div>
         <div style="display:flex;gap:4px">
+          <button class="btn btn-sm" onclick="showMedHistory('${patId}','${m.id}','${m.nombre}')" title="Historial"><i class="ti ti-history"></i></button>
           <button class="btn btn-sm" onclick="openEditMedModal('${patId}','${m.id}')" title="Editar"><i class="ti ti-pencil"></i></button>
           <button class="btn btn-sm btn-danger" onclick="discontinueMed('${patId}','${m.id}')" title="Discontinuar"><i class="ti ti-ban"></i></button>
         </div>
@@ -3164,6 +3759,53 @@ window.saveAddMed=async()=>{
   loadPatMeds(addMedTargetId);
 };
 
+
+
+// ── MEDICATION HISTORY POPUP ──
+window.showMedHistory=async(patId,medId,medNombre)=>{
+  // Remove existing popup
+  document.getElementById('medHistoryPopup')?.remove();
+  
+  const popup=document.createElement('div');
+  popup.id='medHistoryPopup';
+  popup.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:1.25rem;width:min(380px,95vw);max-height:80vh;overflow-y:auto;z-index:9998;box-shadow:0 8px 32px rgba(0,0,0,.4)';
+  popup.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div style="font-size:13px;font-weight:700"><i class="ti ti-history" style="color:var(--blue-act)"></i> Historial: ${medNombre}</div>
+    <button onclick="document.getElementById('medHistoryPopup').remove()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;line-height:1">×</button>
+  </div>
+  <div id="medHistoryContent"><div style="font-size:12px;color:var(--text2)">Cargando...</div></div>`;
+  document.body.appendChild(popup);
+  
+  try{
+    const snap=await getDocs(collection(db,'patients',patId,'clinicalEvents'));
+    const events=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(e=>e.medId===medId && ['med_start','med_stop','med_edit'].includes(e.type))
+      .sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    
+    const typeIcon={'med_start':'<i class="ti ti-pill" style="color:var(--green)"></i>','med_stop':'<i class="ti ti-ban" style="color:var(--red)"></i>','med_edit':'<i class="ti ti-pencil" style="color:var(--amber)"></i>'};
+    const typeLabel={'med_start':'Inicio','med_stop':'Discontinuado','med_edit':'Modificado'};
+    
+    const el=document.getElementById('medHistoryContent');
+    if(!events.length){
+      el.innerHTML='<div style="font-size:12px;color:var(--text2);padding:1rem 0;text-align:center">Sin historial registrado para este medicamento.</div>';
+    } else {
+      el.innerHTML='<div style="position:relative;padding-left:20px;border-left:2px solid var(--border)">'+
+        events.map(evt=>`
+          <div style="position:relative;margin-bottom:14px">
+            <div style="position:absolute;left:-25px;top:2px;background:var(--surface);padding:2px">${typeIcon[evt.type]||''}</div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:2px">${evt.date||'—'} · ${typeLabel[evt.type]||evt.type}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text)">${evt.title||''}</div>
+            ${evt.detail?`<div style="font-size:11px;color:var(--text2);margin-top:3px">${evt.detail}</div>`:''}
+          </div>`).join('')+
+        '</div>';
+    }
+  }catch(e){
+    document.getElementById('medHistoryContent').innerHTML=`<div style="color:var(--red);font-size:12px">Error: ${e.message}</div>`;
+  }
+  
+  // Click outside closes
+  setTimeout(()=>document.addEventListener('click',function h(e){if(!popup.contains(e.target)){popup.remove();document.removeEventListener('click',h);}},),100);
+};
 
 // ── EDIT MEDICATION ──
 window.openEditMedModal=async(patId,medId)=>{
@@ -3328,6 +3970,41 @@ window.sendScaleRequest=async()=>{
   }
 };
 
+
+// ── PENDING SCALES DETAIL POPUP ──
+window.showPendingDetail=(patId)=>{
+  const p=patsCache[patId]; if(!p) return;
+  const details=p._pendingScaleDetails||[];
+  const lines=details.map(d=>{
+    const age=d.dias!=null?(d.dias===0?'hoy':d.dias===1?'hace 1 día':`hace ${d.dias} días`):'';
+    return `<div style="padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:12px;font-weight:600;color:var(--text)">${d.names}</div>
+      ${age?`<div style="font-size:11px;color:var(--coral);margin-top:2px">⏳ Solicitada ${age}</div>`:''}
+      ${d.note?`<div style="font-size:11px;color:var(--text2);margin-top:2px">${d.note}</div>`:''}
+    </div>`;
+  }).join('');
+  
+  // Remove existing popup
+  document.getElementById('pendingPopup')?.remove();
+  
+  const popup=document.createElement('div');
+  popup.id='pendingPopup';
+  popup.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:1rem;width:min(320px,90vw);z-index:9998;box-shadow:0 8px 32px rgba(0,0,0,.4)';
+  popup.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:600"><i class="ti ti-chart-bar-off" style="color:var(--coral)"></i> Escalas pendientes — ${p.nombre}</div>
+      <button onclick="document.getElementById('pendingPopup').remove()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;line-height:1">×</button>
+    </div>
+    ${lines||'<div style="font-size:12px;color:var(--text2)">Sin detalles disponibles.</div>'}
+    <button class="btn btn-primary btn-full" style="margin-top:12px" onclick="document.getElementById('pendingPopup').remove();selectPat('${patId}')">
+      <i class="ti ti-arrow-right"></i>Ir al paciente
+    </button>`;
+  document.body.appendChild(popup);
+  
+  // Click outside closes
+  setTimeout(()=>document.addEventListener('click',function h(e){if(!popup.contains(e.target)){popup.remove();document.removeEventListener('click',h);}},),100);
+};
+
 function showToast(text,type='success'){
   const el=document.createElement('div');
   el.style.cssText=`position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${type==='error'?'var(--red)':'var(--green)'};color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.3)`;
@@ -3339,7 +4016,7 @@ function showToast(text,type='success'){
 const _origPtab=window.ptab;
 window.ptab=(el,id)=>{
   el.closest('.ptabs').querySelectorAll('.ptab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
-  ['pd-diary','pd-charts','pd-acoustic','pd-scales','pd-meds','pd-notes','pd-profile'].forEach(n=>{ const e=document.getElementById(n); if(e) e.style.display=n===id?'block':'none'; });
+  ['pd-diary','pd-charts','pd-acoustic','pd-scales','pd-meds','pd-timeline','pd-notes','pd-profile'].forEach(n=>{ const e=document.getElementById(n); if(e) e.style.display=n===id?'block':'none'; });
   if(id==='pd-charts'){
     destroyCharts();
     setTimeout(async()=>{
@@ -3387,14 +4064,27 @@ async function loadClinicalTimeline(patId, p){
       events.push({type:'scale', date, title:`Escalas completadas`, detail:scaleNames, reqId:req.id, _ts:req.requestedAt?.seconds||0});
     });
 
-    // Add medications as timeline events (deduplicated from clinicalEvents)
+    // Add medications as timeline events.
+    // clinicalEvents is the source of truth for med_start/med_stop/med_edit.
+    // We only add a fallback start event if the med has NO clinicalEvent at all.
     meds.forEach(m=>{
-      if(!events.find(e=>e._medId===m.id&&e.type==='med_start')){
-        events.push({type:'med_start',date:m.fechaInicio||p.fechaInicio||'—',title:'Inicio: '+m.nombre+(m.dosis?' '+m.dosis:''),detail:[m.frecuencia,m.prescriptor?'Prescrito por: '+m.prescriptor:'',m.motivo].filter(Boolean).join(' · ')||'',_medId:m.id,_ts:0});
+      // Check if any clinicalEvent references this med (by medId field stored in the event)
+      const hasClinicalStart=events.find(e=>(e.medId===m.id||e._medId===m.id)&&e.type==='med_start');
+      const hasClinicalStop=events.find(e=>(e.medId===m.id||e._medId===m.id)&&e.type==='med_stop');
+      // Fallback: if no clinical event exists for this med, build one from the med doc
+      if(!hasClinicalStart){
+        events.push({type:'med_start',date:m.fechaInicio||p.fechaInicio||'—',
+          title:'Inicio: '+m.nombre+(m.dosis?' '+m.dosis:''),
+          detail:[m.frecuencia,m.prescriptor?'Prescrito por: '+m.prescriptor:'',m.motivo].filter(Boolean).join(' · ')||'',
+          _medId:m.id,_ts:0});
       }
-      if(m.activo===false&&m.fechaFin&&!events.find(e=>e._medId===m.id&&e.type==='med_stop')){
-        events.push({type:'med_stop',date:m.fechaFin,title:'Discontinuado: '+m.nombre+(m.dosis?' '+m.dosis:''),detail:m.motivoStop||'Discontinuación registrada',_medId:m.id,_ts:0});
+      if(m.activo===false&&m.fechaFin&&!hasClinicalStop){
+        events.push({type:'med_stop',date:m.fechaFin,
+          title:'Discontinuado: '+m.nombre+(m.dosis?' '+m.dosis:''),
+          detail:m.motivoStop||'Discontinuación registrada',
+          _medId:m.id,_ts:0});
       }
+      // med_edit events come entirely from clinicalEvents — never deduplicated, show all
     });
     
     // Add antecedentes as historical events with tracking
@@ -3817,6 +4507,250 @@ window.openEditPat=(id)=>{
     }
   },100);
 };
+
+
+
+// ══════════════════════════════════════════════════════════════
+// CENTRO DE NOTIFICACIONES MÉDICO
+// ══════════════════════════════════════════════════════════════
+
+let notifData = [];   // all notifications in memory
+let notifOpen = false;
+
+// ── Toggle panel ──
+window.toggleNotifPanel = () => {
+  notifOpen = !notifOpen;
+  document.getElementById('notifPanel').classList.toggle('open', notifOpen);
+  document.getElementById('notifOverlay').style.display = notifOpen ? 'block' : 'none';
+  if (notifOpen) renderNotifPanel();
+};
+
+// ── Build notifications from Firebase ──
+async function loadNotifications() {
+  if (!curDoc) return;
+  notifData = [];
+  const pats = Object.values(patsCache);
+  if (!pats.length) return;
+
+  // Read stored read-status from localStorage
+  const readKey = 'notif_read_' + curDoc.uid;
+  const readIds = new Set(JSON.parse(localStorage.getItem(readKey) || '[]'));
+
+  await Promise.all(pats.map(async p => {
+    try {
+      // 1. Completed scale requests (always notify)
+      const scaleSnap = await getDocs(query(
+        collection(db, 'patients', p.id, 'scaleRequests'),
+        where('status', '==', 'completed')
+      ));
+      scaleSnap.docs.forEach(d => {
+        const data = d.data();
+        const nid = 'scale_' + d.id;
+        const names = (data.scales || []).map(sid => SCALES_CATALOG.find(s => s.id === sid)?.name || sid).join(', ');
+        const when = data.completedAt?.toDate?.()?.toLocaleDateString('es', {day:'2-digit',month:'short'}) || data.completedAt?.toDate?.()?.toISOString().slice(0,10) || '';
+        notifData.push({
+          id: nid, patId: p.id, patNombre: p.nombre, reqId: d.id,
+          type: 'scale_done', icon: 'ti-chart-bar-off', color: 'var(--green)',
+          title: p.nombre + ' completó escalas',
+          body: names + (when ? ' · ' + when : ''),
+          ts: data.completedAt?.seconds || 0,
+          unread: !readIds.has(nid)
+        });
+      });
+
+      // 2. Risk alerts from records (last 7 days)
+      const recs = await getDocs(query(
+        collection(db, 'patients', p.id, 'records'),
+        orderBy('timestamp', 'desc')
+      ));
+      const allRecs = recs.docs.map(d => d.data());
+      const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
+      const recent = allRecs.filter(r => {
+        if (!r.date) return false;
+        return new Date(r.date) >= cutoff;
+      });
+
+      // Leaks in last 7 days > 3
+      const recentLeaks = recent.filter(r => r.type === 'leak');
+      if (recentLeaks.length > 3) {
+        const week = Math.floor(Date.now() / (7 * 86400000));
+        const nid = 'leak_' + p.id + '_w' + week;
+        notifData.push({
+          id: nid, patId: p.id, patNombre: p.nombre,
+          type: 'alert', icon: 'ti-alert-triangle', color: 'var(--coral)',
+          title: '⚠️ Fugas frecuentes — ' + p.nombre,
+          body: recentLeaks.length + ' fugas en los últimos 7 días',
+          ts: Date.now() / 1000,
+          unread: !readIds.has(nid)
+        });
+      }
+
+      // Urgency U3-U4 > 30% of recent mictions
+      const recentMics = recent.filter(r => r.type === 'miction');
+      if (recentMics.length >= 5) {
+        const highUrg = recentMics.filter(r => r.urgency >= 3).length;
+        const pct = Math.round(highUrg / recentMics.length * 100);
+        if (pct >= 30) {
+          const week2 = Math.floor(Date.now() / (7 * 86400000));
+          const nid = 'urg_' + p.id + '_w' + week2;
+          notifData.push({
+            id: nid, patId: p.id, patNombre: p.nombre,
+            type: 'alert', icon: 'ti-alert-triangle', color: 'var(--amber)',
+            title: '⚠️ Urgencia severa — ' + p.nombre,
+            body: pct + '% de micciones con urgencia U3-U4 esta semana',
+            ts: Date.now() / 1000,
+            unread: !readIds.has(nid)
+          });
+        }
+      }
+    } catch(e) {}
+  }));
+
+  // Sort: unread first, then by timestamp desc
+  notifData.sort((a, b) => {
+    if (a.unread !== b.unread) return a.unread ? -1 : 1;
+    return b.ts - a.ts;
+  });
+
+  // Update badge
+  const unreadCount = notifData.filter(n => n.unread).length;
+  const badge = document.getElementById('notifBadge');
+  if (badge) {
+    badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+    badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+  }
+
+  if (notifOpen) renderNotifPanel();
+}
+
+// ── Render panel list ──
+function renderNotifPanel() {
+  const list = document.getElementById('notifList');
+  if (!list) return;
+  if (!notifData.length) {
+    list.innerHTML = '<div class="notif-empty"><i class="ti ti-bell-off" style="font-size:2rem;display:block;margin-bottom:.5rem"></i>Sin notificaciones nuevas</div>';
+    return;
+  }
+  list.innerHTML = notifData.map(n => `
+    <div class="notif-item ${n.unread ? (n.type==='alert'?'alert':'unread') : ''}"
+         onclick="handleNotifClick('${n.id}','${n.patId}')">
+      <div class="notif-item-header">
+        <div class="notif-item-icon" style="background:${n.color}22">
+          <i class="ti ${n.icon}" style="color:${n.color}"></i>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:${n.unread?'700':'500'};color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.title}</div>
+          <div class="notif-item-meta">${n.body}</div>
+        </div>
+        ${n.unread ? '<div style="width:7px;height:7px;border-radius:50%;background:var(--blue-act);flex-shrink:0;margin-top:4px"></div>' : ''}
+      </div>
+      ${n.type==='scale_done'?`<div style="margin-top:6px"><button style="background:var(--blue-light);border:1px solid var(--blue-act);color:var(--blue-act);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit" onclick="event.stopPropagation();handleNotifClick('${n.id}','${n.patId}','scales')"><i class="ti ti-eye" style="font-size:11px"></i> Ver resultados</button></div>`:''}
+      ${n.type==='alert'&&n.unread?`<div style="margin-top:6px"><button style="background:transparent;border:1px solid var(--border2);color:var(--text3);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;font-family:inherit" onclick="event.stopPropagation();dismissAlert('${n.id}')"><i class="ti ti-x" style="font-size:10px"></i> Descartar</button></div>`:''}
+    </div>`).join('');
+}
+
+// ── Click: mark read + go to patient ──
+window.handleNotifClick = (nid, patId, tab) => {
+  const readKey = 'notif_read_' + curDoc.uid;
+  const readIds = new Set(JSON.parse(localStorage.getItem(readKey) || '[]'));
+  readIds.add(nid);
+  localStorage.setItem(readKey, JSON.stringify([...readIds]));
+
+  const n = notifData.find(x => x.id === nid);
+  if (n) n.unread = false;
+
+  // Update badge
+  const unreadCount = notifData.filter(x => x.unread).length;
+  const badge = document.getElementById('notifBadge');
+  if (badge) {
+    badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+    badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+  }
+
+  renderNotifPanel();
+  toggleNotifPanel();
+  // Navigate to patient, then optionally to a specific tab
+  if (patId) {
+    showTTab('patients', document.querySelector('.ttab'));
+    setTimeout(() => {
+      selectPat(patId);
+      if (tab === 'scales') {
+        // After patient loads, click the Escalas tab
+        setTimeout(() => {
+          const scalesTab = document.querySelector('.ptab[onclick*="pd-scales"]');
+          if (scalesTab) scalesTab.click();
+        }, 600);
+      }
+    }, 200);
+  }
+};
+
+// ── Mark all read ──
+
+window.dismissAlert = (nid) => {
+  const readKey = 'notif_read_' + curDoc.uid;
+  const readIds = new Set(JSON.parse(localStorage.getItem(readKey) || '[]'));
+  readIds.add(nid);
+  localStorage.setItem(readKey, JSON.stringify([...readIds]));
+  const n = notifData.find(x => x.id === nid);
+  if (n) n.unread = false;
+  const unreadCount = notifData.filter(x => x.unread).length;
+  const badge = document.getElementById('notifBadge');
+  if (badge) { badge.textContent = unreadCount > 9 ? '9+' : unreadCount; badge.style.display = unreadCount > 0 ? 'flex' : 'none'; }
+  renderNotifPanel();
+};
+window.markAllNotifsRead = () => {
+  const readKey = 'notif_read_' + curDoc.uid;
+  const allIds = notifData.map(n => n.id);
+  localStorage.setItem(readKey, JSON.stringify(allIds));
+  notifData.forEach(n => n.unread = false);
+  const badge = document.getElementById('notifBadge');
+  if (badge) badge.style.display = 'none';
+  renderNotifPanel();
+};
+
+// ── Load notifications after patients load ──
+// Hook into patsCache enrichment
+const _origFilterPats = window.filterPats;
+window.filterPats = () => {
+  _origFilterPats?.();
+  // Debounce: only load notifs once per patient refresh
+  clearTimeout(window._notifTimer);
+  window._notifTimer = setTimeout(() => loadNotifications(), 1500);
+};
+
+// ══════════════════════════════════════════════════════════════
+// PWA INSTALL — MÉDICO
+// ══════════════════════════════════════════════════════════════
+let medDeferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  medDeferredPrompt = e;
+  const banner = document.getElementById('medInstallBanner');
+  if (banner && !localStorage.getItem('med_install_dismissed')) {
+    banner.style.display = 'flex';
+  }
+});
+
+window.installMedPWA = async () => {
+  if (!medDeferredPrompt) {
+    // Fallback: show instructions
+    alert('Para instalar:\n1. En Chrome: menú ⋮ → "Añadir a pantalla de inicio"\n2. En Safari (iOS): botón compartir → "En el inicio"');
+    return;
+  }
+  medDeferredPrompt.prompt();
+  const result = await medDeferredPrompt.userChoice;
+  medDeferredPrompt = null;
+  document.getElementById('medInstallBanner').style.display = 'none';
+  if (result.outcome === 'accepted') localStorage.setItem('med_install_dismissed', '1');
+};
+
+window.addEventListener('appinstalled', () => {
+  const banner = document.getElementById('medInstallBanner');
+  if (banner) banner.style.display = 'none';
+  localStorage.setItem('med_install_dismissed', '1');
+});
 
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 </script>
