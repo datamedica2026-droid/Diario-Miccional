@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1821,15 +1822,7 @@ window.genPDF=async()=>{
     Este informe es de apoyo clínico. Debe ser interpretado por un profesional de salud.
   </div>
   
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('/sw.js')
-      .then(r => console.log('SW registered:', r.scope))
-      .catch(e => console.log('SW error:', e));
-  });
-}
-</script>
+
 </body></html>`;
 
   const a=document.createElement('a');
@@ -2827,6 +2820,16 @@ function renderProfile(){
 // Flush any queued calls that happened before module loaded
 if(window.__flushQueue) window.__flushQueue();
 </script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/sw.js')
+      .then(r => console.log('SW registered:', r.scope))
+      .catch(e => console.log('SW error:', e));
+  });
+}
+</script>
+
 </div><!-- end app-shell -->
 </body>
 </html>
