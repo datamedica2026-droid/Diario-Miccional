@@ -2286,52 +2286,8 @@ window.printCard=(id,patData)=>{
 window.openNoteModal=(id)=>{noteTargetId=id;document.getElementById('noteText').value='';document.getElementById('modalNote').classList.add('open');};
 window.saveNote=async()=>{const text=document.getElementById('noteText').value.trim();if(!text||!noteTargetId)return;const p=patsCache[noteTargetId];const notes=[...(p.notes||[]),{text,date:new Date().toISOString().slice(0,10),doctor:curDocData?.nombre||''}];await updateDoc(doc(db,'patients',noteTargetId),{notes});closeM('Note');selectPat(noteTargetId);};
 // ── EDIT DOCTOR PROFILE ──
-let epPhotoBase64 = null;
-
-window.previewProfilePhoto=(input)=>{
-  const file=input.files[0]; if(!file) return;
-  if(file.size>2*1024*1024){ alert('Imagen demasiado grande. Máximo 2MB.'); return; }
-  const reader=new FileReader();
-  reader.onload=(e)=>{
-    epPhotoBase64=e.target.result;
-    const prev=document.getElementById('epAvatarPreview');
-    if(prev) prev.innerHTML=`<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
-  };
-  reader.readAsDataURL(file);
-};
-
-window.openEditProfile=()=>{
-  document.getElementById('epNombre').value=curDocData?.nombre||'';
-  document.getElementById('epEspec').value=curDocData?.especialidad||'';
-  document.getElementById('epClinicas').value=(curDocData?.clinicas||[]).join(', ');
-  document.getElementById('epErr').style.display='none';
-  document.getElementById('modalEditProfile').classList.add('open');
-};
-window.saveEditProfile=async()=>{
-  const nombre=document.getElementById('epNombre').value.trim();
-  const err=document.getElementById('epErr');
-  if(!nombre){err.querySelector('span').textContent='El nombre es obligatorio';err.style.display='flex';return;}
-  const clinicas=document.getElementById('epClinicas').value.split(',').map(c=>c.trim()).filter(Boolean);
-  try{
-    const updates={nombre,especialidad:document.getElementById('epEspec').value.trim(),clinicas};
-    if(epPhotoBase64) updates.photoURL=epPhotoBase64;
-    await updateDoc(doc(db,'doctors',curDoc.uid),updates);
-    curDocData={...curDocData,...updates};
-    document.getElementById('docName').textContent=nombre;
-    const avEl=document.getElementById('docAv');
-    if(curDocData.photoURL){
-      avEl.innerHTML=`<img src="${curDocData.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-      avEl.style.padding='0';
-    } else {
-      avEl.textContent=nombre.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    }
-    populateFilters();
-    closeM('EditProfile');
-  }catch(e){err.querySelector('span').textContent=e.message;err.style.display='flex';}
-};
 
 // ── EDIT PATIENT ──
-let editPatId=null;
 window.openEditPat=(id)=>{
   editPatId=id;
   const p=patsCache[id]; if(!p) return;
@@ -2459,61 +2415,6 @@ window.saveEditPat=async()=>{
   }catch(e){err.querySelector('span').textContent=e.message;err.style.display='flex';}
 };
 
-async function loadColleagues(){
-  const list=document.getElementById('colleaguesList');
-  if(!list) return;
-  list.innerHTML='<div style="font-size:12px;color:var(--text2);padding:1rem">Cargando...</div>';
-  const clinicas=curDocData?.clinicas||[];
-  if(!clinicas.length){
-    list.innerHTML='<div style="grid-column:1/-1;font-size:13px;color:var(--text2)"><i class="ti ti-info-circle" style="color:var(--blue-act)"></i> No tienes clínicas asignadas. Usa el botón ⚙️ para editar tu perfil y agregar clínicas.</div>';
-    return;
-  }
-  const GRADS=[['#0d47a1','#1976d2'],['#1b5e20','#388e3c'],['#4a148c','#7b1fa2'],['#b71c1c','#d32f2f'],['#e65100','#f57c00'],['#006064','#00838f'],['#1a237e','#3949ab'],['#37474f','#546e7a']];
-  try{
-    const snap=await getDocs(collection(db,'doctors'));
-    const seen=new Set();
-    const results=[];
-    snap.forEach(d=>{
-      if(d.id===curDoc.uid||seen.has(d.id)) return;
-      const data=d.data();
-      const docClinics=data.clinicas||[];
-      const match=clinicas.find(cl=>docClinics.some(dc=>dc.toLowerCase().trim()===cl.toLowerCase().trim()));
-      if(match){ seen.add(d.id); results.push({id:d.id,...data,clinicaMatch:match}); }
-    });
-    if(!results.length){
-      list.innerHTML='<div style="grid-column:1/-1;font-size:13px;color:var(--text2)">No hay otros médicos registrados en tus clínicas aún.</div>';
-      return;
-    }
-    list.innerHTML=results.map((c,i)=>{
-      const g=GRADS[i%GRADS.length];
-      const ini=(c.nombre||'DR').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      const av=c.photoURL
-        ?`<img src="${c.photoURL}" style="width:100%;height:100%;object-fit:cover;">`
-        :`<span style="color:#fff">${ini}</span>`;
-      const avBg=c.photoURL?'var(--card2)':`linear-gradient(135deg,${g[0]},${g[1]})`;
-      const safeName=(c.nombre||'').replace(/'/g,'&apos;');
-      return `<div class="colleague-card">
-        <div class="colleague-card-top">
-          <div class="colleague-card-banner" style="background:linear-gradient(135deg,${g[0]},${g[1]})"></div>
-          <div class="colleague-card-avatar" style="background:${avBg}">${av}</div>
-        </div>
-        <div class="colleague-card-body">
-          <div class="colleague-card-name">${c.nombre||'—'}</div>
-          <div class="colleague-card-spec"><i class="ti ti-stethoscope"></i>${c.especialidad||'Médico'}</div>
-          <div class="colleague-card-clinic"><i class="ti ti-building-hospital"></i>${c.clinicaMatch}</div>
-          <div class="colleague-card-actions">
-            <button class="btn btn-primary btn-sm" onclick="startColleagueConsult('${c.id}','${safeName}')">
-              <i class="ti ti-arrows-exchange"></i>Interconsulta
-            </button>
-            ${c.email?`<button class="btn btn-sm" onclick="window.location.href='mailto:${c.email}?subject=Interconsulta%20CURG'"><i class="ti ti-mail"></i>Email</button>`:''}
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-  }catch(e){
-    list.innerHTML=`<div style="grid-column:1/-1;font-size:12px;color:var(--red)"><i class="ti ti-alert-circle"></i> Error: ${e.message}</div>`;
-  }
-}
 
 window.startColleagueConsult=(doctorId,doctorName)=>{
   showTTab('patients',document.querySelector('.ttab'));
@@ -2541,7 +2442,6 @@ Esta acción no se puede deshacer. Se eliminarán todos sus registros.`)) return
   }catch(e){ alert('Error al eliminar: '+e.message); }
 };
 
-let msgTargetId=null;
 window.openMsgModal=(id)=>{ msgTargetId=id; document.getElementById('msgText').value=''; document.getElementById('modalMsg').classList.add('open'); };
 window.sendMsg=async()=>{
   const text=document.getElementById('msgText').value.trim();
@@ -2553,45 +2453,6 @@ window.sendMsg=async()=>{
   alert('Mensaje enviado. El paciente lo verá en su app.');
 };
 
-async function loadReceivedConsults(){
-  const list=document.getElementById('receivedConsultsList'); if(!list) return;
-  try{
-    // Only load consultations where current doctor has added notes
-    // (meaning they accessed it with the code)
-    const snap=await getDocs(collection(db,'consultations'));
-    const received=[];
-    snap.forEach(d=>{
-      const c=d.data();
-      // Skip consultations created by current doctor
-      if(c.fromDoctorId===curDoc.uid) return;
-      // Only show if current doctor has left a note (proof they accessed it)
-      const myNotes=(c.notes||[]).filter(n=>n.doctorId===curDoc.uid);
-      if(myNotes.length===0) return;
-      received.push({id:d.id,...c,myNotes});
-    });
-    if(!received.length){ list.innerHTML='<p style="font-size:12px;color:var(--text2)">No has recibido interconsultas aún.</p>'; return; }
-    const badge=document.getElementById('receivedBadge');
-    const hasNew=received.some(c=>c.status==='active');
-    if(badge) badge.style.display=hasNew?'inline':'none';
-    list.innerHTML=received.slice(0,10).map(c=>{
-      const exp=c.expiresAt?.toDate?.();
-      const expired=exp&&exp<new Date();
-      return `<div class="consult-item">
-        <div class="consult-item-left">
-          <i class="ti ti-user-circle" style="font-size:20px;color:var(--text3)"></i>
-          <div class="consult-item-info">
-            <h4>${c.patientName||'—'} <span style="font-size:11px;color:var(--text2)">de ${c.fromDoctorName||'colega'}</span></h4>
-            <p><span class="consult-code" style="font-size:11px;padding:2px 8px">${c.code}</span> · ${c.notes?.length||0} nota(s)</p>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="consult-status ${expired||c.status==='revoked'?'cs-expired':'cs-active'}">${expired?'Expirada':c.status==='revoked'?'Revocada':'Activa'}</span>
-          ${!expired&&c.status==='active'?`<button class="btn btn-sm btn-primary" onclick="viewReceivedConsult('${c.code}')"><i class="ti ti-eye"></i>Ver</button>`:''}
-        </div>
-      </div>`;
-    }).join('');
-  }catch(e){ list.innerHTML=`<p style="font-size:12px;color:var(--text2)">Error: ${e.message}</p>`; }
-}
 
 window.viewReceivedConsult=(code)=>{
   document.getElementById('consultCodeInput').value=code;
