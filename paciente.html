@@ -1060,9 +1060,18 @@ const fb = initializeApp({
 const db = getFirestore(fb);
 
 // ── CONSENT ──
-function checkConsentStatus(){ if(!localStorage.getItem('curg_consent')) document.getElementById('consentOverlay').style.display='flex'; }
+async function checkConsentStatus(){
+  if(localStorage.getItem('curg_consent')) return;
+  if(patient?.id){ try{ const snap=await getDoc(doc(db,'patients',patient.id)); if(snap.exists()&&snap.data().consentGiven){ localStorage.setItem('curg_consent',JSON.stringify(snap.data().consentGiven)); return; } }catch(e){} }
+  document.getElementById('consentOverlay').style.display='flex';
+}
 window.checkConsent=()=>{ const ok=document.getElementById('ck1').checked&&document.getElementById('ck2').checked&&document.getElementById('ck3').checked; document.getElementById('btnConsent').classList.toggle('ready',ok); };
-window.acceptConsent=()=>{ localStorage.setItem('curg_consent',JSON.stringify({date:new Date().toISOString(),v:'2.0'})); document.getElementById('consentOverlay').style.display='none'; };
+window.acceptConsent=async()=>{
+  const consentData={date:new Date().toISOString(),v:'2.0'};
+  localStorage.setItem('curg_consent',JSON.stringify(consentData));
+  document.getElementById('consentOverlay').style.display='none';
+  if(patient?.id){ try{ await updateDoc(doc(db,'patients',patient.id),{consentGiven:consentData}); }catch(e){} }
+};
 window.revokeConsent=()=>{ if(confirm('¿Estás seguro? Se eliminarán tus preferencias locales.')){ localStorage.removeItem('curg_consent'); localStorage.removeItem('dm_patient'); location.reload(); } };
 
 // ── THEME / LANG ──
