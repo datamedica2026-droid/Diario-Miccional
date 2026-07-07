@@ -775,7 +775,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         </div>
       </div>
       <div id="npScalesSection">
-        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px">Escalas a aplicar (selecciona todas las que apliquen)</div>
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">Escalas a aplicar</div>
+        <div id="npScalesGenderNote" style="font-size:11px;color:var(--text2);background:var(--blue-light);border-radius:7px;padding:7px 10px;margin-bottom:8px"></div>
         <div id="npScalesList"></div>
       </div>
     </div>
@@ -1023,6 +1024,47 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="modal-footer">
       <button class="btn" onclick="closeM('AddMed')"><i class="ti ti-x"></i>Cancelar</button>
       <button class="btn btn-primary" onclick="saveAddMed()"><i class="ti ti-device-floppy"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL EDIT MED -->
+<div class="modal-overlay" id="modalEditMed">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-pencil"></i>Editar medicamento</div>
+    <input type="hidden" id="editMedPatId">
+    <input type="hidden" id="editMedId">
+    <input type="hidden" id="editMedPrevNombre">
+    <input type="hidden" id="editMedPrevDosis">
+    <input type="hidden" id="editMedPrevFrec">
+    <div class="form-row">
+      <div class="form-group"><label>Nombre *</label><input type="text" id="editMedNombre" placeholder="Solifenacina 5mg"></div>
+      <div class="form-group"><label>Dosis</label><input type="text" id="editMedDosis" placeholder="5mg"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Frecuencia</label>
+        <select id="editMedFrec">
+          <option>Cada 24h (una vez/día)</option><option>Cada 12h (dos veces/día)</option>
+          <option>Cada 8h (tres veces/día)</option><option>Solo en la noche</option>
+          <option>Solo en la mañana</option><option>Según necesidad</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Tipo</label>
+        <select id="editMedTipo"><option value="uro">Urológico</option><option value="comorbilidad">Comorbilidad</option><option value="otro">Otro</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Fecha inicio</label><input type="date" id="editMedFecha"></div>
+      <div class="form-group"><label>Prescrito por</label><input type="text" id="editMedPrescriptor" placeholder="Opcional"></div>
+    </div>
+    <div class="form-group"><label>Motivo del cambio *</label><input type="text" id="editMedMotivo" placeholder="Ajuste de dosis, cambio por efectos adversos..."></div>
+    <div style="background:var(--amber-dim);border:1px solid var(--amber);border-radius:8px;padding:10px;font-size:12px;color:var(--amber);margin-bottom:12px">
+      <i class="ti ti-info-circle"></i> El cambio quedará registrado en la evolución del paciente.
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeM('EditMed')"><i class="ti ti-x"></i>Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEditMed()"><i class="ti ti-device-floppy"></i>Guardar cambio</button>
     </div>
   </div>
 </div>
@@ -1286,6 +1328,14 @@ function loadPats(){
     snap.forEach(d=>{ patsCache[d.id]={id:d.id,...d.data()}; });
     filterPats();
     checkInactivityOnLoad();
+    // Enrich with pending scales badge (async, re-renders after)
+    const patIds=Object.keys(patsCache);
+    Promise.all(patIds.map(async pid=>{
+      try{
+        const sq=await getDocs(query(collection(db,'patients',pid,'scaleRequests'),where('status','==','pending')));
+        if(sq.size>0){ patsCache[pid]._pendingScales=sq.size; }
+      }catch(e){}
+    })).then(()=>filterPats());
   });
 }
 
@@ -1317,7 +1367,10 @@ function renderPatList(pats){
     const st=getPatStatus(p);
     return `<div class="pat-item ${p.id===selPatId?'active':''}" onclick="selectPat('${p.id}')">
       <div class="pat-av" style="background:${c}22;color:${c};border:1px solid ${c}44">${ini}</div>
-      <div style="flex:1;min-width:0"><div class="pat-name">${p.nombre||'—'}</div><div class="pat-meta">${p.clinica||''} · ${p.yearInicio||''}</div></div>
+      <div style="flex:1;min-width:0">
+        <div class="pat-name">${p.nombre||'—'}</div>
+        <div class="pat-meta">${p.clinica||''} · ${p.yearInicio||''}${p._pendingScales?' · <span style="color:var(--coral);font-weight:600">⏳ escala pendiente</span>':''}</div>
+      </div>
       <div class="status-dot ${st}"></div>
     </div>`;
   }).join('');
@@ -1487,9 +1540,9 @@ function renderPatView(p, recs, sleepMap, wbMap){
     </div>
 
     <div class="ptabs">
-      <div class="ptab active" onclick="ptab(this,'pd-diary')"><i class="ti ti-list"></i>Diario</div>
-      <div class="ptab" onclick="ptab(this,'pd-charts')"><i class="ti ti-chart-bar"></i>Gráficas</div>
-      <div class="ptab" onclick="ptab(this,'pd-acoustic')"><i class="ti ti-microphone"></i>Acústico</div>
+      <div class="ptab active" onclick="ptab(this,'pd-diary')" ${p.mode==='scales'?'style="display:none"':''}><i class="ti ti-list"></i>Diario</div>
+      <div class="ptab" onclick="ptab(this,'pd-charts')" ${p.mode==='scales'?'style="display:none"':''}><i class="ti ti-chart-bar"></i>Gráficas</div>
+      <div class="ptab" onclick="ptab(this,'pd-acoustic')" ${p.mode==='scales'?'style="display:none"':''}><i class="ti ti-microphone"></i>Acústico</div>
       <div class="ptab" onclick="ptab(this,'pd-scales')"><i class="ti ti-chart-bar-off"></i>Escalas</div>
       <div class="ptab" onclick="ptab(this,'pd-meds')"><i class="ti ti-pill"></i>Medicamentos</div>
       <div class="ptab" onclick="ptab(this,'pd-timeline')"><i class="ti ti-timeline"></i>Evolución</div>
@@ -1637,59 +1690,7 @@ window.openNewPat=()=>{
 };
 window.closeM=(name)=>document.getElementById('modal'+name).classList.remove('open');
 
-window.saveNewPat=async()=>{
-  const nombre=document.getElementById('npN').value.trim();
-  const clinica=document.getElementById('npC').value;
-  const year=document.getElementById('npY').value;
-  const err=document.getElementById('npErr'); err.style.display='none';
-  if(!nombre){ err.querySelector('span').textContent='El nombre es obligatorio'; err.style.display='flex'; return; }
-  if(!clinica){ err.querySelector('span').textContent='Selecciona una clínica'; err.style.display='flex'; return; }
-  const code=genCode();
-  // Collect antecedentes
-  const ants=[];
-  ['antComorbilidades','antExposiciones','antUrologicos','antQuirurgicos'].forEach(gid=>{
-    const g=document.getElementById(gid); if(!g) return;
-    g.querySelectorAll('.ant-chip.selected').forEach(c=>ants.push(c.textContent.trim()));
-  });
-  // Collect scales
-  const selectedScales=[...document.querySelectorAll('input[name="npScale"]:checked')].map(i=>i.value);
-  const mode=npMode||'diary';
-  const data={
-    nombre,
-    fechaNac:document.getElementById('npFN').value,
-    genero:document.getElementById('npG').value,
-    telefono:document.getElementById('npT').value.trim(),
-    email:document.getElementById('npE').value.trim(),
-    diagnostico:document.getElementById('npD').value.trim(),
-    medicoTratante:document.getElementById('npM').value.trim(),
-    notasIniciales:document.getElementById('npNo').value.trim(),
-    antOtros:document.getElementById('npAntOtros')?.value.trim()||'',
-    clinica, yearInicio:parseInt(year)||new Date().getFullYear(),
-    fechaInicio:new Date().toISOString().slice(0,10),
-    doctorId:curDoc.uid, accessCode:code, status:'active',
-    mode, assignedScales:selectedScales, antecedentes:ants,
-    notes:[], createdAt:serverTimestamp()
-  };
-  try{
-    const ref=await addDoc(collection(db,'patients'),data);
-    // Save medications as subcollection
-    for(const m of (npMeds||[])){
-      await addDoc(collection(db,'patients',ref.id,'medications'),{
-        ...m, createdAt:serverTimestamp()
-      });
-    }
-    // Create baseline scale request if scales assigned and mode includes scales
-    if(selectedScales.length && mode!=='diary'){
-      await addDoc(collection(db,'patients',ref.id,'scaleRequests'),{
-        scales:selectedScales, type:'baseline', status:'pending',
-        requestedBy:curDoc.uid, requestedAt:serverTimestamp(),
-        note:'Línea base — completar al inicio del seguimiento'
-      });
-    }
-    closeM('NewPat');
-    setTimeout(()=>printCard(ref.id,{...data,id:ref.id}),400);
-  }catch(e){ err.querySelector('span').textContent=e.message; err.style.display='flex'; }
-};
+// saveNewPat — defined below with complete logic
 function genCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=chars[Math.floor(Math.random()*chars.length)];return c+'-'+Array.from({length:4},()=>chars[Math.floor(Math.random()*chars.length)]).join('');}
 window.copyCode=(code)=>{navigator.clipboard?.writeText(code);};
 window.printCard=(id,patData)=>{
@@ -1769,12 +1770,22 @@ window.openEditPat=(id)=>{
   // Toggle scales section
   const sg=document.getElementById('enpScalesGroup');
   if(sg) sg.style.display=(p.mode==='scales'||p.mode==='both')?'block':'none';
-  // Populate scales checkboxes
+  // Populate scales checkboxes (filtered by patient gender)
   const sl=document.getElementById('enpScalesList');
-  if(sl) sl.innerHTML=SCALES_CATALOG.map(s=>`<label style="display:flex;align-items:flex-start;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:var(--bg)">
-    <input type="checkbox" name="enpScale" value="${s.id}" ${(p.assignedScales||[]).includes(s.id)?'checked':''} style="width:14px;height:14px;accent-color:var(--blue-act);flex-shrink:0;margin-top:2px">
-    <div><div style="font-size:11px;font-weight:600">${s.name} — ${s.full}</div><div style="font-size:10px;color:var(--text2)">${s.desc}</div></div>
-  </label>`).join('');
+  if(sl){
+    const pGender=p.genero||'';
+    sl.innerHTML=SCALES_CATALOG.map(s=>{
+      const compat=s.gender==='all'||!pGender||s.gender===pGender;
+      const incompatLabel=s.gender==='m'?'Solo masculino':s.gender==='f'?'Solo femenino':'';
+      return `<label style="display:flex;align-items:flex-start;gap:8px;padding:6px 8px;border:1px solid ${compat?'var(--border)':'var(--red-dim)'};border-radius:8px;cursor:${compat?'pointer':'not-allowed'};background:${compat?'var(--bg)':'var(--red-dim)'};opacity:${compat?'1':'0.55'}">
+        <input type="checkbox" name="enpScale" value="${s.id}" ${(p.assignedScales||[]).includes(s.id)&&compat?'checked':''} ${compat?'':'disabled'} style="width:14px;height:14px;accent-color:var(--blue-act);flex-shrink:0;margin-top:2px">
+        <div>
+          <div style="font-size:11px;font-weight:600">${s.name} — ${s.full} ${!compat?'<span style="font-size:10px;color:var(--red);font-weight:400">⛔ '+incompatLabel+'</span>':''}</div>
+          <div style="font-size:10px;color:var(--text2)">${s.desc}</div>
+        </div>
+      </label>`;
+    }).join('');
+  }
   // Antecedentes chips — reset then select
   ['enpAntComorbilidades','enpAntExposiciones','enpAntUrologicos','enpAntQuirurgicos'].forEach(gid=>{
     const g=document.getElementById(gid); if(!g) return;
@@ -1845,7 +1856,22 @@ window.saveEditPat=async()=>{
       updates.antecedentesHistory=[...(oldP2?.antecedentesHistory||[]),{date:new Date().toISOString().slice(0,10),added:addedA,removed:removedA,changedBy:curDocData?.nombre||''}];
     }
     await updateDoc(doc(db,'patients',editPatId),updates);
+    // Write antecedentes change to clinicalEvents so it appears in Evolución
+    if(added.length||removed.length){
+      const today=new Date().toISOString().slice(0,10);
+      const parts=[];
+      if(added.length) parts.push('Agregados: '+added.join(', '));
+      if(removed.length) parts.push('Eliminados: '+removed.join(', '));
+      await addDoc(collection(db,'patients',editPatId,'clinicalEvents'),{
+        type:'surgery',
+        date:today,
+        title:'Actualización de antecedentes',
+        detail:parts.join(' | ')+' (por '+( curDocData?.nombre||'médico')+')',
+        createdAt:serverTimestamp()
+      });
+    }
     closeM('EditPat');
+    showToast('Paciente actualizado correctamente.');
     selectPat(editPatId);
   }catch(e){err.querySelector('span').textContent=e.message;err.style.display='flex';}
 };
@@ -2753,13 +2779,21 @@ function refreshScaleList(){
   const el=document.getElementById('npScalesList');
   if(!el) return;
   const gender=document.getElementById('npG')?.value||'';
+  const genderNote=document.getElementById('npScalesGenderNote');
+  if(genderNote){
+    if(!gender) genderNote.textContent='💡 Selecciona el género arriba para filtrar las escalas compatibles automáticamente.';
+    else if(gender==='m') genderNote.textContent='🔵 Mostrando escalas compatibles con paciente masculino. Las escalas femeninas están deshabilitadas.';
+    else if(gender==='f') genderNote.textContent='🔴 Mostrando escalas compatibles con paciente femenino. Las escalas masculinas están deshabilitadas.';
+    else genderNote.textContent='';
+  }
   el.innerHTML=SCALES_CATALOG.map(s=>{
     const compat=s.gender==='all'||!gender||s.gender===gender;
-    return `<label style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;background:var(--bg)">
-      <input type="checkbox" name="npScale" value="${s.id}" ${compat?'checked':''} style="width:16px;height:16px;accent-color:var(--blue-act);flex-shrink:0;margin-top:1px">
+    const incompatLabel=s.gender==='m'?'Solo masculino':s.gender==='f'?'Solo femenino':'';
+    return `<label style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid ${compat?'var(--border)':'var(--red-dim)'};border-radius:8px;margin-bottom:6px;cursor:${compat?'pointer':'not-allowed'};background:${compat?'var(--bg)':'var(--red-dim)'};opacity:${compat?'1':'0.5'}">
+      <input type="checkbox" name="npScale" value="${s.id}" ${compat?'checked':''} ${compat?'':'disabled'} style="width:16px;height:16px;accent-color:var(--blue-act);flex-shrink:0;margin-top:1px">
       <div>
-        <div style="font-size:12px;font-weight:600">${s.name} — ${s.full}</div>
-        <div style="font-size:11px;color:var(--text2)">${s.desc}${!compat?' <span style="color:var(--amber)">(Verificar género)</span>':''}</div>
+        <div style="font-size:12px;font-weight:600">${s.name} — ${s.full} ${!compat?'<span style="font-size:10px;font-weight:400;color:var(--red)">⛔ '+incompatLabel+'</span>':''}</div>
+        <div style="font-size:11px;color:var(--text2)">${s.desc}</div>
       </div>
     </label>`;
   }).join('');
@@ -2872,9 +2906,7 @@ function renderNpMedsList(){
     </div>`).join('');
 }
 
-// ── SAVE NEW PATIENT (updated) ──
-// Override the existing saveNewPat to include new fields
-const _originalSaveNewPat = window.saveNewPat;
+// ── SAVE NEW PATIENT ──
 window.saveNewPat=async()=>{
   const nombre=document.getElementById('npN').value.trim();
   const clinica=document.getElementById('npC').value;
@@ -2931,39 +2963,18 @@ window.saveNewPat=async()=>{
       // Already handled above
     }
     closeM('NewPat');
-    setTimeout(()=>printCard(ref.id,{...data,id:ref.id}),400);
+    showToast('✓ Paciente '+nombre+' creado correctamente.');
+    // Auto-select the new patient so the doctor sees it immediately
+    patsCache[ref.id]={id:ref.id,...data};
+    setTimeout(()=>{
+      filterPats();
+      selectPat(ref.id);
+      printCard(ref.id,{...data,id:ref.id});
+    },400);
   }catch(e){ err.querySelector('span').textContent=e.message; err.style.display='flex'; }
 };
 
-// Reset wizard on modal open
-const _origOpenNewPat = window.openNewPat;
-window.openNewPat=()=>{
-  npCurrentStep=1; npMode='diary'; npMeds=[];
-  // Reset steps
-  ['npStepBasic','npStepMode','npStepAnt'].forEach((id,i)=>{
-    const el=document.getElementById(id);
-    if(el) el.style.display=i===0?'block':'none';
-  });
-  ['npStep1bar','npStep2bar','npStep3bar'].forEach((id,i)=>{
-    const el=document.getElementById(id);
-    if(el) el.style.background=i===0?'var(--blue-act)':'var(--border)';
-  });
-  document.getElementById('npBtnPrev').style.display='none';
-  document.getElementById('npBtnNext').style.display='';
-  document.getElementById('npBtnSave').style.display='none';
-  // Clear fields
-  ['npN','npFN','npT','npE','npD','npM','npNo','npAntOtros'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['npG','npC'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('npY').value=new Date().getFullYear();
-  document.getElementById('npErr').style.display='none';
-  document.querySelectorAll('.ant-chip').forEach(c=>c.classList.remove('selected'));
-  document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('selected'));
-  document.querySelector('.mode-card')?.classList.add('selected');
-  document.getElementById('npScalesSection').style.display='none';
-  document.getElementById('npMedsList').innerHTML='';
-  refreshScaleList();
-  document.getElementById('modalNewPat').classList.add('open');
-};
+// openNewPat is defined above — no duplicate needed
 
 // ── LOAD SCALES TAB ──
 async function loadPatScales(patId, p){
@@ -3084,7 +3095,10 @@ async function loadPatMeds(patId){
           <p>${m.frecuencia||''} · <span class="med-badge ${m.tipo==='uro'?'med-uro':'med-comorbilidad'}">${m.tipo==='uro'?'Urológico':'Comorbilidad'}</span> ${m.fechaInicio?'· desde '+m.fechaInicio:''} ${m.prescriptor?'· '+m.prescriptor:''}</p>
           ${m.motivo?`<p style="color:var(--text3);font-size:10px;margin-top:2px">${m.motivo}</p>`:''}
         </div>
-        <button class="btn btn-sm btn-danger" onclick="discontinueMed('${patId}','${m.id}')"><i class="ti ti-ban"></i></button>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-sm" onclick="openEditMedModal('${patId}','${m.id}')" title="Editar"><i class="ti ti-pencil"></i></button>
+          <button class="btn btn-sm btn-danger" onclick="discontinueMed('${patId}','${m.id}')" title="Discontinuar"><i class="ti ti-ban"></i></button>
+        </div>
       </div>`).join('');
     }
     if(inactive.length){
@@ -3106,16 +3120,20 @@ async function loadPatMeds(patId){
 }
 
 window.discontinueMed=async(patId,medId)=>{
+  const motivo=prompt('¿Motivo de la discontinuación? (requerido)');
+  if(motivo===null) return; // cancelled
+  if(!motivo.trim()){ showToast('Escribe el motivo para continuar'); return; }
   const medSnap=await getDoc(doc(db,'patients',patId,'medications',medId));
   const mData=medSnap.exists()?medSnap.data():{nombre:'Medicamento'};
   const today=new Date().toISOString().slice(0,10);
-  await updateDoc(doc(db,'patients',patId,'medications',medId),{activo:false,fechaFin:today});
+  await updateDoc(doc(db,'patients',patId,'medications',medId),{activo:false,fechaFin:today,motivoStop:motivo.trim()});
   await addDoc(collection(db,'patients',patId,'clinicalEvents'),{
     type:'med_stop', date:today,
     title:`Discontinuado: ${mData.nombre} ${mData.dosis||''}`,
-    detail:mData.motivo||'Discontinuado', medId, createdAt:serverTimestamp()
+    detail:`Motivo: ${motivo.trim()}`, medId, createdAt:serverTimestamp()
   });
   loadPatMeds(patId);
+  showToast('Medicamento discontinuado y registrado en evolución.');
 };
 
 // ── ADD MED TO EXISTING PATIENT ──
@@ -3144,6 +3162,73 @@ window.saveAddMed=async()=>{
   });
   closeM('AddMed');
   loadPatMeds(addMedTargetId);
+};
+
+
+// ── EDIT MEDICATION ──
+window.openEditMedModal=async(patId,medId)=>{
+  const snap=await getDoc(doc(db,'patients',patId,'medications',medId));
+  if(!snap.exists()) return;
+  const m=snap.data();
+  document.getElementById('editMedPatId').value=patId;
+  document.getElementById('editMedId').value=medId;
+  document.getElementById('editMedPrevNombre').value=m.nombre||'';
+  document.getElementById('editMedPrevDosis').value=m.dosis||'';
+  document.getElementById('editMedPrevFrec').value=m.frecuencia||'';
+  document.getElementById('editMedNombre').value=m.nombre||'';
+  document.getElementById('editMedDosis').value=m.dosis||'';
+  document.getElementById('editMedFrec').value=m.frecuencia||'Cada 24h (una vez/día)';
+  document.getElementById('editMedTipo').value=m.tipo||'uro';
+  document.getElementById('editMedFecha').value=m.fechaInicio||'';
+  document.getElementById('editMedPrescriptor').value=m.prescriptor||'';
+  document.getElementById('editMedMotivo').value='';
+  document.getElementById('modalEditMed').classList.add('open');
+};
+
+window.saveEditMed=async()=>{
+  const patId=document.getElementById('editMedPatId').value;
+  const medId=document.getElementById('editMedId').value;
+  const motivo=document.getElementById('editMedMotivo').value.trim();
+  const nombre=document.getElementById('editMedNombre').value.trim();
+  if(!nombre){ showToast('El nombre es obligatorio'); return; }
+  if(!motivo){ showToast('Escribe el motivo del cambio'); return; }
+
+  const prevNombre=document.getElementById('editMedPrevNombre').value;
+  const prevDosis=document.getElementById('editMedPrevDosis').value;
+  const prevFrec=document.getElementById('editMedPrevFrec').value;
+  const newDosis=document.getElementById('editMedDosis').value.trim();
+  const newFrec=document.getElementById('editMedFrec').value;
+
+  // Build change description
+  const cambios=[];
+  if(prevNombre!==nombre) cambios.push(`Nombre: "${prevNombre}" → "${nombre}"`);
+  if(prevDosis!==newDosis) cambios.push(`Dosis: ${prevDosis||'—'} → ${newDosis||'—'}`);
+  if(prevFrec!==newFrec) cambios.push(`Frecuencia: ${prevFrec||'—'} → ${newFrec}`);
+  const detalleCambio=cambios.length?cambios.join(' | '):motivo;
+
+  const updates={
+    nombre,
+    dosis:newDosis,
+    frecuencia:newFrec,
+    tipo:document.getElementById('editMedTipo').value,
+    fechaInicio:document.getElementById('editMedFecha').value,
+    prescriptor:document.getElementById('editMedPrescriptor').value.trim(),
+    motivo,
+  };
+
+  const today=new Date().toISOString().slice(0,10);
+  await updateDoc(doc(db,'patients',patId,'medications',medId),updates);
+  await addDoc(collection(db,'patients',patId,'clinicalEvents'),{
+    type:'med_edit',
+    date:today,
+    title:`Modificado: ${nombre} ${newDosis||''}`,
+    detail:`${detalleCambio} · Motivo: ${motivo}`,
+    medId, createdAt:serverTimestamp()
+  });
+
+  closeM('EditMed');
+  loadPatMeds(patId);
+  showToast('Medicamento actualizado y cambio registrado en evolución.');
 };
 
 // ── ACTIVATE SCALES ──
@@ -3459,8 +3544,8 @@ async function loadClinicalTimeline(patId, p){
       html+=`<div class="card-label" style="margin-bottom:12px"><i class="ti ti-timeline"></i>Línea de tiempo clínica</div>`;
       html+=`<div class="timeline">`;
       events.forEach(evt=>{
-        const dotClass=evt.type==='med_start'?'tl-dot-med':evt.type==='med_stop'?'tl-dot-disc':evt.type==='surgery'?'tl-dot-surgery':evt.type==='scale'?'tl-dot-scale':'tl-dot-alert';
-        const typeLabel=evt.type==='med_start'?'Inicio medicamento':evt.type==='med_stop'?'Discontinuado':evt.type==='surgery'?'Antecedente':evt.type==='scale'?'Escalas completadas':'Evento';
+        const dotClass=evt.type==='med_start'?'tl-dot-med':evt.type==='med_stop'?'tl-dot-disc':evt.type==='med_edit'?'tl-dot-med':evt.type==='surgery'?'tl-dot-surgery':evt.type==='scale'?'tl-dot-scale':'tl-dot-alert';
+        const typeLabel=evt.type==='med_start'?'Inicio medicamento':evt.type==='med_stop'?'Discontinuado':evt.type==='med_edit'?'Cambio de medicamento':evt.type==='surgery'?'Antecedente':evt.type==='scale'?'Escalas completadas':'Evento';
         
         // For scale events, show score delta if available
         let scaleInfo='';
@@ -3516,8 +3601,19 @@ async function loadClinicalTimeline(patId, p){
       </div>
     </div>`;
     
+    // Explain why med-scale comparison is empty if meds exist but no comparison
+    if(meds.length>0 && medComparisons.length===0 && scaleReqs.length>0){
+      html+=`<div style="background:var(--amber-dim);border:1px solid var(--amber);border-radius:8px;padding:10px 12px;margin-bottom:1rem;font-size:12px;color:var(--amber)">
+        <i class="ti ti-info-circle"></i> <strong>Comparativo medicamento→escala:</strong> Para ver el impacto de un medicamento, el paciente debe tener escalas completadas <em>antes</em> y <em>después</em> de la fecha de inicio de ese medicamento. Esto se mostrará automáticamente cuando haya esa secuencia.
+      </div>`;
+    } else if(meds.length>0 && scaleReqs.length===0){
+      html+=`<div style="background:var(--blue-light);border:1px solid var(--blue-act);border-radius:8px;padding:10px 12px;margin-bottom:1rem;font-size:12px;color:var(--blue-act)">
+        <i class="ti ti-info-circle"></i> <strong>Comparativo pendiente:</strong> El paciente tiene medicamentos pero aún no ha completado ninguna escala clínica. El análisis de impacto aparecerá cuando complete la primera evaluación.
+      </div>`;
+    }
+
     if(!events.length&&!smartAlerts.length&&globalScore===null){
-      html='<div class="empty"><i class="ti ti-timeline"></i><p style="font-size:12px">Sin eventos clínicos registrados aún. Los medicamentos, escalas y procedimientos aparecerán aquí automáticamente.</p></div>';
+      html='<div class="empty"><i class="ti ti-timeline"></i><p style="font-size:12px">Sin eventos clínicos registrados aún. Los medicamentos, escalas y procedimientos aparecerán aquí automáticamente cuando se registren.</p></div>';
       html+=`<button class="btn btn-sm btn-green" style="margin-top:8px" onclick="openAddClinicalEvent('${patId}')"><i class="ti ti-plus"></i>Registrar primer evento</button>`;
     }
     
