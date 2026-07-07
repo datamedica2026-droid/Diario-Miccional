@@ -1,4 +1,3 @@
-
 {
   "name": "Diario Miccional — by InnoIA",
   "short_name": "Diario Miccional",
@@ -54,6 +53,18 @@
       "short_name": "Micción",
       "description": "Registra una micción rápidamente",
       "url": "/paciente.html#miction",
+      "icons": [
+        {
+          "src": "/icon-192.svg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Panel Médico",
+      "short_name": "Médico",
+      "description": "Panel de seguimiento clínico para el médico",
+      "url": "/medico.html",
       "icons": [
         {
           "src": "/icon-192.svg",
