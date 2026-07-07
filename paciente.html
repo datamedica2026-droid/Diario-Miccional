@@ -2147,7 +2147,7 @@ async function renderScalesHistory(requests){
 }
 
 // ── FILL SCALES ──
-async function startFillScales(requestId){
+window.startFillScales = async function startFillScales(requestId){
   if(!patient?.id) return;
   const reqSnap=await getDocs(collection(db,'patients',patient.id,'scaleRequests'));
   const req=reqSnap.docs.find(d=>d.id===requestId);
@@ -2175,7 +2175,7 @@ async function startFillScales(requestId){
   fillCurrentScale();
 }
 
-function fillCurrentScale(){
+window.fillCurrentScale = function fillCurrentScale(){
   const scales=currentRequest?.scales||[];
   if(currentScaleIndex>=scales.length){
     submitScaleResults();
