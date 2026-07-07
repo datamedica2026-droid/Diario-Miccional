@@ -2176,18 +2176,18 @@ window.genFullReport=async(id)=>{
   </div>
   <div class="warn">⚠️ Informe de apoyo clínico. No constituye diagnóstico médico. Interpretación exclusiva del profesional de salud tratante.</div>
 
-  \${p.mode!=='scales'?`<h2>Resumen ejecutivo</h2>
+  ${p.mode!=='scales'?`<h2>Resumen ejecutivo</h2>
   <div class="gr">
-    <div class="st"><div class="sl">Total micciones</div><div class="sv">\${mics.length}</div><div class="sr">Normal: 4–7/día</div></div>
-    <div class="st"><div class="sl">Vol. promedio</div><div class="sv">\${avgVol} ml</div><div class="sr">Normal: 250–400 ml</div></div>
-    <div class="st"><div class="sl">Vol. total orina</div><div class="sv">\${totalVol} ml</div><div class="sr">Normal: 800–2000 ml/24h</div></div>
-    <div class="st"><div class="sl">Líquido ingerido</div><div class="sv">\${drks.reduce((a,r)=>a+(r.vol||0),0)} ml</div><div class="sr">Recomendado: 1500–2000 ml</div></div>
+    <div class="st"><div class="sl">Total micciones</div><div class="sv">${mics.length}</div><div class="sr">Normal: 4–7/día</div></div>
+    <div class="st"><div class="sl">Vol. promedio</div><div class="sv">${avgVol} ml</div><div class="sr">Normal: 250–400 ml</div></div>
+    <div class="st"><div class="sl">Vol. total orina</div><div class="sv">${totalVol} ml</div><div class="sr">Normal: 800–2000 ml/24h</div></div>
+    <div class="st"><div class="sl">Líquido ingerido</div><div class="sv">${drks.reduce((a,r)=>a+(r.vol||0),0)} ml</div><div class="sr">Recomendado: 1500–2000 ml</div></div>
   </div>`:''}
-  \${p.mode!=='scales'?`<div class="gr">
-    <div class="st"><div class="sl">Fugas registradas</div><div class="sv" style="color:\${leaks.length>0?'#e65100':'#2e7d32'}">\${leaks.length}</div><div class="sr">Normal: 0</div></div>
-    <div class="st"><div class="sl">Con análisis acústico</div><div class="sv">\${acRecs.length}</div><div class="sr">de \${mics.length} micciones</div></div>
-    <div class="st"><div class="sl">dB promedio global</div><div class="sv">\${avgDB} dB</div><div class="sr">Sobre baseline calibrado</div></div>
-    <div class="st"><div class="sl">Días con registros</div><div class="sv">\${[...new Set(recs.map(r=>r.date))].length}</div></div>
+  ${p.mode!=='scales'?`<div class="gr">
+    <div class="st"><div class="sl">Fugas registradas</div><div class="sv" style="color:${leaks.length>0?'#e65100':'#2e7d32'}">${leaks.length}</div><div class="sr">Normal: 0</div></div>
+    <div class="st"><div class="sl">Con análisis acústico</div><div class="sv">${acRecs.length}</div><div class="sr">de ${mics.length} micciones</div></div>
+    <div class="st"><div class="sl">dB promedio global</div><div class="sv">${avgDB} dB</div><div class="sr">Sobre baseline calibrado</div></div>
+    <div class="st"><div class="sl">Días con registros</div><div class="sv">${[...new Set(recs.map(r=>r.date))].length}</div></div>
   </div>`:''}
 
   ${p.mode!=='scales'?``:''}  
@@ -2695,18 +2695,18 @@ window.genFullReport=async(id)=>{
   </div>
   <div class="warn">⚠️ Informe de apoyo clínico. No constituye diagnóstico médico. Interpretación exclusiva del profesional de salud tratante.</div>
 
-  \${p.mode!=='scales'?`<h2>Resumen ejecutivo</h2>
+  ${p.mode!=='scales'?`<h2>Resumen ejecutivo</h2>
   <div class="gr">
-    <div class="st"><div class="sl">Total micciones</div><div class="sv">\${mics.length}</div><div class="sr">Normal: 4–7/día</div></div>
-    <div class="st"><div class="sl">Vol. promedio</div><div class="sv">\${avgVol} ml</div><div class="sr">Normal: 250–400 ml</div></div>
-    <div class="st"><div class="sl">Vol. total orina</div><div class="sv">\${totalVol} ml</div><div class="sr">Normal: 800–2000 ml/24h</div></div>
-    <div class="st"><div class="sl">Líquido ingerido</div><div class="sv">\${drks.reduce((a,r)=>a+(r.vol||0),0)} ml</div><div class="sr">Recomendado: 1500–2000 ml</div></div>
+    <div class="st"><div class="sl">Total micciones</div><div class="sv">${mics.length}</div><div class="sr">Normal: 4–7/día</div></div>
+    <div class="st"><div class="sl">Vol. promedio</div><div class="sv">${avgVol} ml</div><div class="sr">Normal: 250–400 ml</div></div>
+    <div class="st"><div class="sl">Vol. total orina</div><div class="sv">${totalVol} ml</div><div class="sr">Normal: 800–2000 ml/24h</div></div>
+    <div class="st"><div class="sl">Líquido ingerido</div><div class="sv">${drks.reduce((a,r)=>a+(r.vol||0),0)} ml</div><div class="sr">Recomendado: 1500–2000 ml</div></div>
   </div>`:''}
-  \${p.mode!=='scales'?`<div class="gr">
-    <div class="st"><div class="sl">Fugas registradas</div><div class="sv" style="color:\${leaks.length>0?'#e65100':'#2e7d32'}">\${leaks.length}</div><div class="sr">Normal: 0</div></div>
-    <div class="st"><div class="sl">Con análisis acústico</div><div class="sv">\${acRecs.length}</div><div class="sr">de \${mics.length} micciones</div></div>
-    <div class="st"><div class="sl">dB promedio global</div><div class="sv">\${avgDB} dB</div><div class="sr">Sobre baseline calibrado</div></div>
-    <div class="st"><div class="sl">Días con registros</div><div class="sv">\${[...new Set(recs.map(r=>r.date))].length}</div></div>
+  ${p.mode!=='scales'?`<div class="gr">
+    <div class="st"><div class="sl">Fugas registradas</div><div class="sv" style="color:${leaks.length>0?'#e65100':'#2e7d32'}">${leaks.length}</div><div class="sr">Normal: 0</div></div>
+    <div class="st"><div class="sl">Con análisis acústico</div><div class="sv">${acRecs.length}</div><div class="sr">de ${mics.length} micciones</div></div>
+    <div class="st"><div class="sl">dB promedio global</div><div class="sv">${avgDB} dB</div><div class="sr">Sobre baseline calibrado</div></div>
+    <div class="st"><div class="sl">Días con registros</div><div class="sv">${[...new Set(recs.map(r=>r.date))].length}</div></div>
   </div>`:''}
 
   <h2>Distribución de urgencia</h2>
@@ -2823,15 +2823,7 @@ window.genFullReport=async(id)=>{
     Este informe está protegido bajo normativa de protección de datos personales de salud.
   </div>
   
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('/sw.js')
-      .then(r => console.log('SW registered:', r.scope))
-      .catch(e => console.log('SW error:', e));
-  });
-}
-</script>
+
 </body></html>`;
 
   const a=document.createElement('a');
@@ -4753,5 +4745,15 @@ window.addEventListener('appinstalled', () => {
 
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 </script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/sw.js')
+      .then(r => console.log('SW registered:', r.scope))
+      .catch(e => console.log('SW error:', e));
+  });
+}
+</script>
+
 </body>
 </html>
