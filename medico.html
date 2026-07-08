@@ -1259,13 +1259,17 @@ input,select,textarea{font-size:16px !important;}
     <p style="font-size:12px;color:var(--text2);margin-bottom:1rem">Completa los campos clínicos. El resumen se genera listo para copiar y pegar en la historia clínica del paciente.</p>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="font-size:10px;font-weight:700;color:var(--blue-act);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">S — Subjetivo</div>
       <div class="hc-field"><label>Motivo de consulta</label><textarea id="hcMotivo" placeholder="Síntomas principales por los que consulta..."></textarea></div>
       <div class="hc-field"><label>Enfermedad actual</label><textarea id="hcEnfermedad" placeholder="Evolución cronológica de los síntomas..."></textarea></div>
     </div>
-    <div class="hc-field"><label>Diagnóstico(s)</label><textarea id="hcDiagnostico" rows="2" placeholder="Diagnóstico principal y secundarios (CIE-10 si aplica)..."></textarea></div>
+    <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin:12px 0 6px">A — Análisis / Diagnóstico</div>
+    <div class="hc-field"><label>Diagnóstico(s) — CIE-10 si aplica</label><textarea id="hcDiagnostico" rows="2" placeholder="Ej: N39.0 Infección tracto urinario, N40 Hiperplasia prostática benigna..."></textarea></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="hc-field"><label>Plan de manejo</label><textarea id="hcPlan" placeholder="Tratamiento, seguimiento, estudios solicitados..."></textarea></div>
-      <div class="hc-field"><label>Observaciones clínicas</label><textarea id="hcObservaciones" placeholder="Hallazgos al examen, notas adicionales..."></textarea></div>
+      <div style="font-size:10px;font-weight:700;color:var(--coral);text-transform:uppercase;letter-spacing:.08em;margin:12px 0 6px">P — Plan</div>
+      <div class="hc-field"><label>Plan de manejo</label><textarea id="hcPlan" placeholder="Tratamiento farmacológico, no farmacológico, estudios solicitados, interconsultas..."></textarea></div>
+      <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin:12px 0 6px">O — Objetivo (examen físico + datos del diario)</div>
+      <div class="hc-field"><label>Hallazgos al examen físico</label><textarea id="hcObservaciones" placeholder="Tacto rectal, inspección perineal, tono esfinteriano, residuo postmiccional..."></textarea></div>
     </div>
     <div class="hc-field"><label>Próxima cita / instrucciones al paciente</label><textarea id="hcSiguiente" rows="2" placeholder="Control en X semanas, instrucciones de cuidado..."></textarea></div>
 
@@ -1543,8 +1547,35 @@ function renderPatList(pats){
   }).join('');
 }
 
+
+
+// ── WHATSAPP DIRECTO ──
+window.openWhatsApp=(tel,nombre)=>{
+  // Clean phone number - remove spaces, dashes, parentheses
+  const clean=tel.replace(/[^0-9+]/g,'');
+  // Add Colombia country code if not present
+  const intl=clean.startsWith('+')?clean:clean.startsWith('57')?'+'+clean:'+57'+clean;
+  const msg=encodeURIComponent(`Hola ${nombre}, le escribe su médico a través del sistema Diario Miccional CURG. `);
+  window.open(`https://wa.me/${intl.replace('+','')}?text=${msg}`,'_blank');
+};
+// ── AUDITORÍA DE ACCESOS ──
+async function logAudit(patId, action){
+  if(!curDoc?.uid) return;
+  try{
+    await addDoc(collection(db,'auditLog'),{
+      doctorId: curDoc.uid,
+      doctorName: curDocData?.nombre||'—',
+      patientId: patId,
+      action,
+      timestamp: serverTimestamp(),
+      date: new Date().toISOString().slice(0,10)
+    });
+  }catch(e){} // audit never blocks the main flow
+}
 window.selectPat=async(id)=>{
   selPatId=id; filterPats();
+  // Audit log
+  logAudit(id, 'view_patient');
   // Mobile: slide to content view
   if(window.innerWidth<=600){
     document.getElementById('ttab-patients')?.classList.add('pat-selected');
@@ -1693,6 +1724,7 @@ function renderPatView(p, recs, sleepMap, wbMap){
       <div class="hero-actions">
         <button class="btn btn-sm" onclick="openEditPat('${p.id}')"><i class="ti ti-pencil"></i>Editar</button>
         <button class="btn btn-sm btn-green" onclick="openNoteModal('${p.id}')"><i class="ti ti-notes"></i>Nota</button>
+        ${p.telefono?`<button class="btn btn-sm" style="background:#25D366;color:#fff;border:none;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:4px;font-family:inherit" onclick="openWhatsApp('${p.telefono}','${(p.nombre||'').replace(/'/g,'')}')"><i class="ti ti-brand-whatsapp"></i>WA</button>`:''}
         <button class="btn btn-sm btn-primary" onclick="genFullReport('${p.id}')"><i class="ti ti-file-report"></i>Informe</button>
         <button class="btn btn-sm" style="background:var(--purple-dim);color:var(--purple);border:1px solid var(--purple)" onclick="openHistoriaClinica('${p.id}')"><i class="ti ti-clipboard-text"></i>Historia clínica</button>
         <button class="btn btn-sm btn-amber" onclick="generateConsultCode('${p.id}')"><i class="ti ti-arrows-exchange"></i>Interconsulta</button>
@@ -2151,17 +2183,28 @@ window.startColleagueConsult=(doctorId,doctorName)=>{
 };
 
 window.confirmDeletePat=async(id,nombre)=>{
-  if(!confirm(`¿Eliminar a ${nombre}?
-
-Esta acción no se puede deshacer. Se eliminarán todos sus registros.`)) return;
+  // Primera confirmación
+  if(!confirm(`⚠️ ELIMINAR PACIENTE\n\n"${nombre}"\n\nEsta acción eliminará PERMANENTEMENTE todos los registros, micciones, escalas, medicamentos y eventos clínicos de este paciente.\n\n¿Estás seguro?`)) return;
+  // Segunda confirmación: escribir el nombre
+  const typed = prompt(`Para confirmar, escribe exactamente el nombre del paciente:\n"${nombre}"`);
+  if(typed === null) return;
+  if(typed.trim() !== nombre.trim()){
+    alert('El nombre no coincide. Eliminación cancelada.');
+    return;
+  }
   try{
-    for(const col of ['records','sleep','wellbeing']){
-      const snap=await getDocs(collection(db,'patients',id,col));
-      for(const d of snap.docs) await deleteDoc(doc(db,'patients',id,col,d.id));
+    showToast('Eliminando paciente...', 'error');
+    for(const col of ['records','sleep','wellbeing','medications','scaleRequests','scaleResults','clinicalEvents','notes']){
+      try{
+        const snap=await getDocs(collection(db,'patients',id,col));
+        for(const d of snap.docs) await deleteDoc(doc(db,'patients',id,col,d.id));
+      }catch(e){}
     }
     await deleteDoc(doc(db,'patients',id));
+    delete patsCache[id];
     selPatId=null;
-    document.getElementById('patContent').innerHTML=`<div class="empty" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center"><i class="ti ti-check-circle" style="font-size:3rem;color:var(--green);margin-bottom:1rem"></i><div style="font-size:1rem;font-weight:600">Paciente eliminado</div></div>`;
+    filterPats();
+    document.getElementById('patContent').innerHTML=`<div class="empty" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center"><i class="ti ti-check-circle" style="font-size:3rem;color:var(--green);margin-bottom:1rem"></i><div style="font-size:1rem;font-weight:600">Paciente eliminado correctamente</div></div>`;
   }catch(e){ alert('Error al eliminar: '+e.message); }
 };
 
@@ -2261,7 +2304,7 @@ window.exportCSV=async(id)=>{
   a.download='CURG_'+String(p.nombre||'paciente').replace(/ /g,'_')+'_'+String(p.clinica||'clinica')+'.csv';
   a.click();
 };
-window.genFullReport=async(id)=>{
+window.genFullReport=async(id)=>{ logAudit(id,'download_report');
   const p=patsCache[id];if(!p)return;
   const [rSnap,slSnap,wbSnap,medSnapR,scaleReqSnapR,scaleResSnapR]=await Promise.all([
     getDocs(query(collection(db,'patients',id,'records'),orderBy('timestamp','desc'))),
@@ -2572,20 +2615,7 @@ window.startColleagueConsult=(doctorId,doctorName)=>{
   },200);
 };
 
-window.confirmDeletePat=async(id,nombre)=>{
-  if(!confirm(`¿Eliminar a ${nombre}?
 
-Esta acción no se puede deshacer. Se eliminarán todos sus registros.`)) return;
-  try{
-    for(const col of ['records','sleep','wellbeing']){
-      const snap=await getDocs(collection(db,'patients',id,col));
-      for(const d of snap.docs) await deleteDoc(doc(db,'patients',id,col,d.id));
-    }
-    await deleteDoc(doc(db,'patients',id));
-    selPatId=null;
-    document.getElementById('patContent').innerHTML=`<div class="empty" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center"><i class="ti ti-check-circle" style="font-size:3rem;color:var(--green);margin-bottom:1rem"></i><div style="font-size:1rem;font-weight:600">Paciente eliminado</div></div>`;
-  }catch(e){ alert('Error al eliminar: '+e.message); }
-};
 
 window.openMsgModal=(id)=>{ msgTargetId=id; document.getElementById('msgText').value=''; document.getElementById('modalMsg').classList.add('open'); };
 window.sendMsg=async()=>{
@@ -3191,11 +3221,15 @@ async function loadComparative(){
     // Render inactivity alerts
     if(inactives.length){
       alertsDiv.innerHTML=inactives.map(p=>`
-        <div class="inactivity-alert">
-          <i class="ti ti-clock"></i>
-          <div>
+        <div class="inactivity-alert" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <i class="ti ti-clock" style="flex-shrink:0"></i>
+          <div style="flex:1;min-width:0">
             <strong>${p.nombre}</strong> — sin registros hace <strong>${p.daysSince} días</strong>
-            ${p.telefono?`<button class="btn btn-sm btn-amber" style="margin-left:8px;padding:2px 8px;font-size:11px" onclick="window.location.href='tel:${p.telefono}'"><i class="ti ti-phone"></i>Llamar</button>`:''}
+          </div>
+          <div style="display:flex;gap:5px;flex-shrink:0">
+            ${p.telefono?`<button onclick="openWhatsApp('${p.telefono}','${(p.nombre||'').replace(/'/g,'')}')" style="background:#25D366;color:#fff;border:none;padding:4px 8px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit"><i class="ti ti-brand-whatsapp"></i> WA</button>`:''}
+            ${p.telefono?`<a href="tel:${p.telefono}" class="btn btn-sm btn-amber"><i class="ti ti-phone"></i></a>`:''}
+            <button onclick="selectPat('${p.id}')" class="btn btn-sm"><i class="ti ti-arrow-right"></i></button>
           </div>
         </div>`).join('');
     }
@@ -4570,7 +4604,7 @@ window.generarNotaHC=async()=>{
     const obs=document.getElementById('hcObservaciones').value.trim();
     const siguiente=document.getElementById('hcSiguiente').value.trim();
     
-    const nota=`NOTA DE CONSULTA — UROLOGÍA
+    const nota=`NOTA DE CONSULTA UROLÓGICA — FORMATO SOAP
 Fecha: ${today}
 Médico: ${curDocData?.nombre||'—'} | Especialidad: ${curDocData?.especialidad||'Urología'}
 Institución: ${p.clinica||'—'}
@@ -4580,7 +4614,7 @@ Nombre: ${p.nombre||'—'}
 ${age?'Edad: '+age+' años':''}${p.fechaNac?' | Fecha nac.: '+p.fechaNac:''}${p.genero?' | Género: '+(p.genero==='m'?'Masculino':p.genero==='f'?'Femenino':'Otro'):''}
 ${p.telefono?'Tel: '+p.telefono:''} ${p.email?'| Email: '+p.email:''}
 ──────────────────────────────────────────────
-${motivo?'MOTIVO DE CONSULTA:\n'+motivo+'\n──────────────────────────────────────────────\n':''}${enfermedad?'ENFERMEDAD ACTUAL:\n'+enfermedad+'\n──────────────────────────────────────────────\n':''}ANTECEDENTES:${ants.length?'\n  Urológicos/quirúrgicos: '+ants.join(', '):''}
+${motivo||enfermedad?'S — SUBJETIVO:\n'+(motivo?'Motivo: '+motivo+'\n':'')+(enfermedad?'Enfermedad actual: '+enfermedad+'\n':'')+'──────────────────────────────────────────────\n':''}ANTECEDENTES:${ants.length?'\n  Urológicos/quirúrgicos: '+ants.join(', '):''}
 ${p.antOtros?'  Otros: '+p.antOtros:''}
 ──────────────────────────────────────────────
 DIARIO MICCIONAL — RESUMEN OBJETIVO:
@@ -4593,7 +4627,7 @@ Líquido total ingerido: ${drks.reduce((a,r)=>a+(r.vol||0),0)} ml
 Fugas de orina: ${leaks.length} episodio(s)
 Urgencia severa (U3-U4): ${urgHigh} episodio(s) (${mics.length?Math.round(urgHigh/mics.length*100):0}%)
 ${acRecs.length?'Análisis acústico del flujo (Tsui et al. 2006):\n  dB promedio: '+avgDB+' | Débil: '+fD.weak+' | Bajo: '+fD.low+' | Normal: '+fD.normal+' | Fuerte: '+fD.strong:''}${scalesSummary}──────────────────────────────────────────────
-${p.urofluj?`UROFLUJOMETRÍA DE REFERENCIA (${p.urofluj.fecha||'—'}):\n${[p.urofluj.qmax?'  Qmax: '+p.urofluj.qmax+' ml/s':null,p.urofluj.qavg?'  Qavg: '+p.urofluj.qavg+' ml/s':null,p.urofluj.vol?'  Vol: '+p.urofluj.vol+' ml':null,p.urofluj.patron?'  Patrón: '+p.urofluj.patron:null].filter(Boolean).join('\n')}\n──────────────────────────────────────────────\n`:''}${activeMeds.length?'MEDICAMENTOS ACTUALES:\n'+activeMeds.map(m=>`  • ${m.nombre} ${m.dosis||''} — ${m.frecuencia||''} (${m.tipo==='uro'?'Urológico':'Comorbilidad'})${m.fechaInicio?' desde '+m.fechaInicio:''}`).join('\n')+'\n──────────────────────────────────────────────\n':''}${diagnostico?'DIAGNÓSTICO:\n'+diagnostico+'\n──────────────────────────────────────────────\n':''}${obs?'HALLAZGOS / EXAMEN FÍSICO:\n'+obs+'\n──────────────────────────────────────────────\n':''}${plan?'PLAN DE MANEJO:\n'+plan+'\n──────────────────────────────────────────────\n':''}${siguiente?'PRÓXIMA CITA / INSTRUCCIONES:\n'+siguiente+'\n──────────────────────────────────────────────\n':''}Nota generada con Diario Miccional v2.0 · by InnoIA · verificado CURG
+${p.urofluj?`UROFLUJOMETRÍA DE REFERENCIA (${p.urofluj.fecha||'—'}):\n${[p.urofluj.qmax?'  Qmax: '+p.urofluj.qmax+' ml/s':null,p.urofluj.qavg?'  Qavg: '+p.urofluj.qavg+' ml/s':null,p.urofluj.vol?'  Vol: '+p.urofluj.vol+' ml':null,p.urofluj.patron?'  Patrón: '+p.urofluj.patron:null].filter(Boolean).join('\n')}\n──────────────────────────────────────────────\n`:''}${activeMeds.length?'MEDICAMENTOS ACTUALES:\n'+activeMeds.map(m=>`  • ${m.nombre} ${m.dosis||''} — ${m.frecuencia||''} (${m.tipo==='uro'?'Urológico':'Comorbilidad'})${m.fechaInicio?' desde '+m.fechaInicio:''}`).join('\n')+'\n──────────────────────────────────────────────\n':''}${diagnostico?'A — ANÁLISIS / DIAGNÓSTICO:\n'+diagnostico+'\n──────────────────────────────────────────────\n':''}${obs?'O — OBJETIVO (EXAMEN FÍSICO):\n'+obs+'\n──────────────────────────────────────────────\n':''}${plan||siguiente?'P — PLAN:\n'+(plan?'Manejo: '+plan+'\n':'')+(siguiente?'Próxima cita / instrucciones: '+siguiente+'\n':'')+'──────────────────────────────────────────────\n':''}Nota generada con Diario Miccional v2.0 · by InnoIA · verificado CURG
 Referencia científica: ICS 2019, EAU Guidelines 2023, Tsui et al. 2006`;
     
     document.getElementById('hcOutput').textContent=nota;
