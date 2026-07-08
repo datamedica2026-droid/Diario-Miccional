@@ -1,13 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Diario Miccional — by InnoIA</title>
-<meta name="theme-color" content="#042C53">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+tyle" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Diario Miccional">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#042C53">
@@ -438,6 +429,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .terms-link a{color:var(--blue-act);text-decoration:underline;cursor:pointer;}
 .empty-state i{font-size:2.5rem;display:block;margin-bottom:.75rem;}
 input,select,textarea{font-size:16px !important;}
+
+/* ── HELP BUTTON ── */
+.fab-help{position:fixed;bottom:80px;right:16px;width:40px;height:40px;border-radius:50%;background:var(--blue-act);color:#fff;border:none;font-size:18px;cursor:pointer;z-index:100;box-shadow:0 3px 12px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;}
 </style>
 </head>
 <body>
@@ -949,7 +943,15 @@ input,select,textarea{font-size:16px !important;}
     </div>
     <div class="form-row" style="margin-bottom:10px">
       <div class="form-group" style="margin:0"><label>Hora <span class="req">*</span></label><input type="time" id="micHora"></div>
-      <div class="form-group" style="margin:0"><label>Volumen (ml) <span class="req">*</span></label><input type="number" id="micVol" placeholder="250" min="0" max="1000"></div>
+      <div class="form-group" style="margin:0"><label>Volumen (ml) <span class="req">*</span> <span onclick="toggleMedidorTip()" style="color:var(--blue-act);font-size:11px;cursor:pointer;font-weight:400">¿Cómo medir? ℹ</span></label>
+          <input type="number" id="micVol" placeholder="250" min="0" max="1000">
+          <div id="medidorTip" style="display:none;background:var(--blue-light);border:1px solid var(--blue-act);border-radius:8px;padding:9px 12px;margin-top:6px;font-size:12px;color:var(--text);line-height:1.6">
+            <strong>Jarra medidora de cocina</strong> (consíguela desde $5.000):<br>
+            1️⃣ Orina dentro de la jarra<br>
+            2️⃣ Lee el volumen en ml<br>
+            3️⃣ Vierte al sanitario y registra<br>
+            <span style="color:var(--text3);font-size:11px">Sin jarra: anota estimación y escribe "sin medidor" en notas.</span>
+          </div></div>
     </div>
     <div class="form-row" style="margin-bottom:14px">
       <div class="form-group" id="durSection" style="margin:0"><label>Duración (seg) <span class="req">*</span><span style="font-size:10px;color:var(--text3);font-weight:400;text-transform:none;margin-left:4px">usa el cronómetro</span></label><input type="number" id="micDur" placeholder="autodetectado" readonly style="background:var(--border);cursor:not-allowed;border-radius:11px;padding:11px 13px;font-size:15px;color:var(--text);font-family:inherit;width:100%;border:1.5px solid var(--border)"></div>
@@ -1159,6 +1161,8 @@ function enterApp(){
   setTimeout(()=>{ loadPatientMedsView(); loadPatientAntsView(); }, 500);
   // Calibrate acoustic thresholds if patient has uroflujometria
   if(patient?.urofluj) calibrateThreshFromUro(patient.urofluj);
+  // Show help button
+  const fabHelp=document.getElementById('fabHelp'); if(fabHelp) fabHelp.style.display='flex';
   // Show welcome screen on first login (overrides the showScreen above)
   showWelcomeIfNeeded();
 }
@@ -1185,6 +1189,11 @@ function showWelcomeIfNeeded(){
   }
   steps.push({icon:'ti-heart-rate-monitor',color:'var(--purple)',title:'Revisa tu progreso',desc:'En la pestaña Progreso podrás ver cómo evolucionan tus síntomas a lo largo del tiempo.'});
   
+  // Medidor instructions for all modes
+  if(mode==='diary'||mode==='both'){
+    steps.push({icon:'ti-tools-kitchen-2',color:'var(--amber)',title:'¿Cómo medir el volumen?',desc:'Usa una jarra medidora de cocina (de las que venden en tiendas desde $5.000). Orina dentro, lee la cantidad en ml, y vierte al sanitario. El celular va cerca del inodoro para captar el sonido.'});
+  }
+
   document.getElementById('welcomeSteps').innerHTML=steps.map(s=>`
     <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">
       <div style="width:36px;height:36px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
@@ -1202,6 +1211,12 @@ function showWelcomeIfNeeded(){
   return true;
 }
 
+
+window.showTutorial = () => {
+  // Reset welcome screen and show it again
+  localStorage.removeItem('dm_welcomed_'+patient?.id);
+  showWelcomeIfNeeded();
+};
 window.dismissWelcome=()=>{
   localStorage.setItem('dm_welcomed_'+patient.id,'1');
   document.getElementById('screen-welcome').classList.remove('active');
@@ -1308,11 +1323,11 @@ window.saveSleep=async()=>{
 // ── WELLBEING ──
 window.setWb=(v)=>{ selWb=v; document.querySelectorAll('.wb-btn').forEach((b,i)=>b.classList.toggle('selected',i==={great:0,ok:1,bad:2}[v])); saveWb(); };
 window.setPain=(v)=>{ selPain=v; document.querySelectorAll('.pain-btn').forEach((b,i)=>b.classList.toggle('selected',i===v)); saveWb(); };
-async function saveWb(){
+window.saveWellbeing = window.saveWb = async function saveWb(){
   if(!patient?.id||selWb===null) return;
   try{ await setDoc(doc(db,'patients',patient.id,'wellbeing',todayKey()),{date:todayKey(),wellbeing:selWb,pain:selPain,timestamp:serverTimestamp()},{merge:true}); const s=document.getElementById('wbStatus'); s.textContent='✓ '+(lang==='es'?'Guardado':'Saved'); setTimeout(()=>{ s.textContent=''; },2000); }catch(e){}
 }
-async function loadWb(){
+window.loadWb = async function loadWb(){
   if(!patient?.id) return;
   try{ const snap=await getDoc(doc(db,'patients',patient.id,'wellbeing',todayKey())); if(snap.exists()){ const d=snap.data(); if(d.wellbeing){ selWb=d.wellbeing; document.querySelectorAll('.wb-btn')[{great:0,ok:1,bad:2}[d.wellbeing]]?.classList.add('selected'); } if(d.pain!=null){ selPain=d.pain; document.querySelectorAll('.pain-btn').forEach((b,i)=>b.classList.toggle('selected',i===d.pain)); } } }catch(e){}
 }
@@ -1438,6 +1453,7 @@ document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click
 
 // ── URGENCY / POS ──
 window.setUrg=(n)=>{ selUrg=n; document.querySelectorAll('.urg-btn').forEach((b,i)=>b.classList.toggle('selected',i===n)); };
+window.toggleMedidorTip=()=>{ const t=document.getElementById('medidorTip'); if(t) t.style.display=t.style.display==='none'?'block':'none'; };
 window.togglePos=()=>{ document.getElementById('posSection').style.display=document.getElementById('micGenero').value==='m'?'block':'none'; };
 window.setPos=(p)=>{ selPos=p; document.getElementById('posSit').classList.toggle('selected',p==='sentado'); document.getElementById('posStand').classList.toggle('selected',p==='parado'); };
 
@@ -2939,6 +2955,10 @@ if('serviceWorker' in navigator){
 }
 </script>
 
+  <!-- Help/tutorial button -->
+  <button class="fab-help" id="fabHelp" onclick="showTutorial()" title="Ayuda" style="display:none">
+    <i class="ti ti-help"></i>
+  </button>
 </div><!-- end app-shell -->
 </body>
 </html>
